@@ -70,21 +70,25 @@ abline(Auto.lm.fit,lwd=3,col="red")
 i. Is there a relationship between the predictor and the re-
 sponse?
 
-Yes, p-value: < 2.2e-16
+> Yes, p-value: < 2.2e-16
 
 ii. How strong is the relationship between the predictor and
 the response?
 
-very strong, because
-## Coefficients:
-##              Estimate Std. Error t value Pr(>|t|)    
-## (Intercept) 39.935861   0.717499   55.66   <2e-16 ***
-## horsepower  -0.157845   0.006446  -24.49   <2e-16 ***
+> very strong, because
+
+#### Coefficients:
+
+#### Estimate Std. Error t value Pr(>|t|)    
+
+#### (Intercept) 39.935861   0.717499   55.66   <2e-16 ***
+
+#### horsepower  -0.157845   0.006446  -24.49   <2e-16 ***
 
 iii. Is the relationship between the predictor and the response
 positive or negative?
 
-negative, we can see their negative relationship on the plot
+> negative, we can see their negative relationship on the plot
 
 iv. What is the predicted mpg associated with a horsepower of
 98? What are the associated 95 % conﬁdence and prediction
@@ -149,7 +153,9 @@ What is the length of the vector y? What are the values of β 0
 and β 1 in this linear model?
 
 > the length of the vector y is 100
+
 > β 0= -1
+
 > β 1= 0.5
 
 ```{r}
@@ -178,9 +184,13 @@ XY.lm.fit <- lm(Y~X)
 summary(XY.lm.fit)
 confint(XY.lm.fit)
 ```
+
 > β 0= -1
+
 > β 1= 0.5
+
 > Estimate β 0= -1.01885
+
 > Estimate β 1= 0.49947
 
 
@@ -278,10 +288,7 @@ confint(XY3.lm.fit)
 
 > the less noisy data set has smaller conﬁdence intervals for β 0 and β 1
 
-# 15. This problem involves the Boston data set, which we saw in the lab
-for this chapter. We will now try to predict per capita crime rate
-using the other variables in this data set. In other words, per capita
-crime rate is the response, and the other variables are the predictors.
+# 15. This problem involves the Boston data set, which we saw in the lab for this chapter. We will now try to predict per capita crime rate using the other variables in this data set. In other words, per capita crime rate is the response, and the other variables are the predictors.
 
 (a) For each predictor, ﬁt a simple linear regression model to predict
 the response. Describe your results. In which of the models is

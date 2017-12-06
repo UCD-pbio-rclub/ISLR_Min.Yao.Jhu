@@ -54,79 +54,273 @@ mpg as the response and horsepower as the predictor. Use the
 summary() function to print the results. Comment on the output.
 For example:
 
+```{r}
+library(ISLR)
+#Auto
+summary(Auto)
+attach(Auto)
+Auto.lm.fit=lm(mpg~horsepower)
+summary(Auto.lm.fit)
+
+plot(horsepower,mpg)
+abline(Auto.lm.fit,lwd=3,col="red")
+```
+
+
 i. Is there a relationship between the predictor and the re-
 sponse?
+
+Yes, p-value: < 2.2e-16
 
 ii. How strong is the relationship between the predictor and
 the response?
 
+very strong, because
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) 39.935861   0.717499   55.66   <2e-16 ***
+## horsepower  -0.157845   0.006446  -24.49   <2e-16 ***
+
 iii. Is the relationship between the predictor and the response
 positive or negative?
+
+negative, we can see their negative relationship on the plot
 
 iv. What is the predicted mpg associated with a horsepower of
 98? What are the associated 95 % conﬁdence and prediction
 intervals?
 
+```{r}
+predict(Auto.lm.fit,data.frame(horsepower=98), interval="confidence")
+predict(Auto.lm.fit,data.frame(horsepower=98), interval="prediction")
+```
+
+
 (b) Plot the response and the predictor. Use the abline() function
 to display the least squares regression line.
+
+```{r}
+plot(horsepower,mpg)
+abline(Auto.lm.fit,lwd=3,col="red")
+```
+
 
 (c) Use the plot() function to produce diagnostic plots of the least
 squares regression ﬁt. Comment on any problems you see with
 the ﬁt.
+
+```{r}
+par(mfrow=c(2,2))
+plot(Auto.lm.fit)
+
+```
+
 
 # 13. In this exercise you will create some simulated data and will ﬁt simple linear regression models to it. Make sure to use set.seed(1) prior to starting part (a) to ensure consistent results.
 
 (a) Using the rnorm() function, create a vector, x, containing 100
 observations drawn from a N(0, 1) distribution. This represents
 a feature, X.
+
+```{r}
+set.seed(1) 
+#?rnorm() 
+X <- rnorm(100, mean = 0, sd = 1)
+X
+
+```
+
+
 (b) Using the rnorm() function, create a vector, eps, containing 100
 observations drawn from a N(0, 0.25) distribution i.e. a normal
 distribution with mean zero and variance 0.25.
+
+```{r}
+eps <- rnorm(100, mean = 0, sd = sqrt(0.25))
+eps
+
+```
+
 (c) Using x and eps, generate a vector y according to the model
 
-Y = − 1 + 0.5X + . (3.39)
+Y = − 1 + 0.5X + E. (3.39)
 
 What is the length of the vector y? What are the values of β 0
 and β 1 in this linear model?
 
+> the length of the vector y is 100
+> β 0= -1
+> β 1= 0.5
+
+```{r}
+Y = -1 + 0.5*X + eps
+Y
+
+```
+
+
 (d) Create a scatterplot displaying the relationship between x and
 y. Comment on what you observe.
+
+```{r}
+plot(X,Y)
+
+```
+
+> linear relationship
+
 (e) Fit a least squares linear model to predict y using x. Comment
-on the model obtained. How do
-ˆ
-β 0 and
-ˆ
-β 1 compare to β 0 and
+on the model obtained. How doˆβ 0 and ˆβ 1 compare to β 0 and
 β 1 ?
+
+```{r}
+XY.lm.fit <- lm(Y~X)
+summary(XY.lm.fit)
+confint(XY.lm.fit)
+```
+> β 0= -1
+> β 1= 0.5
+> Estimate β 0= -1.01885
+> Estimate β 1= 0.49947
+
+
 (f) Display the least squares line on the scatterplot obtained in (d).
 Draw the population regression line on the plot, in a diﬀerent
-color. Use the legend() command to create an appropriate leg-
-end.
+color. Use the legend() command to create an appropriate legend.
+
+```{r}
+plot(X,Y)
+abline(XY.lm.fit,lwd=3,col="red")
+abline(coef= c(-1,0.5),lwd=2,col="blue")
+#?abline
+#?legend()
+legend(-2.2,0.5, legend=c("least.squares.line", "pop.regression.line"),
+       col=c("red", "blue"), lty=1, cex=0.8)
+
+```
+
+
 (g) Now ﬁt a polynomial regression model that predicts y using x
-and x
-2
-. Is there evidence that the quadratic term improves the
+and x2. Is there evidence that the quadratic term improves the
 model ﬁt? Explain your answer.
+
+```{r}
+poly.lm.fit=lm(Y ~ poly(X,2))
+summary(poly.lm.fit)
+confint(poly.lm.fit)
+```
+
+
 (h) Repeat (a)–(f) after modifying the data generation process in
 such a way that there is less noise in the data. The model (3.39)
 should remain the same. You can do this by decreasing the vari-
 ance of the normal distribution used to generate the error term
- in (b). Describe your results.
+E in (b). Describe your results.
+
+```{r}
+X2 <- rnorm(100, mean = 0, sd = 1)
+X2
+eps2 <- rnorm(100, mean = 0, sd = sqrt(0.01))
+eps2
+Y2 = -1 + 0.5*X2 + eps2
+Y2
+
+XY2.lm.fit <- lm(Y2~X2)
+summary(XY2.lm.fit)
+confint(XY2.lm.fit)
+
+plot(X2,Y2)
+abline(XY2.lm.fit,lwd=3,col="red")
+abline(coef= c(-1,0.5),lwd=2,col="blue")
+legend(-2.2,0.2, legend=c("least.squares.line", "pop.regression.line"),
+       col=c("red", "blue"), lty=1, cex=0.8)
+
+```
+
+
 (i) Repeat (a)–(f) after modifying the data generation process in
 such a way that there is more noise in the data. The model
 (3.39) should remain the same. You can do this by increasing
 the variance of the normal distribution used to generate the
-error term  in (b). Describe your results.
+error term E in (b). Describe your results.
+
+```{r}
+X3 <- rnorm(100, mean = 0, sd = 1)
+X3
+eps3 <- rnorm(100, mean = 0, sd = sqrt(1))
+eps3
+Y3 = -1 + 0.5*X3 + eps3
+Y3
+
+XY3.lm.fit <- lm(Y3~X3)
+summary(XY3.lm.fit)
+confint(XY3.lm.fit)
+
+plot(X3,Y3)
+abline(XY3.lm.fit,lwd=3,col="red")
+abline(coef= c(-1,0.5),lwd=2,col="blue")
+legend(-2.2,1.6, legend=c("least.squares.line", "pop.regression.line"),
+       col=c("red", "blue"), lty=1, cex=0.8)
+```
+
+
 (j) What are the conﬁdence intervals for β 0 and β 1 based on the
 original data set, the noisier data set, and the less noisy data
 set? Comment on your results.
+
+```{r}
+confint(XY.lm.fit)
+confint(XY2.lm.fit)
+confint(XY3.lm.fit)
+```
+
+> the noisier data set has larger conﬁdence intervals for β 0 and β 1
+
+> the less noisy data set has smaller conﬁdence intervals for β 0 and β 1
 
 # 15. This problem involves the Boston data set, which we saw in the lab
 for this chapter. We will now try to predict per capita crime rate
 using the other variables in this data set. In other words, per capita
 crime rate is the response, and the other variables are the predictors.
+
 (a) For each predictor, ﬁt a simple linear regression model to predict
 the response. Describe your results. In which of the models is
 there a statistically signiﬁcant association between the predictor
 and the response? Create some plots to back up your assertions.
+
+```{r}
+library(MASS)
+summary(Boston)
+names(Boston)
+?Boston
+
+attach(Boston)
+lm.fit.zn=lm(crim~zn)
+summary(lm.fit.zn)
+lm.fit.indus=lm(crim~indus)
+summary(lm.fit.indus)
+lm.fit.chas=lm(crim~chas)
+summary(lm.fit.chas)
+lm.fit.nox=lm(crim~nox)
+summary(lm.fit.nox)
+lm.fit.rm=lm(crim~rm)
+summary(lm.fit.rm)
+lm.fit.age=lm(crim~age)
+summary(lm.fit.age)
+lm.fit.dis=lm(crim~dis)
+summary(lm.fit.dis)
+lm.fit.rad=lm(crim~rad)
+summary(lm.fit.rad)
+lm.fit.tax=lm(crim~tax)
+summary(lm.fit.tax)
+lm.fit.ptratio=lm(crim~ptratio)
+summary(lm.fit.ptratio)
+lm.fit.black=lm(crim~black)
+summary(lm.fit.black)
+lm.fit.lstat=lm(crim~lstat)
+summary(lm.fit.lstat)
+lm.fit.medv=lm(crim~medv)
+summary(lm.fit.medv)
+
+```
 

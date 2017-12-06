@@ -18,7 +18,7 @@ library(ISLR)
 
 
 ```r
-fix(Boston)
+#fix(Boston)
 names(Boston)
 ```
 
@@ -175,4 +175,86 @@ which.max(hatvalues(lm.fit))
 
 ![](chapter3-1_files/figure-html/unnamed-chunk-2-7.png)<!-- -->
 
+# 8. This question involves the use of simple linear regression on the Auto data set.
+
+(a) Use the lm() function to perform a simple linear regression with
+mpg as the response and horsepower as the predictor. Use the
+summary() function to print the results. Comment on the output.
+For example:
+
+i. Is there a relationship between the predictor and the re-
+sponse?
+
+ii. How strong is the relationship between the predictor and
+the response?
+
+iii. Is the relationship between the predictor and the response
+positive or negative?
+
+iv. What is the predicted mpg associated with a horsepower of
+98? What are the associated 95 % conﬁdence and prediction
+intervals?
+
+(b) Plot the response and the predictor. Use the abline() function
+to display the least squares regression line.
+
+(c) Use the plot() function to produce diagnostic plots of the least
+squares regression ﬁt. Comment on any problems you see with
+the ﬁt.
+
+# 13. In this exercise you will create some simulated data and will ﬁt simple linear regression models to it. Make sure to use set.seed(1) prior to starting part (a) to ensure consistent results.
+
+(a) Using the rnorm() function, create a vector, x, containing 100
+observations drawn from a N(0, 1) distribution. This represents
+a feature, X.
+(b) Using the rnorm() function, create a vector, eps, containing 100
+observations drawn from a N(0, 0.25) distribution i.e. a normal
+distribution with mean zero and variance 0.25.
+(c) Using x and eps, generate a vector y according to the model
+
+Y = − 1 + 0.5X + . (3.39)
+
+What is the length of the vector y? What are the values of β 0
+and β 1 in this linear model?
+
+(d) Create a scatterplot displaying the relationship between x and
+y. Comment on what you observe.
+(e) Fit a least squares linear model to predict y using x. Comment
+on the model obtained. How do
+ˆ
+β 0 and
+ˆ
+β 1 compare to β 0 and
+β 1 ?
+(f) Display the least squares line on the scatterplot obtained in (d).
+Draw the population regression line on the plot, in a diﬀerent
+color. Use the legend() command to create an appropriate leg-
+end.
+(g) Now ﬁt a polynomial regression model that predicts y using x
+and x
+2
+. Is there evidence that the quadratic term improves the
+model ﬁt? Explain your answer.
+(h) Repeat (a)–(f) after modifying the data generation process in
+such a way that there is less noise in the data. The model (3.39)
+should remain the same. You can do this by decreasing the vari-
+ance of the normal distribution used to generate the error term
+ in (b). Describe your results.
+(i) Repeat (a)–(f) after modifying the data generation process in
+such a way that there is more noise in the data. The model
+(3.39) should remain the same. You can do this by increasing
+the variance of the normal distribution used to generate the
+error term  in (b). Describe your results.
+(j) What are the conﬁdence intervals for β 0 and β 1 based on the
+original data set, the noisier data set, and the less noisy data
+set? Comment on your results.
+
+# 15. This problem involves the Boston data set, which we saw in the lab
+for this chapter. We will now try to predict per capita crime rate
+using the other variables in this data set. In other words, per capita
+crime rate is the response, and the other variables are the predictors.
+(a) For each predictor, ﬁt a simple linear regression model to predict
+the response. Describe your results. In which of the models is
+there a statistically signiﬁcant association between the predictor
+and the response? Create some plots to back up your assertions.
 

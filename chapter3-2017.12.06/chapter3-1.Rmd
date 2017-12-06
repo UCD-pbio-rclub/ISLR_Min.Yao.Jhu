@@ -232,7 +232,7 @@ confint(XY2.lm.fit)
 plot(X2,Y2)
 abline(XY2.lm.fit,lwd=3,col="red")
 abline(coef= c(-1,0.5),lwd=2,col="blue")
-legend(-2.2,0.2, legend=c("least.squares.line", "pop.regression.line"),
+legend(-3,0.3, legend=c("least.squares.line", "pop.regression.line"),
        col=c("red", "blue"), lty=1, cex=0.8)
 
 ```
@@ -259,7 +259,7 @@ confint(XY3.lm.fit)
 plot(X3,Y3)
 abline(XY3.lm.fit,lwd=3,col="red")
 abline(coef= c(-1,0.5),lwd=2,col="blue")
-legend(-2.2,1.6, legend=c("least.squares.line", "pop.regression.line"),
+legend(-3,1, legend=c("least.squares.line", "pop.regression.line"),
        col=c("red", "blue"), lty=1, cex=0.8)
 ```
 

@@ -1,0 +1,30 @@
+---
+title: "chapter3-2"
+author: "Min-Yao"
+date: "2017年12月12日"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r}
+library(MASS)
+library(ISLR)
+```
+
+
+# Multiple Linear Regression
+
+```{r}
+
+lm.fit=lm(medv~lstat+age,data=Boston)
+summary(lm.fit)
+lm.fit=lm(medv~.,data=Boston)
+summary(lm.fit)
+library(car)
+vif(lm.fit)
+lm.fit1=lm(medv~.-age,data=Boston)
+summary(lm.fit1)
+lm.fit1=update(lm.fit, ~.-age)
+```
+

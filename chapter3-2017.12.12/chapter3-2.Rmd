@@ -118,7 +118,7 @@ Urban, and US.
 summary(Carseats)
 lm.fit.Carseats=lm(Sales~Price+Urban+US,data=Carseats)
 summary(lm.fit.Carseats)
-?Carseats
+#?Carseats
 ```
 
 
@@ -195,9 +195,62 @@ the response. Describe your results. In which of the models is
 there a statistically signiﬁcant association between the predictor
 and the response? Create some plots to back up your assertions.
 
+```{r}
+library(MASS)
+summary(Boston)
+names(Boston)
+#?Boston
+
+attach(Boston)
+lm.fit.zn=lm(crim~zn)
+summary(lm.fit.zn)
+lm.fit.indus=lm(crim~indus)
+summary(lm.fit.indus)
+lm.fit.chas=lm(crim~chas)
+summary(lm.fit.chas)
+lm.fit.nox=lm(crim~nox)
+summary(lm.fit.nox)
+lm.fit.rm=lm(crim~rm)
+summary(lm.fit.rm)
+lm.fit.age=lm(crim~age)
+summary(lm.fit.age)
+lm.fit.dis=lm(crim~dis)
+summary(lm.fit.dis)
+lm.fit.rad=lm(crim~rad)
+summary(lm.fit.rad)
+lm.fit.tax=lm(crim~tax)
+summary(lm.fit.tax)
+lm.fit.ptratio=lm(crim~ptratio)
+summary(lm.fit.ptratio)
+lm.fit.black=lm(crim~black)
+summary(lm.fit.black)
+lm.fit.lstat=lm(crim~lstat)
+summary(lm.fit.lstat)
+lm.fit.medv=lm(crim~medv)
+summary(lm.fit.medv)
+```
+
 (b) Fit a multiple regression model to predict the response using
 all of the predictors. Describe your results. For which predictors
 can we reject the null hypothesis H 0 : β j = 0?
+
+```{r}
+summary(Boston)
+
+lm.fit.all=lm(crim~.,data=Boston)
+summary(lm.fit.all)
+#?Boston
+```
+
+> zn: proportion of residential land zoned for lots over 25,000 sq.ft.
+
+> dis: weighted mean of distances to five Boston employment centres.
+
+> rad: index of accessibility to radial highways.
+
+> black: 1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town.
+
+> medv: median value of owner-occupied homes in \$1000s.
 
 (c) How do your results from (a) compare to your results from (b)?
 Create a plot displaying the univariate regression coeﬃcients
@@ -207,7 +260,90 @@ single point in the plot. Its coeﬃcient in a simple linear regres-
 sion model is shown on the x-axis, and its coeﬃcient estimate
 in the multiple linear regression model is shown on the y-axis.
 
+```{r}
+coefficients(lm.fit.zn)
+coefficients(lm.fit.all)
+
+coefficients.a = c(coefficients(lm.fit.zn)[2],
+                   coefficients(lm.fit.indus)[2],
+                   coefficients(lm.fit.chas)[2],
+                   coefficients(lm.fit.nox)[2],
+                   coefficients(lm.fit.rm)[2],
+                   coefficients(lm.fit.age)[2],
+                   coefficients(lm.fit.dis)[2],
+                   coefficients(lm.fit.rad)[2],
+                   coefficients(lm.fit.tax)[2],
+                   coefficients(lm.fit.ptratio)[2],
+                   coefficients(lm.fit.black)[2],
+                   coefficients(lm.fit.lstat)[2],
+                   coefficients(lm.fit.medv)[2])
+coefficients.a
+
+names(coefficients.a)
+name = c(names(coefficients.a))
+name
+
+coefficients.b = coefficients(lm.fit.all)[2:14]
+coefficients.b
+
+final.data.fram = data.frame(x=coefficients.a, y= coefficients.b, names = name)
+final.data.fram
+
+library(ggplot2)
+
+ggplot(final.data.fram, aes(x,y)) + 
+  geom_point() + 
+  geom_text(aes(label=names))
+```
+
+
 (d) Is there evidence of non-linear association between any of the
 predictors and the response? To answer this question, for each
 predictor X, ﬁt a model of the form
 Y = β 0 + β 1 X + β 2 X2 + β 3 X3 + E.
+
+```{r}
+
+attach(Boston)
+poly.lm.fit.zn=lm(crim~poly(zn,3))
+summary(poly.lm.fit.zn)
+
+poly.lm.fit.indus=lm(crim~poly(indus,3))
+summary(poly.lm.fit.indus)
+
+#poly.lm.fit.chas=lm(crim~poly(chas,3))
+#summary(poly.lm.fit.chas)
+poly.lm.fit.chas=lm(crim~poly(chas,1))
+summary(poly.lm.fit.chas)
+
+poly.lm.fit.nox=lm(crim~poly(nox,3))
+summary(poly.lm.fit.nox)
+
+poly.lm.fit.rm=lm(crim~poly(rm,3))
+summary(poly.lm.fit.rm)
+
+poly.lm.fit.age=lm(crim~poly(age,3))
+summary(poly.lm.fit.age)
+
+poly.lm.fit.dis=lm(crim~poly(dis,3))
+summary(poly.lm.fit.dis)
+
+poly.lm.fit.rad=lm(crim~poly(rad,3))
+summary(poly.lm.fit.rad)
+
+poly.lm.fit.tax=lm(crim~poly(tax,3))
+summary(poly.lm.fit.tax)
+
+poly.lm.fit.ptratio=lm(crim~poly(ptratio,3))
+summary(poly.lm.fit.ptratio)
+
+poly.lm.fit.black=lm(crim~poly(black,3))
+summary(poly.lm.fit.black)
+
+poly.lm.fit.lstat=lm(crim~poly(lstat,3))
+summary(poly.lm.fit.lstat)
+
+poly.lm.fit.medv=lm(crim~poly(medv,3))
+summary(poly.lm.fit.medv)
+```
+

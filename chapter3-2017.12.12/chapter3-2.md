@@ -8,10 +8,6 @@ library(MASS)
 library(ISLR)
 ```
 
-```
-## Warning: package 'ISLR' was built under R version 3.4.2
-```
-
 
 # Multiple Linear Regression
 
@@ -83,13 +79,6 @@ summary(lm.fit)
 
 ```r
 library(car)
-```
-
-```
-## Warning: package 'car' was built under R version 3.4.3
-```
-
-```r
 vif(lm.fit)
 ```
 
@@ -541,7 +530,362 @@ names(Boston)
 
 ```r
 #?Boston
+```
 
+> faster method from last week
+
+
+```r
+library(psych)
+```
+
+```
+## 
+## Attaching package: 'psych'
+```
+
+```
+## The following object is masked from 'package:car':
+## 
+##     logit
+```
+
+```r
+library(tidyverse)
+```
+
+```
+## -- Attaching packages ------------------------------------- tidyverse 1.2.1 --
+```
+
+```
+## √ ggplot2 2.2.1     √ purrr   0.2.4
+## √ tibble  1.3.4     √ dplyr   0.7.4
+## √ tidyr   0.7.2     √ stringr 1.2.0
+## √ readr   1.1.1     √ forcats 0.2.0
+```
+
+```
+## -- Conflicts ---------------------------------------- tidyverse_conflicts() --
+## x ggplot2::%+%()   masks psych::%+%()
+## x ggplot2::alpha() masks psych::alpha()
+## x dplyr::filter()  masks stats::filter()
+## x dplyr::lag()     masks stats::lag()
+## x dplyr::recode()  masks car::recode()
+## x dplyr::select()  masks MASS::select()
+## x purrr::some()    masks car::some()
+```
+
+```r
+data(Boston)
+boston <- as_tibble(Boston)
+boston
+```
+
+```
+## # A tibble: 506 x 14
+##       crim    zn indus  chas   nox    rm   age    dis   rad   tax ptratio
+##  *   <dbl> <dbl> <dbl> <int> <dbl> <dbl> <dbl>  <dbl> <int> <dbl>   <dbl>
+##  1 0.00632  18.0  2.31     0 0.538 6.575  65.2 4.0900     1   296    15.3
+##  2 0.02731   0.0  7.07     0 0.469 6.421  78.9 4.9671     2   242    17.8
+##  3 0.02729   0.0  7.07     0 0.469 7.185  61.1 4.9671     2   242    17.8
+##  4 0.03237   0.0  2.18     0 0.458 6.998  45.8 6.0622     3   222    18.7
+##  5 0.06905   0.0  2.18     0 0.458 7.147  54.2 6.0622     3   222    18.7
+##  6 0.02985   0.0  2.18     0 0.458 6.430  58.7 6.0622     3   222    18.7
+##  7 0.08829  12.5  7.87     0 0.524 6.012  66.6 5.5605     5   311    15.2
+##  8 0.14455  12.5  7.87     0 0.524 6.172  96.1 5.9505     5   311    15.2
+##  9 0.21124  12.5  7.87     0 0.524 5.631 100.0 6.0821     5   311    15.2
+## 10 0.17004  12.5  7.87     0 0.524 6.004  85.9 6.5921     5   311    15.2
+## # ... with 496 more rows, and 3 more variables: black <dbl>, lstat <dbl>,
+## #   medv <dbl>
+```
+
+```r
+predictors <- colnames(boston)[-1]
+lmfits <- map(predictors,function(x) lm(crim ~ get(x), data=boston))
+lmsummaries <- lapply(lmfits,summary)
+names(lmsummaries) <- predictors
+lmsummaries
+```
+
+```
+## $zn
+## 
+## Call:
+## lm(formula = crim ~ get(x), data = boston)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -4.429 -4.222 -2.620  1.250 84.523 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  4.45369    0.41722  10.675  < 2e-16 ***
+## get(x)      -0.07393    0.01609  -4.594 5.51e-06 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 8.435 on 504 degrees of freedom
+## Multiple R-squared:  0.04019,	Adjusted R-squared:  0.03828 
+## F-statistic:  21.1 on 1 and 504 DF,  p-value: 5.506e-06
+## 
+## 
+## $indus
+## 
+## Call:
+## lm(formula = crim ~ get(x), data = boston)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -11.972  -2.698  -0.736   0.712  81.813 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) -2.06374    0.66723  -3.093  0.00209 ** 
+## get(x)       0.50978    0.05102   9.991  < 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 7.866 on 504 degrees of freedom
+## Multiple R-squared:  0.1653,	Adjusted R-squared:  0.1637 
+## F-statistic: 99.82 on 1 and 504 DF,  p-value: < 2.2e-16
+## 
+## 
+## $chas
+## 
+## Call:
+## lm(formula = crim ~ get(x), data = boston)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -3.738 -3.661 -3.435  0.018 85.232 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)   3.7444     0.3961   9.453   <2e-16 ***
+## get(x)       -1.8928     1.5061  -1.257    0.209    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 8.597 on 504 degrees of freedom
+## Multiple R-squared:  0.003124,	Adjusted R-squared:  0.001146 
+## F-statistic: 1.579 on 1 and 504 DF,  p-value: 0.2094
+## 
+## 
+## $nox
+## 
+## Call:
+## lm(formula = crim ~ get(x), data = boston)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -12.371  -2.738  -0.974   0.559  81.728 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  -13.720      1.699  -8.073 5.08e-15 ***
+## get(x)        31.249      2.999  10.419  < 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 7.81 on 504 degrees of freedom
+## Multiple R-squared:  0.1772,	Adjusted R-squared:  0.1756 
+## F-statistic: 108.6 on 1 and 504 DF,  p-value: < 2.2e-16
+## 
+## 
+## $rm
+## 
+## Call:
+## lm(formula = crim ~ get(x), data = boston)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -6.604 -3.952 -2.654  0.989 87.197 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)   20.482      3.365   6.088 2.27e-09 ***
+## get(x)        -2.684      0.532  -5.045 6.35e-07 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 8.401 on 504 degrees of freedom
+## Multiple R-squared:  0.04807,	Adjusted R-squared:  0.04618 
+## F-statistic: 25.45 on 1 and 504 DF,  p-value: 6.347e-07
+## 
+## 
+## $age
+## 
+## Call:
+## lm(formula = crim ~ get(x), data = boston)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -6.789 -4.257 -1.230  1.527 82.849 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) -3.77791    0.94398  -4.002 7.22e-05 ***
+## get(x)       0.10779    0.01274   8.463 2.85e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 8.057 on 504 degrees of freedom
+## Multiple R-squared:  0.1244,	Adjusted R-squared:  0.1227 
+## F-statistic: 71.62 on 1 and 504 DF,  p-value: 2.855e-16
+## 
+## 
+## $dis
+## 
+## Call:
+## lm(formula = crim ~ get(x), data = boston)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -6.708 -4.134 -1.527  1.516 81.674 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)   9.4993     0.7304  13.006   <2e-16 ***
+## get(x)       -1.5509     0.1683  -9.213   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 7.965 on 504 degrees of freedom
+## Multiple R-squared:  0.1441,	Adjusted R-squared:  0.1425 
+## F-statistic: 84.89 on 1 and 504 DF,  p-value: < 2.2e-16
+## 
+## 
+## $rad
+## 
+## Call:
+## lm(formula = crim ~ get(x), data = boston)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -10.164  -1.381  -0.141   0.660  76.433 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) -2.28716    0.44348  -5.157 3.61e-07 ***
+## get(x)       0.61791    0.03433  17.998  < 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 6.718 on 504 degrees of freedom
+## Multiple R-squared:  0.3913,	Adjusted R-squared:   0.39 
+## F-statistic: 323.9 on 1 and 504 DF,  p-value: < 2.2e-16
+## 
+## 
+## $tax
+## 
+## Call:
+## lm(formula = crim ~ get(x), data = boston)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -12.513  -2.738  -0.194   1.065  77.696 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) -8.528369   0.815809  -10.45   <2e-16 ***
+## get(x)       0.029742   0.001847   16.10   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 6.997 on 504 degrees of freedom
+## Multiple R-squared:  0.3396,	Adjusted R-squared:  0.3383 
+## F-statistic: 259.2 on 1 and 504 DF,  p-value: < 2.2e-16
+## 
+## 
+## $ptratio
+## 
+## Call:
+## lm(formula = crim ~ get(x), data = boston)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -7.654 -3.985 -1.912  1.825 83.353 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) -17.6469     3.1473  -5.607 3.40e-08 ***
+## get(x)        1.1520     0.1694   6.801 2.94e-11 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 8.24 on 504 degrees of freedom
+## Multiple R-squared:  0.08407,	Adjusted R-squared:  0.08225 
+## F-statistic: 46.26 on 1 and 504 DF,  p-value: 2.943e-11
+## 
+## 
+## $black
+## 
+## Call:
+## lm(formula = crim ~ get(x), data = boston)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -13.756  -2.299  -2.095  -1.296  86.822 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) 16.553529   1.425903  11.609   <2e-16 ***
+## get(x)      -0.036280   0.003873  -9.367   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 7.946 on 504 degrees of freedom
+## Multiple R-squared:  0.1483,	Adjusted R-squared:  0.1466 
+## F-statistic: 87.74 on 1 and 504 DF,  p-value: < 2.2e-16
+## 
+## 
+## $lstat
+## 
+## Call:
+## lm(formula = crim ~ get(x), data = boston)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -13.925  -2.822  -0.664   1.079  82.862 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) -3.33054    0.69376  -4.801 2.09e-06 ***
+## get(x)       0.54880    0.04776  11.491  < 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 7.664 on 504 degrees of freedom
+## Multiple R-squared:  0.2076,	Adjusted R-squared:  0.206 
+## F-statistic:   132 on 1 and 504 DF,  p-value: < 2.2e-16
+## 
+## 
+## $medv
+## 
+## Call:
+## lm(formula = crim ~ get(x), data = boston)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -9.071 -4.022 -2.343  1.298 80.957 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) 11.79654    0.93419   12.63   <2e-16 ***
+## get(x)      -0.36316    0.03839   -9.46   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 7.934 on 504 degrees of freedom
+## Multiple R-squared:  0.1508,	Adjusted R-squared:  0.1491 
+## F-statistic: 89.49 on 1 and 504 DF,  p-value: < 2.2e-16
+```
+
+> slow method
+
+
+```r
 attach(Boston)
 lm.fit.zn=lm(crim~zn)
 summary(lm.fit.zn)
@@ -880,6 +1224,7 @@ summary(lm.fit.medv)
 ## F-statistic: 89.49 on 1 and 504 DF,  p-value: < 2.2e-16
 ```
 
+
 (b) Fit a multiple regression model to predict the response using
 all of the predictors. Describe your results. For which predictors
 can we reject the null hypothesis H 0 : β j = 0?
@@ -982,6 +1327,68 @@ in the multiple linear regression model is shown on the y-axis.
 
 
 ```r
+predictors <- colnames(boston)[-1]
+coefficients.single <- map(predictors,function(x) coefficients(lm(crim ~ get(x), data=boston))[2])
+coefficients.single
+```
+
+```
+## [[1]]
+##      get(x) 
+## -0.07393498 
+## 
+## [[2]]
+##    get(x) 
+## 0.5097763 
+## 
+## [[3]]
+##    get(x) 
+## -1.892777 
+## 
+## [[4]]
+##   get(x) 
+## 31.24853 
+## 
+## [[5]]
+##    get(x) 
+## -2.684051 
+## 
+## [[6]]
+##    get(x) 
+## 0.1077862 
+## 
+## [[7]]
+##    get(x) 
+## -1.550902 
+## 
+## [[8]]
+##    get(x) 
+## 0.6179109 
+## 
+## [[9]]
+##     get(x) 
+## 0.02974225 
+## 
+## [[10]]
+##   get(x) 
+## 1.151983 
+## 
+## [[11]]
+##      get(x) 
+## -0.03627964 
+## 
+## [[12]]
+##    get(x) 
+## 0.5488048 
+## 
+## [[13]]
+##     get(x) 
+## -0.3631599
+```
+
+```r
+##################################
+
 coefficients(lm.fit.zn)
 ```
 
@@ -1086,19 +1493,13 @@ final.data.fram
 
 ```r
 library(ggplot2)
-```
 
-```
-## Warning: package 'ggplot2' was built under R version 3.4.1
-```
-
-```r
-ggplot(final.data.fram, aes(x,y)) + 
+ggplot(final.data.fram, aes(x,y, color =names)) + 
   geom_point() + 
-  geom_text(aes(label=names))
+  geom_text(aes(label=names, color =names))
 ```
 
-![](chapter3-2_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
+![](chapter3-2_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
 
 
 (d) Is there evidence of non-linear association between any of the
@@ -1107,12 +1508,367 @@ predictor X, ﬁt a model of the form
 Y = β 0 + β 1 X + β 2 X2 + β 3 X3 + E.
 
 
+> faster method based on last week's codes
+
+
+```r
+#library(psych)
+#library(tidyverse)
+
+#data(Boston)
+#boston <- as_tibble(Boston)
+head(boston)
+```
+
+```
+## # A tibble: 6 x 14
+##      crim    zn indus  chas   nox    rm   age    dis   rad   tax ptratio
+##     <dbl> <dbl> <dbl> <int> <dbl> <dbl> <dbl>  <dbl> <int> <dbl>   <dbl>
+## 1 0.00632    18  2.31     0 0.538 6.575  65.2 4.0900     1   296    15.3
+## 2 0.02731     0  7.07     0 0.469 6.421  78.9 4.9671     2   242    17.8
+## 3 0.02729     0  7.07     0 0.469 7.185  61.1 4.9671     2   242    17.8
+## 4 0.03237     0  2.18     0 0.458 6.998  45.8 6.0622     3   222    18.7
+## 5 0.06905     0  2.18     0 0.458 7.147  54.2 6.0622     3   222    18.7
+## 6 0.02985     0  2.18     0 0.458 6.430  58.7 6.0622     3   222    18.7
+## # ... with 3 more variables: black <dbl>, lstat <dbl>, medv <dbl>
+```
+
+```r
+predictors <- colnames(boston)[-1]
+predictors
+```
+
+```
+##  [1] "zn"      "indus"   "chas"    "nox"     "rm"      "age"     "dis"    
+##  [8] "rad"     "tax"     "ptratio" "black"   "lstat"   "medv"
+```
+
+```r
+predictors2 <- predictors [-3]
+predictors2
+```
+
+```
+##  [1] "zn"      "indus"   "nox"     "rm"      "age"     "dis"     "rad"    
+##  [8] "tax"     "ptratio" "black"   "lstat"   "medv"
+```
+
+```r
+head(Boston)
+```
+
+```
+##      crim zn indus chas   nox    rm  age    dis rad tax ptratio  black
+## 1 0.00632 18  2.31    0 0.538 6.575 65.2 4.0900   1 296    15.3 396.90
+## 2 0.02731  0  7.07    0 0.469 6.421 78.9 4.9671   2 242    17.8 396.90
+## 3 0.02729  0  7.07    0 0.469 7.185 61.1 4.9671   2 242    17.8 392.83
+## 4 0.03237  0  2.18    0 0.458 6.998 45.8 6.0622   3 222    18.7 394.63
+## 5 0.06905  0  2.18    0 0.458 7.147 54.2 6.0622   3 222    18.7 396.90
+## 6 0.02985  0  2.18    0 0.458 6.430 58.7 6.0622   3 222    18.7 394.12
+##   lstat medv
+## 1  4.98 24.0
+## 2  9.14 21.6
+## 3  4.03 34.7
+## 4  2.94 33.4
+## 5  5.33 36.2
+## 6  5.21 28.7
+```
+
+```r
+polylmfits <- map(predictors2,
+                  function(i) lm(crim ~ poly(Boston[,i],3),data = Boston))
+
+polylmsummaries <- lapply(polylmfits,summary)
+names(polylmsummaries) <- predictors2
+polylmsummaries
+```
+
+```
+## $zn
+## 
+## Call:
+## lm(formula = crim ~ poly(Boston[, i], 3), data = Boston)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -4.821 -4.614 -1.294  0.473 84.130 
+## 
+## Coefficients:
+##                       Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)             3.6135     0.3722   9.709  < 2e-16 ***
+## poly(Boston[, i], 3)1 -38.7498     8.3722  -4.628  4.7e-06 ***
+## poly(Boston[, i], 3)2  23.9398     8.3722   2.859  0.00442 ** 
+## poly(Boston[, i], 3)3 -10.0719     8.3722  -1.203  0.22954    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 8.372 on 502 degrees of freedom
+## Multiple R-squared:  0.05824,	Adjusted R-squared:  0.05261 
+## F-statistic: 10.35 on 3 and 502 DF,  p-value: 1.281e-06
+## 
+## 
+## $indus
+## 
+## Call:
+## lm(formula = crim ~ poly(Boston[, i], 3), data = Boston)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -8.278 -2.514  0.054  0.764 79.713 
+## 
+## Coefficients:
+##                       Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)              3.614      0.330  10.950  < 2e-16 ***
+## poly(Boston[, i], 3)1   78.591      7.423  10.587  < 2e-16 ***
+## poly(Boston[, i], 3)2  -24.395      7.423  -3.286  0.00109 ** 
+## poly(Boston[, i], 3)3  -54.130      7.423  -7.292  1.2e-12 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 7.423 on 502 degrees of freedom
+## Multiple R-squared:  0.2597,	Adjusted R-squared:  0.2552 
+## F-statistic: 58.69 on 3 and 502 DF,  p-value: < 2.2e-16
+## 
+## 
+## $nox
+## 
+## Call:
+## lm(formula = crim ~ poly(Boston[, i], 3), data = Boston)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -9.110 -2.068 -0.255  0.739 78.302 
+## 
+## Coefficients:
+##                       Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)             3.6135     0.3216  11.237  < 2e-16 ***
+## poly(Boston[, i], 3)1  81.3720     7.2336  11.249  < 2e-16 ***
+## poly(Boston[, i], 3)2 -28.8286     7.2336  -3.985 7.74e-05 ***
+## poly(Boston[, i], 3)3 -60.3619     7.2336  -8.345 6.96e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 7.234 on 502 degrees of freedom
+## Multiple R-squared:  0.297,	Adjusted R-squared:  0.2928 
+## F-statistic: 70.69 on 3 and 502 DF,  p-value: < 2.2e-16
+## 
+## 
+## $rm
+## 
+## Call:
+## lm(formula = crim ~ poly(Boston[, i], 3), data = Boston)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -18.485  -3.468  -2.221  -0.015  87.219 
+## 
+## Coefficients:
+##                       Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)             3.6135     0.3703   9.758  < 2e-16 ***
+## poly(Boston[, i], 3)1 -42.3794     8.3297  -5.088 5.13e-07 ***
+## poly(Boston[, i], 3)2  26.5768     8.3297   3.191  0.00151 ** 
+## poly(Boston[, i], 3)3  -5.5103     8.3297  -0.662  0.50858    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 8.33 on 502 degrees of freedom
+## Multiple R-squared:  0.06779,	Adjusted R-squared:  0.06222 
+## F-statistic: 12.17 on 3 and 502 DF,  p-value: 1.067e-07
+## 
+## 
+## $age
+## 
+## Call:
+## lm(formula = crim ~ poly(Boston[, i], 3), data = Boston)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -9.762 -2.673 -0.516  0.019 82.842 
+## 
+## Coefficients:
+##                       Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)             3.6135     0.3485  10.368  < 2e-16 ***
+## poly(Boston[, i], 3)1  68.1820     7.8397   8.697  < 2e-16 ***
+## poly(Boston[, i], 3)2  37.4845     7.8397   4.781 2.29e-06 ***
+## poly(Boston[, i], 3)3  21.3532     7.8397   2.724  0.00668 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 7.84 on 502 degrees of freedom
+## Multiple R-squared:  0.1742,	Adjusted R-squared:  0.1693 
+## F-statistic: 35.31 on 3 and 502 DF,  p-value: < 2.2e-16
+## 
+## 
+## $dis
+## 
+## Call:
+## lm(formula = crim ~ poly(Boston[, i], 3), data = Boston)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -10.757  -2.588   0.031   1.267  76.378 
+## 
+## Coefficients:
+##                       Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)             3.6135     0.3259  11.087  < 2e-16 ***
+## poly(Boston[, i], 3)1 -73.3886     7.3315 -10.010  < 2e-16 ***
+## poly(Boston[, i], 3)2  56.3730     7.3315   7.689 7.87e-14 ***
+## poly(Boston[, i], 3)3 -42.6219     7.3315  -5.814 1.09e-08 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 7.331 on 502 degrees of freedom
+## Multiple R-squared:  0.2778,	Adjusted R-squared:  0.2735 
+## F-statistic: 64.37 on 3 and 502 DF,  p-value: < 2.2e-16
+## 
+## 
+## $rad
+## 
+## Call:
+## lm(formula = crim ~ poly(Boston[, i], 3), data = Boston)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -10.381  -0.412  -0.269   0.179  76.217 
+## 
+## Coefficients:
+##                       Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)             3.6135     0.2971  12.164  < 2e-16 ***
+## poly(Boston[, i], 3)1 120.9074     6.6824  18.093  < 2e-16 ***
+## poly(Boston[, i], 3)2  17.4923     6.6824   2.618  0.00912 ** 
+## poly(Boston[, i], 3)3   4.6985     6.6824   0.703  0.48231    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 6.682 on 502 degrees of freedom
+## Multiple R-squared:    0.4,	Adjusted R-squared:  0.3965 
+## F-statistic: 111.6 on 3 and 502 DF,  p-value: < 2.2e-16
+## 
+## 
+## $tax
+## 
+## Call:
+## lm(formula = crim ~ poly(Boston[, i], 3), data = Boston)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -13.273  -1.389   0.046   0.536  76.950 
+## 
+## Coefficients:
+##                       Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)             3.6135     0.3047  11.860  < 2e-16 ***
+## poly(Boston[, i], 3)1 112.6458     6.8537  16.436  < 2e-16 ***
+## poly(Boston[, i], 3)2  32.0873     6.8537   4.682 3.67e-06 ***
+## poly(Boston[, i], 3)3  -7.9968     6.8537  -1.167    0.244    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 6.854 on 502 degrees of freedom
+## Multiple R-squared:  0.3689,	Adjusted R-squared:  0.3651 
+## F-statistic:  97.8 on 3 and 502 DF,  p-value: < 2.2e-16
+## 
+## 
+## $ptratio
+## 
+## Call:
+## lm(formula = crim ~ poly(Boston[, i], 3), data = Boston)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -6.833 -4.146 -1.655  1.408 82.697 
+## 
+## Coefficients:
+##                       Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)              3.614      0.361  10.008  < 2e-16 ***
+## poly(Boston[, i], 3)1   56.045      8.122   6.901 1.57e-11 ***
+## poly(Boston[, i], 3)2   24.775      8.122   3.050  0.00241 ** 
+## poly(Boston[, i], 3)3  -22.280      8.122  -2.743  0.00630 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 8.122 on 502 degrees of freedom
+## Multiple R-squared:  0.1138,	Adjusted R-squared:  0.1085 
+## F-statistic: 21.48 on 3 and 502 DF,  p-value: 4.171e-13
+## 
+## 
+## $black
+## 
+## Call:
+## lm(formula = crim ~ poly(Boston[, i], 3), data = Boston)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -13.096  -2.343  -2.128  -1.439  86.790 
+## 
+## Coefficients:
+##                       Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)             3.6135     0.3536  10.218   <2e-16 ***
+## poly(Boston[, i], 3)1 -74.4312     7.9546  -9.357   <2e-16 ***
+## poly(Boston[, i], 3)2   5.9264     7.9546   0.745    0.457    
+## poly(Boston[, i], 3)3  -4.8346     7.9546  -0.608    0.544    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 7.955 on 502 degrees of freedom
+## Multiple R-squared:  0.1498,	Adjusted R-squared:  0.1448 
+## F-statistic: 29.49 on 3 and 502 DF,  p-value: < 2.2e-16
+## 
+## 
+## $lstat
+## 
+## Call:
+## lm(formula = crim ~ poly(Boston[, i], 3), data = Boston)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -15.234  -2.151  -0.486   0.066  83.353 
+## 
+## Coefficients:
+##                       Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)             3.6135     0.3392  10.654   <2e-16 ***
+## poly(Boston[, i], 3)1  88.0697     7.6294  11.543   <2e-16 ***
+## poly(Boston[, i], 3)2  15.8882     7.6294   2.082   0.0378 *  
+## poly(Boston[, i], 3)3 -11.5740     7.6294  -1.517   0.1299    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 7.629 on 502 degrees of freedom
+## Multiple R-squared:  0.2179,	Adjusted R-squared:  0.2133 
+## F-statistic: 46.63 on 3 and 502 DF,  p-value: < 2.2e-16
+## 
+## 
+## $medv
+## 
+## Call:
+## lm(formula = crim ~ poly(Boston[, i], 3), data = Boston)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -24.427  -1.976  -0.437   0.439  73.655 
+## 
+## Coefficients:
+##                       Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)              3.614      0.292  12.374  < 2e-16 ***
+## poly(Boston[, i], 3)1  -75.058      6.569 -11.426  < 2e-16 ***
+## poly(Boston[, i], 3)2   88.086      6.569  13.409  < 2e-16 ***
+## poly(Boston[, i], 3)3  -48.033      6.569  -7.312 1.05e-12 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 6.569 on 502 degrees of freedom
+## Multiple R-squared:  0.4202,	Adjusted R-squared:  0.4167 
+## F-statistic: 121.3 on 3 and 502 DF,  p-value: < 2.2e-16
+```
+
+> slow method
+
+
 ```r
 attach(Boston)
 ```
 
 ```
-## The following objects are masked from Boston (pos = 4):
+## The following objects are masked from Boston (pos = 3):
 ## 
 ##     age, black, chas, crim, dis, indus, lstat, medv, nox, ptratio,
 ##     rad, rm, tax, zn
@@ -1481,4 +2237,3 @@ summary(poly.lm.fit.medv)
 ## Multiple R-squared:  0.4202,	Adjusted R-squared:  0.4167 
 ## F-statistic: 121.3 on 3 and 502 DF,  p-value: < 2.2e-16
 ```
-

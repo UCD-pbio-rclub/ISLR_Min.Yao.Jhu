@@ -200,7 +200,28 @@ library(MASS)
 summary(Boston)
 names(Boston)
 #?Boston
+```
 
+> faster method from last week
+
+```{r}
+library(psych)
+library(tidyverse)
+
+data(Boston)
+boston <- as_tibble(Boston)
+boston
+predictors <- colnames(boston)[-1]
+lmfits <- map(predictors,function(x) lm(crim ~ get(x), data=boston))
+lmsummaries <- lapply(lmfits,summary)
+names(lmsummaries) <- predictors
+lmsummaries
+
+```
+
+> slow method
+
+```{r}
 attach(Boston)
 lm.fit.zn=lm(crim~zn)
 summary(lm.fit.zn)
@@ -229,6 +250,7 @@ summary(lm.fit.lstat)
 lm.fit.medv=lm(crim~medv)
 summary(lm.fit.medv)
 ```
+
 
 (b) Fit a multiple regression model to predict the response using
 all of the predictors. Describe your results. For which predictors
@@ -261,6 +283,13 @@ sion model is shown on the x-axis, and its coeﬃcient estimate
 in the multiple linear regression model is shown on the y-axis.
 
 ```{r}
+
+predictors <- colnames(boston)[-1]
+coefficients.single <- map(predictors,function(x) coefficients(lm(crim ~ get(x), data=boston))[2])
+coefficients.single
+
+##################################
+
 coefficients(lm.fit.zn)
 coefficients(lm.fit.all)
 
@@ -291,9 +320,9 @@ final.data.fram
 
 library(ggplot2)
 
-ggplot(final.data.fram, aes(x,y)) + 
+ggplot(final.data.fram, aes(x,y, color =names)) + 
   geom_point() + 
-  geom_text(aes(label=names))
+  geom_text(aes(label=names, color =names))
 ```
 
 
@@ -301,6 +330,35 @@ ggplot(final.data.fram, aes(x,y)) +
 predictors and the response? To answer this question, for each
 predictor X, ﬁt a model of the form
 Y = β 0 + β 1 X + β 2 X2 + β 3 X3 + E.
+
+
+> faster method based on last week's codes
+
+```{r}
+#library(psych)
+#library(tidyverse)
+
+#data(Boston)
+#boston <- as_tibble(Boston)
+head(boston)
+
+predictors <- colnames(boston)[-1]
+predictors
+predictors2 <- predictors [-3]
+predictors2
+
+head(Boston)
+
+polylmfits <- map(predictors2,
+                  function(i) lm(crim ~ poly(Boston[,i],3),data = Boston))
+
+polylmsummaries <- lapply(polylmfits,summary)
+names(polylmsummaries) <- predictors2
+polylmsummaries
+
+```
+
+> slow method
 
 ```{r}
 
@@ -346,4 +404,3 @@ summary(poly.lm.fit.lstat)
 poly.lm.fit.medv=lm(crim~poly(medv,3))
 summary(poly.lm.fit.medv)
 ```
-

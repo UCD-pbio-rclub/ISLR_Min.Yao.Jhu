@@ -30,53 +30,163 @@ lm.fit1=update(lm.fit, ~.-age)
 
 # 1. Describe the null hypotheses to which the p-values given in Table 3.4 correspond. Explain what conclusions you can draw based on these p-values. Your explanation should be phrased in terms of sales, TV, radio, and newspaper, rather than in terms of the coeﬃcients of the linear model.
 
+>  the null hypothesis is 
+H 0 : β 1 = β 2 = · · · = β p = 0
+there is no relationship between the response and the predictors
+
+> Intercept
+the null model: a model that contains an intercept but no predictors. .
+null hypothesis = no advertising -> no sales
+Reject, because small p-value
+
+> TV
+for a given amount of radio and newspaper advertising, spending an additional $1,000 on TV advertising leads to an increase in sales by approximately 46 units. 
+null hypothesis = add TV -> no sale changes
+Reject, because small p-value
+
+> radio
+for a given amount of TV and newspaper advertising, spending an additional $1,000 on radio advertising leads to an increase in sales by approximately 189 units. 
+null hypothesis = add TV -> no sale changes
+Reject, because small p-value
+
+> newspaper
+for a given amount of TV and radio advertising, spending an additional $1,000 on newspaper advertising leads to an decrease in sales by approximately 1 units. 
+null hypothesis = add newspaper -> no sale changes
+accept, because large p-value
+
 # 9. This question involves the use of multiple linear regression on the Auto data set.
 
 (a) Produce a scatterplot matrix which includes all of the variables
 in the data set.
 
+```{r}
+pairs (Auto)
+```
+
+
 (b) Compute the matrix of correlations between the variables using
-the function cor(). You will need to exclude the name variable,
-cor()
-which is qualitative.
+the function cor(). You will need to exclude the name variable, which is qualitative.
+
+```{r}
+#?cor()
+summary(Auto)
+str(Auto)
+autononame<-Auto[,-9]
+#autononame
+#Auto
+
+cor(autononame)
+
+```
+
 
 (c) Use the lm() function to perform a multiple linear regression
 with mpg as the response and all other variables except name as
 the predictors. Use the summary() function to print the results.
 Comment on the output. For instance:
 
+```{r}
+lm.fit.auto=lm(mpg~.-name,data=Auto)
+summary(lm.fit.auto)
+```
+
+
 i. Is there a relationship between the predictors and the re-
 sponse?
+
+> Yes, because p-value: < 2.2e-16
 
 ii. Which predictors appear to have a statistically signiﬁcant
 relationship to the response?
 
+> displacement, because p-value: 0.00844
+> weight, because p-value: < 2e-16
+> year, because p-value: < 2e-16
+> origin, because p-value: 4.67e-07
+
+
 iii. What does the coeﬃcient for the year variable suggest?
+
+> for a given amount of other predictors, adding one year leads to an increase in mpg by approximately 0.75 units.
 
 # 10. This question should be answered using the Carseats data set.
 (a) Fit a multiple regression model to predict Sales using Price,
 Urban, and US.
 
+```{r}
+#Carseats
+summary(Carseats)
+lm.fit.Carseats=lm(Sales~Price+Urban+US,data=Carseats)
+summary(lm.fit.Carseats)
+?Carseats
+```
+
+
 (b) Provide an interpretation of each coeﬃcient in the model. Be
 careful—some of the variables in the model are qualitative!
+
+> Intercept: the null model: a model that contains an intercept but no predictors. 
+null hypothesis = no predictors -> no sales
+Reject, because small p-value
+
+> Price(Price company charges for car seats at each site)
+For a given amount of other predictors, increasing one unit of Price leads to an decrease in Sales by approximately 54 units.
+
+> Urban(A factor with levels No and Yes to indicate whether the store is in an urban or rural location)
+For a given amount of other predictors, whether the store is in an urban or rural location doesn't affect sales.
+
+> US(A factor with levels No and Yes to indicate whether the store is in the US or not)
+For a given amount of other predictors, whether the store is in the US or not affect sales. If the store is in the US, Sales increases 1200 units.
 
 (c) Write out the model in equation form, being careful to handle
 the qualitative variables properly.
 
+> Sales = β 0 + β 1 Price + β 2 Urban + β 3 US + E.
+
+> Sales = 13.04 -0.05 Price -0.02 Urban + 1.20 US + E.
+
 (d) For which of the predictors can you reject the null hypothesis
 H 0 : β j = 0?
+
+> Intercept, p value:< 2e-16
+
+> Price, p value:< 2e-16
+
+> USYes, p value:4.86e-06
 
 (e) On the basis of your response to the previous question, ﬁt a
 smaller model that only uses the predictors for which there is
 evidence of association with the outcome.
 
+```{r}
+lm.fit.Carseats.new <- update(lm.fit.Carseats, ~ . - Urban)
+summary(lm.fit.Carseats.new)
+```
+
+
 (f) How well do the models in (a) and (e) ﬁt the data?
+
+> (a) Adjusted R-squared:  0.2335
+> (e) Adjusted R-squared:  0.2354
 
 (g) Using the model from (e), obtain 95 % conﬁdence intervals for
 the coeﬃcient(s).
 
+```{r}
+confint(lm.fit.Carseats.new)
+```
+
+
 (h) Is there evidence of outliers or high leverage observations in the
 model from (e)?
+
+> outliers are observations for which the response y i is unusual given the predictor x i . In contrast, observations with high leverage have an unusual value for x i . 
+
+```{r}
+plot(lm.fit.Carseats.new)
+
+```
+
 
 # 15. This problem involves the Boston data set, which we saw in the lab for this chapter. We will now try to predict per capita crime rate using the other variables in this data set. In other words, per capita crime rate is the response, and the other variables are the predictors.
 

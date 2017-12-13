@@ -28,3 +28,76 @@ summary(lm.fit1)
 lm.fit1=update(lm.fit, ~.-age)
 ```
 
+# 1. Describe the null hypotheses to which the p-values given in Table 3.4 correspond. Explain what conclusions you can draw based on these p-values. Your explanation should be phrased in terms of sales, TV, radio, and newspaper, rather than in terms of the coeﬃcients of the linear model.
+
+# 9. This question involves the use of multiple linear regression on the Auto data set.
+
+(a) Produce a scatterplot matrix which includes all of the variables
+in the data set.
+
+(b) Compute the matrix of correlations between the variables using
+the function cor(). You will need to exclude the name variable,
+cor()
+which is qualitative.
+
+(c) Use the lm() function to perform a multiple linear regression
+with mpg as the response and all other variables except name as
+the predictors. Use the summary() function to print the results.
+Comment on the output. For instance:
+
+i. Is there a relationship between the predictors and the re-
+sponse?
+
+ii. Which predictors appear to have a statistically signiﬁcant
+relationship to the response?
+
+iii. What does the coeﬃcient for the year variable suggest?
+
+# 10. This question should be answered using the Carseats data set.
+(a) Fit a multiple regression model to predict Sales using Price,
+Urban, and US.
+
+(b) Provide an interpretation of each coeﬃcient in the model. Be
+careful—some of the variables in the model are qualitative!
+
+(c) Write out the model in equation form, being careful to handle
+the qualitative variables properly.
+
+(d) For which of the predictors can you reject the null hypothesis
+H 0 : β j = 0?
+
+(e) On the basis of your response to the previous question, ﬁt a
+smaller model that only uses the predictors for which there is
+evidence of association with the outcome.
+
+(f) How well do the models in (a) and (e) ﬁt the data?
+
+(g) Using the model from (e), obtain 95 % conﬁdence intervals for
+the coeﬃcient(s).
+
+(h) Is there evidence of outliers or high leverage observations in the
+model from (e)?
+
+# 15. This problem involves the Boston data set, which we saw in the lab for this chapter. We will now try to predict per capita crime rate using the other variables in this data set. In other words, per capita crime rate is the response, and the other variables are the predictors.
+
+(a) For each predictor, ﬁt a simple linear regression model to predict
+the response. Describe your results. In which of the models is
+there a statistically signiﬁcant association between the predictor
+and the response? Create some plots to back up your assertions.
+
+(b) Fit a multiple regression model to predict the response using
+all of the predictors. Describe your results. For which predictors
+can we reject the null hypothesis H 0 : β j = 0?
+
+(c) How do your results from (a) compare to your results from (b)?
+Create a plot displaying the univariate regression coeﬃcients
+from (a) on the x-axis, and the multiple regression coeﬃcients
+from (b) on the y-axis. That is, each predictor is displayed as a
+single point in the plot. Its coeﬃcient in a simple linear regres-
+sion model is shown on the x-axis, and its coeﬃcient estimate
+in the multiple linear regression model is shown on the y-axis.
+
+(d) Is there evidence of non-linear association between any of the
+predictors and the response? To answer this question, for each
+predictor X, ﬁt a model of the form
+Y = β 0 + β 1 X + β 2 X2 + β 3 X3 + E.

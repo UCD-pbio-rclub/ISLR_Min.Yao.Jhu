@@ -382,6 +382,7 @@ careful—some of the variables in the model are qualitative!
 > Intercept: the null model: a model that contains an intercept but no predictors. 
 null hypothesis = no predictors -> no sales
 Reject, because small p-value
+*Intercept is different from 0 or not
 
 > Price(Price company charges for car seats at each site)
 For a given amount of other predictors, increasing one unit of Price leads to an decrease in Sales by approximately 54 units.

@@ -534,6 +534,7 @@ Suppose we use least squares to ﬁt the model, and get ˆβ 0 = 50, ˆβ 1 =
 salary = 50 + 20XGPA + 0.07XIQ + 35XGender + 0.01XGPAXIQ + (− 10)XGPAXGender
 
 (a) Which answer is correct, and why?
+
 i. For a ﬁxed value of IQ and GPA, males earn more on average
 than females.
 
@@ -544,6 +545,27 @@ average than males.
 
 > Yes
 
+# a person with IQ of 110 and a GPA of 3.0, females earn more on average than males.
+
+
+```r
+Predict.female.low <- 50 + 20*3 + 0.07*110 + 35*1 + 0.01*3*110 + (-10)*3*1
+Predict.female.low
+```
+
+```
+## [1] 126
+```
+
+```r
+Predict.male.low <- 50 + 20*3 + 0.07*110 + 35*0 + 0.01*3*110 + (-10)*3*0
+Predict.male.low
+```
+
+```
+## [1] 121
+```
+
 iii. For a ﬁxed value of IQ and GPA, males earn more on average
 than females provided that the GPA is high enough.
 
@@ -553,6 +575,29 @@ iv. For a ﬁxed value of IQ and GPA, females earn more on
 average than males provided that the GPA is high enough.
 
 > No
+
+# a person with IQ of 110 and a GPA of 4.0, males earn more on average than females provided that the GPA is high enough.
+
+
+```r
+Predict.female.high <- 50 + 20*4 + 0.07*110 + 35*1 + 0.01*4*110 + (-10)*4*1
+Predict.female.high
+```
+
+```
+## [1] 137.1
+```
+
+```r
+Predict.male.high <- 50 + 20*4 + 0.07*110 + 35*0 + 0.01*4*110 + (-10)*4*0
+Predict.male.high
+```
+
+```
+## [1] 142.1
+```
+
+
 
 (b) Predict the salary of a female with IQ of 110 and a GPA of 4.0.
 
@@ -622,7 +667,7 @@ par(mfrow=c(2,2))
 plot(lm.fit.auto)
 ```
 
-![](chapter3-3_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+![](chapter3-3_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
 > Potential Problems
 
 > 1. Non-linearity of the response-predictor relationships. 2. Not normal distribution. 3. Outliers. 4. High-leverage points.
@@ -1992,4 +2037,4 @@ confint(lm.fit.Carseats.new)
 plot(lm.fit.Carseats.new)
 ```
 
-![](chapter3-3_files/figure-html/unnamed-chunk-15-1.png)<!-- -->![](chapter3-3_files/figure-html/unnamed-chunk-15-2.png)<!-- -->![](chapter3-3_files/figure-html/unnamed-chunk-15-3.png)<!-- -->![](chapter3-3_files/figure-html/unnamed-chunk-15-4.png)<!-- -->
+![](chapter3-3_files/figure-html/unnamed-chunk-17-1.png)<!-- -->![](chapter3-3_files/figure-html/unnamed-chunk-17-2.png)<!-- -->![](chapter3-3_files/figure-html/unnamed-chunk-17-3.png)<!-- -->![](chapter3-3_files/figure-html/unnamed-chunk-17-4.png)<!-- -->

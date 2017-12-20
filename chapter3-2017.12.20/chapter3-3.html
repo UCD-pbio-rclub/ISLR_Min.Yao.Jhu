@@ -491,6 +491,15 @@ LoadLibraries</code></pre>
 <blockquote>
 <p>Yes</p>
 </blockquote>
+</div>
+<div id="a-person-with-iq-of-110-and-a-gpa-of-3.0-females-earn-more-on-average-than-males." class="section level1">
+<h1>a person with IQ of 110 and a GPA of 3.0, females earn more on average than males.</h1>
+<pre class="r"><code>Predict.female.low &lt;- 50 + 20*3 + 0.07*110 + 35*1 + 0.01*3*110 + (-10)*3*1
+Predict.female.low</code></pre>
+<pre><code>## [1] 126</code></pre>
+<pre class="r"><code>Predict.male.low &lt;- 50 + 20*3 + 0.07*110 + 35*0 + 0.01*3*110 + (-10)*3*0
+Predict.male.low</code></pre>
+<pre><code>## [1] 121</code></pre>
 <ol start="3" style="list-style-type: lower-roman">
 <li>For a ﬁxed value of IQ and GPA, males earn more on average than females provided that the GPA is high enough.</li>
 </ol>
@@ -503,6 +512,15 @@ LoadLibraries</code></pre>
 <blockquote>
 <p>No</p>
 </blockquote>
+</div>
+<div id="a-person-with-iq-of-110-and-a-gpa-of-4.0-males-earn-more-on-average-than-females-provided-that-the-gpa-is-high-enough." class="section level1">
+<h1>a person with IQ of 110 and a GPA of 4.0, males earn more on average than females provided that the GPA is high enough.</h1>
+<pre class="r"><code>Predict.female.high &lt;- 50 + 20*4 + 0.07*110 + 35*1 + 0.01*4*110 + (-10)*4*1
+Predict.female.high</code></pre>
+<pre><code>## [1] 137.1</code></pre>
+<pre class="r"><code>Predict.male.high &lt;- 50 + 20*4 + 0.07*110 + 35*0 + 0.01*4*110 + (-10)*4*0
+Predict.male.high</code></pre>
+<pre><code>## [1] 142.1</code></pre>
 <ol start="2" style="list-style-type: lower-alpha">
 <li>Predict the salary of a female with IQ of 110 and a GPA of 4.0.</li>
 </ol>

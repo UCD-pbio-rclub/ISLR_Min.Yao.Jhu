@@ -434,7 +434,7 @@ summary(lm(medv~log(rm),data=Boston))
 # Qualitative Predictors
 
 ```r
-fix(Carseats)
+#fix(Carseats)
 names(Carseats)
 ```
 
@@ -505,7 +505,185 @@ LoadLibraries=function(){
  library(MASS)
  print("The libraries have been loaded.")
  }
-#LoadLibraries
-#LoadLibraries()
+LoadLibraries
 ```
 
+```
+## function(){
+##  library(ISLR)
+##  library(MASS)
+##  print("The libraries have been loaded.")
+##  }
+```
+
+```r
+LoadLibraries()
+```
+
+```
+## [1] "The libraries have been loaded."
+```
+
+3. Suppose we have a data set with ﬁve predictors, X 1 = GPA, X 2 = IQ,
+X 3 = Gender (1 for Female and 0 for Male), X 4 = Interaction between
+GPA and IQ, and X 5 = Interaction between GPA and Gender. The
+response is starting salary after graduation (in thousands of dollars).
+Suppose we use least squares to ﬁt the model, and get
+ˆ
+β 0 = 50,
+ˆ
+β 1 =
+20,
+ˆ
+β 2 = 0.07,
+ˆ
+β 3 = 35,
+ˆ
+β 4 = 0.01,
+ˆ
+β 5 = − 10.
+(a) Which answer is correct, and why?
+i. For a ﬁxed value of IQ and GPA, males earn more on average
+than females.
+ii. For a ﬁxed value of IQ and GPA, females earn more on
+average than males.
+iii. For a ﬁxed value of IQ and GPA, males earn more on average
+than females provided that the GPA is high enough.
+iv. For a ﬁxed value of IQ and GPA, females earn more on
+average than males provided that the GPA is high enough.
+(b) Predict the salary of a female with IQ of 110 and a GPA of 4.0.
+(c) True or false: Since the coeﬃcient for the GPA/IQ interaction
+term is very small, there is very little evidence of an interaction
+eﬀect. Justify your answer.
+
+9. This question involves the use of multiple linear regression on the
+Auto data set.
+
+(d) Use the plot() function to produce diagnostic plots of the linear
+regression ﬁt. Comment on any problems you see with the ﬁt.
+Do the residual plots suggest any unusually large outliers? Does
+the leverage plot identify any observations with unusually high
+leverage?
+(e) Use the * and : symbols to ﬁt linear regression models with
+interaction eﬀects. Do any interactions appear to be statistically
+signiﬁcant?
+(f) Try a few diﬀerent transformations of the variables, such as
+log(X),
+√
+X, X 2 . Comment on your ﬁndings.
+
+10. This question should be answered using the Carseats data set.
+
+(h) Is there evidence of outliers or high leverage observations in the
+model from (e)?
+
+> outliers are observations for which the response y i is unusual given the predictor x i . In contrast, observations with high leverage have an unusual value for x i . 
+
+
+```r
+#Carseats
+summary(Carseats)
+```
+
+```
+##      Sales          CompPrice       Income        Advertising    
+##  Min.   : 0.000   Min.   : 77   Min.   : 21.00   Min.   : 0.000  
+##  1st Qu.: 5.390   1st Qu.:115   1st Qu.: 42.75   1st Qu.: 0.000  
+##  Median : 7.490   Median :125   Median : 69.00   Median : 5.000  
+##  Mean   : 7.496   Mean   :125   Mean   : 68.66   Mean   : 6.635  
+##  3rd Qu.: 9.320   3rd Qu.:135   3rd Qu.: 91.00   3rd Qu.:12.000  
+##  Max.   :16.270   Max.   :175   Max.   :120.00   Max.   :29.000  
+##    Population        Price        ShelveLoc        Age       
+##  Min.   : 10.0   Min.   : 24.0   Bad   : 96   Min.   :25.00  
+##  1st Qu.:139.0   1st Qu.:100.0   Good  : 85   1st Qu.:39.75  
+##  Median :272.0   Median :117.0   Medium:219   Median :54.50  
+##  Mean   :264.8   Mean   :115.8                Mean   :53.32  
+##  3rd Qu.:398.5   3rd Qu.:131.0                3rd Qu.:66.00  
+##  Max.   :509.0   Max.   :191.0                Max.   :80.00  
+##    Education    Urban       US     
+##  Min.   :10.0   No :118   No :142  
+##  1st Qu.:12.0   Yes:282   Yes:258  
+##  Median :14.0                      
+##  Mean   :13.9                      
+##  3rd Qu.:16.0                      
+##  Max.   :18.0
+```
+
+```r
+lm.fit.Carseats=lm(Sales~Price+Urban+US,data=Carseats)
+summary(lm.fit.Carseats)
+```
+
+```
+## 
+## Call:
+## lm(formula = Sales ~ Price + Urban + US, data = Carseats)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -6.9206 -1.6220 -0.0564  1.5786  7.0581 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) 13.043469   0.651012  20.036  < 2e-16 ***
+## Price       -0.054459   0.005242 -10.389  < 2e-16 ***
+## UrbanYes    -0.021916   0.271650  -0.081    0.936    
+## USYes        1.200573   0.259042   4.635 4.86e-06 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.472 on 396 degrees of freedom
+## Multiple R-squared:  0.2393,	Adjusted R-squared:  0.2335 
+## F-statistic: 41.52 on 3 and 396 DF,  p-value: < 2.2e-16
+```
+
+```r
+#?Carseats
+```
+
+
+```r
+lm.fit.Carseats.new <- update(lm.fit.Carseats, ~ . - Urban)
+summary(lm.fit.Carseats.new)
+```
+
+```
+## 
+## Call:
+## lm(formula = Sales ~ Price + US, data = Carseats)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -6.9269 -1.6286 -0.0574  1.5766  7.0515 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) 13.03079    0.63098  20.652  < 2e-16 ***
+## Price       -0.05448    0.00523 -10.416  < 2e-16 ***
+## USYes        1.19964    0.25846   4.641 4.71e-06 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.469 on 397 degrees of freedom
+## Multiple R-squared:  0.2393,	Adjusted R-squared:  0.2354 
+## F-statistic: 62.43 on 2 and 397 DF,  p-value: < 2.2e-16
+```
+
+
+```r
+confint(lm.fit.Carseats.new)
+```
+
+```
+##                   2.5 %      97.5 %
+## (Intercept) 11.79032020 14.27126531
+## Price       -0.06475984 -0.04419543
+## USYes        0.69151957  1.70776632
+```
+
+
+```r
+plot(lm.fit.Carseats.new)
+```
+
+![](chapter3-3_files/figure-html/unnamed-chunk-11-1.png)<!-- -->![](chapter3-3_files/figure-html/unnamed-chunk-11-2.png)<!-- -->![](chapter3-3_files/figure-html/unnamed-chunk-11-3.png)<!-- -->![](chapter3-3_files/figure-html/unnamed-chunk-11-4.png)<!-- -->

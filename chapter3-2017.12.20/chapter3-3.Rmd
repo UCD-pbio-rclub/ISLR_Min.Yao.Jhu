@@ -82,7 +82,7 @@ summary(lm(medv~log(rm),data=Boston))
 
 # Qualitative Predictors
 ```{r}
-fix(Carseats)
+#fix(Carseats)
 names(Carseats)
 lm.fit=lm(Sales~.+Income:Advertising+Price:Age,data=Carseats)
 summary(lm.fit)
@@ -103,4 +103,58 @@ LoadLibraries=function(){
 #LoadLibraries
 #LoadLibraries()
 ```
+
+3. Suppose we have a data set with ﬁve predictors, X 1 = GPA, X 2 = IQ,
+X 3 = Gender (1 for Female and 0 for Male), X 4 = Interaction between
+GPA and IQ, and X 5 = Interaction between GPA and Gender. The
+response is starting salary after graduation (in thousands of dollars).
+Suppose we use least squares to ﬁt the model, and get
+ˆ
+β 0 = 50,
+ˆ
+β 1 =
+20,
+ˆ
+β 2 = 0.07,
+ˆ
+β 3 = 35,
+ˆ
+β 4 = 0.01,
+ˆ
+β 5 = − 10.
+(a) Which answer is correct, and why?
+i. For a ﬁxed value of IQ and GPA, males earn more on average
+than females.
+ii. For a ﬁxed value of IQ and GPA, females earn more on
+average than males.
+iii. For a ﬁxed value of IQ and GPA, males earn more on average
+than females provided that the GPA is high enough.
+iv. For a ﬁxed value of IQ and GPA, females earn more on
+average than males provided that the GPA is high enough.
+(b) Predict the salary of a female with IQ of 110 and a GPA of 4.0.
+(c) True or false: Since the coeﬃcient for the GPA/IQ interaction
+term is very small, there is very little evidence of an interaction
+eﬀect. Justify your answer.
+
+9. This question involves the use of multiple linear regression on the
+Auto data set.
+
+(d) Use the plot() function to produce diagnostic plots of the linear
+regression ﬁt. Comment on any problems you see with the ﬁt.
+Do the residual plots suggest any unusually large outliers? Does
+the leverage plot identify any observations with unusually high
+leverage?
+(e) Use the * and : symbols to ﬁt linear regression models with
+interaction eﬀects. Do any interactions appear to be statistically
+signiﬁcant?
+(f) Try a few diﬀerent transformations of the variables, such as
+log(X),
+√
+X, X 2 . Comment on your ﬁndings.
+
+10. This question should be answered using the Carseats data set.
+
+(h) Is there evidence of outliers or high leverage observations in the
+model from (e)?
+
 

@@ -108,33 +108,48 @@ LoadLibraries()
 X 3 = Gender (1 for Female and 0 for Male), X 4 = Interaction between
 GPA and IQ, and X 5 = Interaction between GPA and Gender. The
 response is starting salary after graduation (in thousands of dollars).
-Suppose we use least squares to ﬁt the model, and get
-ˆ
-β 0 = 50,
-ˆ
-β 1 =
-20,
-ˆ
-β 2 = 0.07,
-ˆ
-β 3 = 35,
-ˆ
-β 4 = 0.01,
-ˆ
-β 5 = − 10.
+Suppose we use least squares to ﬁt the model, and get ˆβ 0 = 50, ˆβ 1 =
+20, ˆβ 2 = 0.07, ˆβ 3 = 35, ˆβ 4 = 0.01, ˆβ 5 = − 10.
+
+salary = 50 + 20XGPA + 0.07XIQ + 35XGender + 0.01XGPAXIQ + (− 10)XGPAXGender
+
 (a) Which answer is correct, and why?
 i. For a ﬁxed value of IQ and GPA, males earn more on average
 than females.
+
+> No
+
 ii. For a ﬁxed value of IQ and GPA, females earn more on
 average than males.
+
+> Yes
+
 iii. For a ﬁxed value of IQ and GPA, males earn more on average
 than females provided that the GPA is high enough.
+
+> Yes
+
 iv. For a ﬁxed value of IQ and GPA, females earn more on
 average than males provided that the GPA is high enough.
+
+> No
+
 (b) Predict the salary of a female with IQ of 110 and a GPA of 4.0.
+
+```{r}
+Predict1 <- 50 + 20*4 + 0.07*110 + 35*1 + 0.01*4*110 + (-10)*4*1
+Predict1
+
+```
+
+> 137.1 (in thousands of dollars)
+
 (c) True or false: Since the coeﬃcient for the GPA/IQ interaction
 term is very small, there is very little evidence of an interaction
 eﬀect. Justify your answer.
+
+> No, The evidence of an interaction eﬀect should based on p value.
+
 
 9. This question involves the use of multiple linear regression on the
 Auto data set.
@@ -144,13 +159,13 @@ regression ﬁt. Comment on any problems you see with the ﬁt.
 Do the residual plots suggest any unusually large outliers? Does
 the leverage plot identify any observations with unusually high
 leverage?
+
 (e) Use the * and : symbols to ﬁt linear regression models with
 interaction eﬀects. Do any interactions appear to be statistically
 signiﬁcant?
+
 (f) Try a few diﬀerent transformations of the variables, such as
-log(X),
-√
-X, X 2 . Comment on your ﬁndings.
+log(X), √X, X 2 . Comment on your ﬁndings.
 
 10. This question should be answered using the Carseats data set.
 

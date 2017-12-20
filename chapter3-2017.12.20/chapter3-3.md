@@ -584,12 +584,862 @@ Do the residual plots suggest any unusually large outliers? Does
 the leverage plot identify any observations with unusually high
 leverage?
 
+
+```r
+lm.fit.auto=lm(mpg~.-name,data=Auto)
+summary(lm.fit.auto)
+```
+
+```
+## 
+## Call:
+## lm(formula = mpg ~ . - name, data = Auto)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -9.5903 -2.1565 -0.1169  1.8690 13.0604 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  -17.218435   4.644294  -3.707  0.00024 ***
+## cylinders     -0.493376   0.323282  -1.526  0.12780    
+## displacement   0.019896   0.007515   2.647  0.00844 ** 
+## horsepower    -0.016951   0.013787  -1.230  0.21963    
+## weight        -0.006474   0.000652  -9.929  < 2e-16 ***
+## acceleration   0.080576   0.098845   0.815  0.41548    
+## year           0.750773   0.050973  14.729  < 2e-16 ***
+## origin         1.426141   0.278136   5.127 4.67e-07 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 3.328 on 384 degrees of freedom
+## Multiple R-squared:  0.8215,	Adjusted R-squared:  0.8182 
+## F-statistic: 252.4 on 7 and 384 DF,  p-value: < 2.2e-16
+```
+
+```r
+par(mfrow=c(2,2)) 
+plot(lm.fit.auto)
+```
+
+![](chapter3-3_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+> Potential Problems
+
+> 1. Non-linearity of the response-predictor relationships. 2. Not normal distribution. 3. Outliers. 4. High-leverage points.
+
 (e) Use the * and : symbols to ﬁt linear regression models with
 interaction eﬀects. Do any interactions appear to be statistically
 signiﬁcant?
 
+
+```r
+names(Auto)
+```
+
+```
+## [1] "mpg"          "cylinders"    "displacement" "horsepower"  
+## [5] "weight"       "acceleration" "year"         "origin"      
+## [9] "name"
+```
+
+```r
+lm.fit.auto2=lm(mpg~.-name + cylinders*displacement*horsepower*weight*acceleration*year*origin,data=Auto)
+summary(lm.fit.auto2)
+```
+
+```
+## 
+## Call:
+## lm(formula = mpg ~ . - name + cylinders * displacement * horsepower * 
+##     weight * acceleration * year * origin, data = Auto)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -6.4533 -1.0707  0.0000  0.9962  9.1994 
+## 
+## Coefficients: (15 not defined because of singularities)
+##                                                                     Estimate
+## (Intercept)                                                        6.785e+04
+## cylinders                                                         -1.585e+04
+## displacement                                                      -1.419e+03
+## horsepower                                                        -1.300e+03
+## weight                                                             4.373e+01
+## acceleration                                                      -8.400e+03
+## year                                                               6.232e+02
+## origin                                                            -5.789e+04
+## cylinders:displacement                                             3.404e+02
+## cylinders:horsepower                                               3.118e+02
+## displacement:horsepower                                            8.962e+00
+## cylinders:weight                                                  -1.158e+01
+## displacement:weight                                                2.313e-01
+## horsepower:weight                                                  4.055e-01
+## cylinders:acceleration                                             2.009e+03
+## displacement:acceleration                                          1.682e+01
+## horsepower:acceleration                                            1.076e+01
+## weight:acceleration                                                3.748e-01
+## cylinders:year                                                    -1.748e+02
+## displacement:year                                                  8.341e+00
+## horsepower:year                                                    1.607e+00
+## weight:year                                                       -9.176e-01
+## acceleration:year                                                  9.485e+01
+## cylinders:origin                                                   1.319e+04
+## displacement:origin                                                1.351e+03
+## horsepower:origin                                                  1.241e+03
+## weight:origin                                                     -4.564e+01
+## acceleration:origin                                                7.439e+03
+## year:origin                                                       -7.745e+02
+## cylinders:displacement:horsepower                                 -2.075e+00
+## cylinders:displacement:weight                                     -4.967e-02
+## cylinders:horsepower:weight                                       -9.443e-02
+## displacement:horsepower:weight                                    -2.805e-03
+## cylinders:displacement:acceleration                               -3.446e+00
+## cylinders:horsepower:acceleration                                 -1.650e+00
+## displacement:horsepower:acceleration                              -6.798e-02
+## cylinders:weight:acceleration                                     -3.977e-02
+## displacement:weight:acceleration                                  -3.174e-03
+## horsepower:weight:acceleration                                    -3.717e-03
+## cylinders:displacement:year                                       -1.871e+00
+## cylinders:horsepower:year                                         -1.675e-01
+## displacement:horsepower:year                                      -1.594e-02
+## cylinders:weight:year                                              2.400e-01
+## displacement:weight:year                                          -7.017e-04
+## horsepower:weight:year                                            -6.825e-04
+## cylinders:acceleration:year                                       -2.225e+01
+## displacement:acceleration:year                                    -1.068e-01
+## horsepower:acceleration:year                                      -1.653e-01
+## weight:acceleration:year                                          -6.359e-03
+## cylinders:displacement:origin                                     -3.266e+02
+## cylinders:horsepower:origin                                       -2.947e+02
+## displacement:horsepower:origin                                    -8.446e+00
+## cylinders:weight:origin                                            1.216e+01
+## displacement:weight:origin                                        -2.103e-01
+## horsepower:weight:origin                                          -3.992e-01
+## cylinders:acceleration:origin                                     -1.777e+03
+## displacement:acceleration:origin                                  -1.175e+01
+## horsepower:acceleration:origin                                    -3.670e+00
+## weight:acceleration:origin                                        -1.515e-01
+## cylinders:year:origin                                              2.131e+02
+## displacement:year:origin                                          -7.372e+00
+## horsepower:year:origin                                            -6.129e-01
+## weight:year:origin                                                 9.512e-01
+## acceleration:year:origin                                          -8.096e+01
+## cylinders:displacement:horsepower:weight                           6.153e-04
+## cylinders:displacement:horsepower:acceleration                     8.053e-03
+## cylinders:displacement:weight:acceleration                         3.041e-04
+## cylinders:horsepower:weight:acceleration                           3.603e-04
+## displacement:horsepower:weight:acceleration                        2.971e-05
+## cylinders:displacement:horsepower:year                             1.436e-03
+## cylinders:displacement:weight:year                                 5.645e-05
+## cylinders:horsepower:weight:year                                   5.134e-05
+## displacement:horsepower:weight:year                                6.861e-06
+## cylinders:displacement:acceleration:year                           1.517e-02
+## cylinders:horsepower:acceleration:year                             2.417e-02
+## displacement:horsepower:acceleration:year                          1.006e-03
+## cylinders:weight:acceleration:year                                 7.543e-04
+## displacement:weight:acceleration:year                              4.571e-05
+## horsepower:weight:acceleration:year                                5.842e-05
+## cylinders:displacement:horsepower:origin                           1.974e+00
+## cylinders:displacement:weight:origin                               4.576e-02
+## cylinders:horsepower:weight:origin                                 9.146e-02
+## displacement:horsepower:weight:origin                              2.646e-03
+## cylinders:displacement:acceleration:origin                         2.354e+00
+## cylinders:horsepower:acceleration:origin                          -5.449e-02
+## displacement:horsepower:acceleration:origin                        2.922e-02
+## cylinders:weight:acceleration:origin                              -1.186e-02
+## displacement:weight:acceleration:origin                            1.539e-03
+## horsepower:weight:acceleration:origin                              2.184e-03
+## cylinders:displacement:year:origin                                 1.676e+00
+## cylinders:horsepower:year:origin                                  -8.713e-02
+## displacement:horsepower:year:origin                                8.343e-03
+## cylinders:weight:year:origin                                      -2.488e-01
+## displacement:weight:year:origin                                    3.907e-04
+## horsepower:weight:year:origin                                      5.097e-04
+## cylinders:acceleration:year:origin                                 1.900e+01
+## displacement:acceleration:year:origin                              3.522e-02
+## horsepower:acceleration:year:origin                                6.027e-02
+## weight:acceleration:year:origin                                    2.916e-03
+## cylinders:displacement:horsepower:weight:acceleration             -2.295e-06
+## cylinders:displacement:horsepower:weight:year                     -4.178e-07
+## cylinders:displacement:horsepower:acceleration:year               -1.124e-04
+## cylinders:displacement:weight:acceleration:year                   -4.299e-06
+## cylinders:horsepower:weight:acceleration:year                     -5.449e-06
+## displacement:horsepower:weight:acceleration:year                  -4.413e-07
+## cylinders:displacement:horsepower:weight:origin                   -5.872e-04
+## cylinders:displacement:horsepower:acceleration:origin                     NA
+## cylinders:displacement:weight:acceleration:origin                         NA
+## cylinders:horsepower:weight:acceleration:origin                           NA
+## displacement:horsepower:weight:acceleration:origin                -1.684e-05
+## cylinders:displacement:horsepower:year:origin                             NA
+## cylinders:displacement:weight:year:origin                                 NA
+## cylinders:horsepower:weight:year:origin                                   NA
+## displacement:horsepower:weight:year:origin                        -4.410e-06
+## cylinders:displacement:acceleration:year:origin                           NA
+## cylinders:horsepower:acceleration:year:origin                             NA
+## displacement:horsepower:acceleration:year:origin                  -4.537e-04
+## cylinders:weight:acceleration:year:origin                                 NA
+## displacement:weight:acceleration:year:origin                      -2.222e-05
+## horsepower:weight:acceleration:year:origin                        -3.306e-05
+## cylinders:displacement:horsepower:weight:acceleration:year         3.293e-08
+## cylinders:displacement:horsepower:weight:acceleration:origin              NA
+## cylinders:displacement:horsepower:weight:year:origin                      NA
+## cylinders:displacement:horsepower:acceleration:year:origin                NA
+## cylinders:displacement:weight:acceleration:year:origin                    NA
+## cylinders:horsepower:weight:acceleration:year:origin                      NA
+## displacement:horsepower:weight:acceleration:year:origin            2.522e-07
+## cylinders:displacement:horsepower:weight:acceleration:year:origin         NA
+##                                                                   Std. Error
+## (Intercept)                                                        5.058e+04
+## cylinders                                                          9.813e+03
+## displacement                                                       9.892e+02
+## horsepower                                                         9.564e+02
+## weight                                                             3.998e+01
+## acceleration                                                       5.946e+03
+## year                                                               7.248e+02
+## origin                                                             4.376e+04
+## cylinders:displacement                                             2.325e+02
+## cylinders:horsepower                                               2.133e+02
+## displacement:horsepower                                            6.394e+00
+## cylinders:weight                                                   9.975e+00
+## displacement:weight                                                1.695e-01
+## horsepower:weight                                                  3.201e-01
+## cylinders:acceleration                                             1.380e+03
+## displacement:acceleration                                          1.593e+01
+## horsepower:acceleration                                            2.313e+01
+## weight:acceleration                                                7.925e-01
+## cylinders:year                                                     1.665e+02
+## displacement:year                                                  6.084e+00
+## horsepower:year                                                    4.964e+00
+## weight:year                                                        7.729e-01
+## acceleration:year                                                  6.703e+01
+## cylinders:origin                                                   9.455e+03
+## displacement:origin                                                9.883e+02
+## horsepower:origin                                                  9.258e+02
+## weight:origin                                                      3.692e+01
+## acceleration:origin                                                5.873e+03
+## year:origin                                                        5.774e+02
+## cylinders:displacement:horsepower                                  1.370e+00
+## cylinders:displacement:weight                                      3.278e-02
+## cylinders:horsepower:weight                                        6.523e-02
+## displacement:horsepower:weight                                     2.095e-03
+## cylinders:displacement:acceleration                                1.925e+00
+## cylinders:horsepower:acceleration                                  2.294e+00
+## displacement:horsepower:acceleration                               1.616e-01
+## cylinders:weight:acceleration                                      8.196e-02
+## displacement:weight:acceleration                                   4.950e-03
+## horsepower:weight:acceleration                                     9.754e-03
+## cylinders:displacement:year                                        1.240e+00
+## cylinders:horsepower:year                                          4.792e-01
+## displacement:horsepower:year                                       3.453e-02
+## cylinders:weight:year                                              1.956e-01
+## displacement:weight:year                                           1.063e-03
+## horsepower:weight:year                                             2.087e-03
+## cylinders:acceleration:year                                        1.523e+01
+## displacement:acceleration:year                                     1.814e-01
+## horsepower:acceleration:year                                       2.979e-01
+## weight:acceleration:year                                           1.018e-02
+## cylinders:displacement:origin                                      2.342e+02
+## cylinders:horsepower:origin                                        2.146e+02
+## displacement:horsepower:origin                                     6.208e+00
+## cylinders:weight:origin                                            9.713e+00
+## displacement:weight:origin                                         1.620e-01
+## horsepower:weight:origin                                           2.979e-01
+## cylinders:acceleration:origin                                      1.391e+03
+## displacement:acceleration:origin                                   1.128e+01
+## horsepower:acceleration:origin                                     1.032e+01
+## weight:acceleration:origin                                         3.466e-01
+## cylinders:year:origin                                              1.533e+02
+## displacement:year:origin                                           5.763e+00
+## horsepower:year:origin                                             2.320e+00
+## weight:year:origin                                                 7.427e-01
+## acceleration:year:origin                                           6.551e+01
+## cylinders:displacement:horsepower:weight                           4.125e-04
+## cylinders:displacement:horsepower:acceleration                     1.331e-02
+## cylinders:displacement:weight:acceleration                         4.129e-04
+## cylinders:horsepower:weight:acceleration                           8.587e-04
+## displacement:horsepower:weight:acceleration                        5.895e-05
+## cylinders:displacement:horsepower:year                             2.859e-03
+## cylinders:displacement:weight:year                                 8.960e-05
+## cylinders:horsepower:weight:year                                   1.863e-04
+## displacement:horsepower:weight:year                                1.258e-05
+## cylinders:displacement:acceleration:year                           1.668e-02
+## cylinders:horsepower:acceleration:year                             2.951e-02
+## displacement:horsepower:acceleration:year                          2.111e-03
+## cylinders:weight:acceleration:year                                 1.042e-03
+## displacement:weight:acceleration:year                              6.427e-05
+## horsepower:weight:acceleration:year                                1.252e-04
+## cylinders:displacement:horsepower:origin                           1.380e+00
+## cylinders:displacement:weight:origin                               3.286e-02
+## cylinders:horsepower:weight:origin                                 6.533e-02
+## displacement:horsepower:weight:origin                              2.022e-03
+## cylinders:displacement:acceleration:origin                         1.622e+00
+## cylinders:horsepower:acceleration:origin                           2.162e-01
+## displacement:horsepower:acceleration:origin                        8.997e-02
+## cylinders:weight:acceleration:origin                               9.461e-03
+## displacement:weight:acceleration:origin                            3.037e-03
+## horsepower:weight:acceleration:origin                              4.625e-03
+## cylinders:displacement:year:origin                                 1.247e+00
+## cylinders:horsepower:year:origin                                   7.737e-02
+## displacement:horsepower:year:origin                                1.938e-02
+## cylinders:weight:year:origin                                       1.927e-01
+## displacement:weight:year:origin                                    6.625e-04
+## horsepower:weight:year:origin                                      9.857e-04
+## cylinders:acceleration:year:origin                                 1.533e+01
+## displacement:acceleration:year:origin                              9.168e-02
+## horsepower:acceleration:year:origin                                1.337e-01
+## weight:acceleration:year:origin                                    4.536e-03
+## cylinders:displacement:horsepower:weight:acceleration              4.466e-06
+## cylinders:displacement:horsepower:weight:year                      9.705e-07
+## cylinders:displacement:horsepower:acceleration:year                1.748e-04
+## cylinders:displacement:weight:acceleration:year                    5.405e-06
+## cylinders:horsepower:weight:acceleration:year                      1.111e-05
+## displacement:horsepower:weight:acceleration:year                   7.632e-07
+## cylinders:displacement:horsepower:weight:origin                    4.152e-04
+## cylinders:displacement:horsepower:acceleration:origin                     NA
+## cylinders:displacement:weight:acceleration:origin                         NA
+## cylinders:horsepower:weight:acceleration:origin                           NA
+## displacement:horsepower:weight:acceleration:origin                 3.791e-05
+## cylinders:displacement:horsepower:year:origin                             NA
+## cylinders:displacement:weight:year:origin                                 NA
+## cylinders:horsepower:weight:year:origin                                   NA
+## displacement:horsepower:weight:year:origin                         8.158e-06
+## cylinders:displacement:acceleration:year:origin                           NA
+## cylinders:horsepower:acceleration:year:origin                             NA
+## displacement:horsepower:acceleration:year:origin                   1.169e-03
+## cylinders:weight:acceleration:year:origin                                 NA
+## displacement:weight:acceleration:year:origin                       3.907e-05
+## horsepower:weight:acceleration:year:origin                         5.950e-05
+## cylinders:displacement:horsepower:weight:acceleration:year         5.819e-08
+## cylinders:displacement:horsepower:weight:acceleration:origin              NA
+## cylinders:displacement:horsepower:weight:year:origin                      NA
+## cylinders:displacement:horsepower:acceleration:year:origin                NA
+## cylinders:displacement:weight:acceleration:year:origin                    NA
+## cylinders:horsepower:weight:acceleration:year:origin                      NA
+## displacement:horsepower:weight:acceleration:year:origin            4.889e-07
+## cylinders:displacement:horsepower:weight:acceleration:year:origin         NA
+##                                                                   t value
+## (Intercept)                                                         1.342
+## cylinders                                                          -1.616
+## displacement                                                       -1.434
+## horsepower                                                         -1.360
+## weight                                                              1.094
+## acceleration                                                       -1.413
+## year                                                                0.860
+## origin                                                             -1.323
+## cylinders:displacement                                              1.464
+## cylinders:horsepower                                                1.461
+## displacement:horsepower                                             1.402
+## cylinders:weight                                                   -1.161
+## displacement:weight                                                 1.365
+## horsepower:weight                                                   1.267
+## cylinders:acceleration                                              1.456
+## displacement:acceleration                                           1.056
+## horsepower:acceleration                                             0.465
+## weight:acceleration                                                 0.473
+## cylinders:year                                                     -1.049
+## displacement:year                                                   1.371
+## horsepower:year                                                     0.324
+## weight:year                                                        -1.187
+## acceleration:year                                                   1.415
+## cylinders:origin                                                    1.395
+## displacement:origin                                                 1.367
+## horsepower:origin                                                   1.340
+## weight:origin                                                      -1.236
+## acceleration:origin                                                 1.267
+## year:origin                                                        -1.341
+## cylinders:displacement:horsepower                                  -1.515
+## cylinders:displacement:weight                                      -1.515
+## cylinders:horsepower:weight                                        -1.448
+## displacement:horsepower:weight                                     -1.339
+## cylinders:displacement:acceleration                                -1.790
+## cylinders:horsepower:acceleration                                  -0.719
+## displacement:horsepower:acceleration                               -0.421
+## cylinders:weight:acceleration                                      -0.485
+## displacement:weight:acceleration                                   -0.641
+## horsepower:weight:acceleration                                     -0.381
+## cylinders:displacement:year                                        -1.510
+## cylinders:horsepower:year                                          -0.349
+## displacement:horsepower:year                                       -0.462
+## cylinders:weight:year                                               1.227
+## displacement:weight:year                                           -0.660
+## horsepower:weight:year                                             -0.327
+## cylinders:acceleration:year                                        -1.461
+## displacement:acceleration:year                                     -0.589
+## horsepower:acceleration:year                                       -0.555
+## weight:acceleration:year                                           -0.625
+## cylinders:displacement:origin                                      -1.394
+## cylinders:horsepower:origin                                        -1.373
+## displacement:horsepower:origin                                     -1.361
+## cylinders:weight:origin                                             1.252
+## displacement:weight:origin                                         -1.298
+## horsepower:weight:origin                                           -1.340
+## cylinders:acceleration:origin                                      -1.278
+## displacement:acceleration:origin                                   -1.042
+## horsepower:acceleration:origin                                     -0.356
+## weight:acceleration:origin                                         -0.437
+## cylinders:year:origin                                               1.390
+## displacement:year:origin                                           -1.279
+## horsepower:year:origin                                             -0.264
+## weight:year:origin                                                  1.281
+## acceleration:year:origin                                           -1.236
+## cylinders:displacement:horsepower:weight                            1.492
+## cylinders:displacement:horsepower:acceleration                      0.605
+## cylinders:displacement:weight:acceleration                          0.737
+## cylinders:horsepower:weight:acceleration                            0.420
+## displacement:horsepower:weight:acceleration                         0.504
+## cylinders:displacement:horsepower:year                              0.502
+## cylinders:displacement:weight:year                                  0.630
+## cylinders:horsepower:weight:year                                    0.276
+## displacement:horsepower:weight:year                                 0.545
+## cylinders:displacement:acceleration:year                            0.910
+## cylinders:horsepower:acceleration:year                              0.819
+## displacement:horsepower:acceleration:year                           0.477
+## cylinders:weight:acceleration:year                                  0.724
+## displacement:weight:acceleration:year                               0.711
+## horsepower:weight:acceleration:year                                 0.467
+## cylinders:displacement:horsepower:origin                            1.430
+## cylinders:displacement:weight:origin                                1.392
+## cylinders:horsepower:weight:origin                                  1.400
+## displacement:horsepower:weight:origin                               1.309
+## cylinders:displacement:acceleration:origin                          1.451
+## cylinders:horsepower:acceleration:origin                           -0.252
+## displacement:horsepower:acceleration:origin                         0.325
+## cylinders:weight:acceleration:origin                               -1.254
+## displacement:weight:acceleration:origin                             0.507
+## horsepower:weight:acceleration:origin                               0.472
+## cylinders:displacement:year:origin                                  1.344
+## cylinders:horsepower:year:origin                                   -1.126
+## displacement:horsepower:year:origin                                 0.430
+## cylinders:weight:year:origin                                       -1.291
+## displacement:weight:year:origin                                     0.590
+## horsepower:weight:year:origin                                       0.517
+## cylinders:acceleration:year:origin                                  1.239
+## displacement:acceleration:year:origin                               0.384
+## horsepower:acceleration:year:origin                                 0.451
+## weight:acceleration:year:origin                                     0.643
+## cylinders:displacement:horsepower:weight:acceleration              -0.514
+## cylinders:displacement:horsepower:weight:year                      -0.430
+## cylinders:displacement:horsepower:acceleration:year                -0.643
+## cylinders:displacement:weight:acceleration:year                    -0.795
+## cylinders:horsepower:weight:acceleration:year                      -0.491
+## displacement:horsepower:weight:acceleration:year                   -0.578
+## cylinders:displacement:horsepower:weight:origin                    -1.414
+## cylinders:displacement:horsepower:acceleration:origin                  NA
+## cylinders:displacement:weight:acceleration:origin                      NA
+## cylinders:horsepower:weight:acceleration:origin                        NA
+## displacement:horsepower:weight:acceleration:origin                 -0.444
+## cylinders:displacement:horsepower:year:origin                          NA
+## cylinders:displacement:weight:year:origin                              NA
+## cylinders:horsepower:weight:year:origin                                NA
+## displacement:horsepower:weight:year:origin                         -0.541
+## cylinders:displacement:acceleration:year:origin                        NA
+## cylinders:horsepower:acceleration:year:origin                          NA
+## displacement:horsepower:acceleration:year:origin                   -0.388
+## cylinders:weight:acceleration:year:origin                              NA
+## displacement:weight:acceleration:year:origin                       -0.569
+## horsepower:weight:acceleration:year:origin                         -0.556
+## cylinders:displacement:horsepower:weight:acceleration:year          0.566
+## cylinders:displacement:horsepower:weight:acceleration:origin           NA
+## cylinders:displacement:horsepower:weight:year:origin                   NA
+## cylinders:displacement:horsepower:acceleration:year:origin             NA
+## cylinders:displacement:weight:acceleration:year:origin                 NA
+## cylinders:horsepower:weight:acceleration:year:origin                   NA
+## displacement:horsepower:weight:acceleration:year:origin             0.516
+## cylinders:displacement:horsepower:weight:acceleration:year:origin      NA
+##                                                                   Pr(>|t|)
+## (Intercept)                                                         0.1808
+## cylinders                                                           0.1073
+## displacement                                                        0.1527
+## horsepower                                                          0.1751
+## weight                                                              0.2750
+## acceleration                                                        0.1589
+## year                                                                0.3906
+## origin                                                              0.1869
+## cylinders:displacement                                              0.1444
+## cylinders:horsepower                                                0.1450
+## displacement:horsepower                                             0.1622
+## cylinders:weight                                                    0.2468
+## displacement:weight                                                 0.1735
+## horsepower:weight                                                   0.2063
+## cylinders:acceleration                                              0.1467
+## displacement:acceleration                                           0.2920
+## horsepower:acceleration                                             0.6421
+## weight:acceleration                                                 0.6367
+## cylinders:year                                                      0.2949
+## displacement:year                                                   0.1715
+## horsepower:year                                                     0.7464
+## weight:year                                                         0.2361
+## acceleration:year                                                   0.1582
+## cylinders:origin                                                    0.1641
+## displacement:origin                                                 0.1726
+## horsepower:origin                                                   0.1813
+## weight:origin                                                       0.2175
+## acceleration:origin                                                 0.2064
+## year:origin                                                         0.1809
+## cylinders:displacement:horsepower                                   0.1310
+## cylinders:displacement:weight                                       0.1308
+## cylinders:horsepower:weight                                         0.1488
+## displacement:horsepower:weight                                      0.1816
+## cylinders:displacement:acceleration                                 0.0745
+## cylinders:horsepower:acceleration                                   0.4726
+## displacement:horsepower:acceleration                                0.6744
+## cylinders:weight:acceleration                                       0.6279
+## displacement:weight:acceleration                                    0.5220
+## horsepower:weight:acceleration                                      0.7035
+## cylinders:displacement:year                                         0.1323
+## cylinders:horsepower:year                                           0.7270
+## displacement:horsepower:year                                        0.6447
+## cylinders:weight:year                                               0.2208
+## displacement:weight:year                                            0.5098
+## horsepower:weight:year                                              0.7439
+## cylinders:acceleration:year                                         0.1452
+## displacement:acceleration:year                                      0.5565
+## horsepower:acceleration:year                                        0.5794
+## weight:acceleration:year                                            0.5326
+## cylinders:displacement:origin                                       0.1644
+## cylinders:horsepower:origin                                         0.1708
+## displacement:horsepower:origin                                      0.1747
+## cylinders:weight:origin                                             0.2118
+## displacement:weight:origin                                          0.1953
+## horsepower:weight:origin                                            0.1813
+## cylinders:acceleration:origin                                       0.2025
+## displacement:acceleration:origin                                    0.2985
+## horsepower:acceleration:origin                                      0.7223
+## weight:acceleration:origin                                          0.6624
+## cylinders:year:origin                                               0.1657
+## displacement:year:origin                                            0.2019
+## horsepower:year:origin                                              0.7919
+## weight:year:origin                                                  0.2014
+## acceleration:year:origin                                            0.2175
+## cylinders:displacement:horsepower:weight                            0.1369
+## cylinders:displacement:horsepower:acceleration                      0.5458
+## cylinders:displacement:weight:acceleration                          0.4620
+## cylinders:horsepower:weight:acceleration                            0.6751
+## displacement:horsepower:weight:acceleration                         0.6147
+## cylinders:displacement:horsepower:year                              0.6160
+## cylinders:displacement:weight:year                                  0.5292
+## cylinders:horsepower:weight:year                                    0.7831
+## displacement:horsepower:weight:year                                 0.5860
+## cylinders:displacement:acceleration:year                            0.3639
+## cylinders:horsepower:acceleration:year                              0.4134
+## displacement:horsepower:acceleration:year                           0.6339
+## cylinders:weight:acceleration:year                                  0.4696
+## displacement:weight:acceleration:year                               0.4776
+## horsepower:weight:acceleration:year                                 0.6411
+## cylinders:displacement:horsepower:origin                            0.1538
+## cylinders:displacement:weight:origin                                0.1649
+## cylinders:horsepower:weight:origin                                  0.1626
+## displacement:horsepower:weight:origin                               0.1917
+## cylinders:displacement:acceleration:origin                          0.1479
+## cylinders:horsepower:acceleration:origin                            0.8012
+## displacement:horsepower:acceleration:origin                         0.7456
+## cylinders:weight:acceleration:origin                                0.2109
+## displacement:weight:acceleration:origin                             0.6127
+## horsepower:weight:acceleration:origin                               0.6372
+## cylinders:displacement:year:origin                                  0.1800
+## cylinders:horsepower:year:origin                                    0.2611
+## displacement:horsepower:year:origin                                 0.6672
+## cylinders:weight:year:origin                                        0.1977
+## displacement:weight:year:origin                                     0.5558
+## horsepower:weight:year:origin                                       0.6055
+## cylinders:acceleration:year:origin                                  0.2162
+## displacement:acceleration:year:origin                               0.7011
+## horsepower:acceleration:year:origin                                 0.6525
+## weight:acceleration:year:origin                                     0.5208
+## cylinders:displacement:horsepower:weight:acceleration               0.6078
+## cylinders:displacement:horsepower:weight:year                       0.6672
+## cylinders:displacement:horsepower:acceleration:year                 0.5206
+## cylinders:displacement:weight:acceleration:year                     0.4270
+## cylinders:horsepower:weight:acceleration:year                       0.6240
+## displacement:horsepower:weight:acceleration:year                    0.5636
+## cylinders:displacement:horsepower:weight:origin                     0.1584
+## cylinders:displacement:horsepower:acceleration:origin                   NA
+## cylinders:displacement:weight:acceleration:origin                       NA
+## cylinders:horsepower:weight:acceleration:origin                         NA
+## displacement:horsepower:weight:acceleration:origin                  0.6573
+## cylinders:displacement:horsepower:year:origin                           NA
+## cylinders:displacement:weight:year:origin                               NA
+## cylinders:horsepower:weight:year:origin                                 NA
+## displacement:horsepower:weight:year:origin                          0.5893
+## cylinders:displacement:acceleration:year:origin                         NA
+## cylinders:horsepower:acceleration:year:origin                           NA
+## displacement:horsepower:acceleration:year:origin                    0.6983
+## cylinders:weight:acceleration:year:origin                               NA
+## displacement:weight:acceleration:year:origin                        0.5700
+## horsepower:weight:acceleration:year:origin                          0.5789
+## cylinders:displacement:horsepower:weight:acceleration:year          0.5719
+## cylinders:displacement:horsepower:weight:acceleration:origin            NA
+## cylinders:displacement:horsepower:weight:year:origin                    NA
+## cylinders:displacement:horsepower:acceleration:year:origin              NA
+## cylinders:displacement:weight:acceleration:year:origin                  NA
+## cylinders:horsepower:weight:acceleration:year:origin                    NA
+## displacement:horsepower:weight:acceleration:year:origin             0.6064
+## cylinders:displacement:horsepower:weight:acceleration:year:origin       NA
+##                                                                    
+## (Intercept)                                                        
+## cylinders                                                          
+## displacement                                                       
+## horsepower                                                         
+## weight                                                             
+## acceleration                                                       
+## year                                                               
+## origin                                                             
+## cylinders:displacement                                             
+## cylinders:horsepower                                               
+## displacement:horsepower                                            
+## cylinders:weight                                                   
+## displacement:weight                                                
+## horsepower:weight                                                  
+## cylinders:acceleration                                             
+## displacement:acceleration                                          
+## horsepower:acceleration                                            
+## weight:acceleration                                                
+## cylinders:year                                                     
+## displacement:year                                                  
+## horsepower:year                                                    
+## weight:year                                                        
+## acceleration:year                                                  
+## cylinders:origin                                                   
+## displacement:origin                                                
+## horsepower:origin                                                  
+## weight:origin                                                      
+## acceleration:origin                                                
+## year:origin                                                        
+## cylinders:displacement:horsepower                                  
+## cylinders:displacement:weight                                      
+## cylinders:horsepower:weight                                        
+## displacement:horsepower:weight                                     
+## cylinders:displacement:acceleration                               .
+## cylinders:horsepower:acceleration                                  
+## displacement:horsepower:acceleration                               
+## cylinders:weight:acceleration                                      
+## displacement:weight:acceleration                                   
+## horsepower:weight:acceleration                                     
+## cylinders:displacement:year                                        
+## cylinders:horsepower:year                                          
+## displacement:horsepower:year                                       
+## cylinders:weight:year                                              
+## displacement:weight:year                                           
+## horsepower:weight:year                                             
+## cylinders:acceleration:year                                        
+## displacement:acceleration:year                                     
+## horsepower:acceleration:year                                       
+## weight:acceleration:year                                           
+## cylinders:displacement:origin                                      
+## cylinders:horsepower:origin                                        
+## displacement:horsepower:origin                                     
+## cylinders:weight:origin                                            
+## displacement:weight:origin                                         
+## horsepower:weight:origin                                           
+## cylinders:acceleration:origin                                      
+## displacement:acceleration:origin                                   
+## horsepower:acceleration:origin                                     
+## weight:acceleration:origin                                         
+## cylinders:year:origin                                              
+## displacement:year:origin                                           
+## horsepower:year:origin                                             
+## weight:year:origin                                                 
+## acceleration:year:origin                                           
+## cylinders:displacement:horsepower:weight                           
+## cylinders:displacement:horsepower:acceleration                     
+## cylinders:displacement:weight:acceleration                         
+## cylinders:horsepower:weight:acceleration                           
+## displacement:horsepower:weight:acceleration                        
+## cylinders:displacement:horsepower:year                             
+## cylinders:displacement:weight:year                                 
+## cylinders:horsepower:weight:year                                   
+## displacement:horsepower:weight:year                                
+## cylinders:displacement:acceleration:year                           
+## cylinders:horsepower:acceleration:year                             
+## displacement:horsepower:acceleration:year                          
+## cylinders:weight:acceleration:year                                 
+## displacement:weight:acceleration:year                              
+## horsepower:weight:acceleration:year                                
+## cylinders:displacement:horsepower:origin                           
+## cylinders:displacement:weight:origin                               
+## cylinders:horsepower:weight:origin                                 
+## displacement:horsepower:weight:origin                              
+## cylinders:displacement:acceleration:origin                         
+## cylinders:horsepower:acceleration:origin                           
+## displacement:horsepower:acceleration:origin                        
+## cylinders:weight:acceleration:origin                               
+## displacement:weight:acceleration:origin                            
+## horsepower:weight:acceleration:origin                              
+## cylinders:displacement:year:origin                                 
+## cylinders:horsepower:year:origin                                   
+## displacement:horsepower:year:origin                                
+## cylinders:weight:year:origin                                       
+## displacement:weight:year:origin                                    
+## horsepower:weight:year:origin                                      
+## cylinders:acceleration:year:origin                                 
+## displacement:acceleration:year:origin                              
+## horsepower:acceleration:year:origin                                
+## weight:acceleration:year:origin                                    
+## cylinders:displacement:horsepower:weight:acceleration              
+## cylinders:displacement:horsepower:weight:year                      
+## cylinders:displacement:horsepower:acceleration:year                
+## cylinders:displacement:weight:acceleration:year                    
+## cylinders:horsepower:weight:acceleration:year                      
+## displacement:horsepower:weight:acceleration:year                   
+## cylinders:displacement:horsepower:weight:origin                    
+## cylinders:displacement:horsepower:acceleration:origin              
+## cylinders:displacement:weight:acceleration:origin                  
+## cylinders:horsepower:weight:acceleration:origin                    
+## displacement:horsepower:weight:acceleration:origin                 
+## cylinders:displacement:horsepower:year:origin                      
+## cylinders:displacement:weight:year:origin                          
+## cylinders:horsepower:weight:year:origin                            
+## displacement:horsepower:weight:year:origin                         
+## cylinders:displacement:acceleration:year:origin                    
+## cylinders:horsepower:acceleration:year:origin                      
+## displacement:horsepower:acceleration:year:origin                   
+## cylinders:weight:acceleration:year:origin                          
+## displacement:weight:acceleration:year:origin                       
+## horsepower:weight:acceleration:year:origin                         
+## cylinders:displacement:horsepower:weight:acceleration:year         
+## cylinders:displacement:horsepower:weight:acceleration:origin       
+## cylinders:displacement:horsepower:weight:year:origin               
+## cylinders:displacement:horsepower:acceleration:year:origin         
+## cylinders:displacement:weight:acceleration:year:origin             
+## cylinders:horsepower:weight:acceleration:year:origin               
+## displacement:horsepower:weight:acceleration:year:origin            
+## cylinders:displacement:horsepower:weight:acceleration:year:origin  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.418 on 279 degrees of freedom
+## Multiple R-squared:  0.9315,	Adjusted R-squared:  0.904 
+## F-statistic: 33.88 on 112 and 279 DF,  p-value: < 2.2e-16
+```
+
+
 (f) Try a few diﬀerent transformations of the variables, such as
 log(X), √X, X 2 . Comment on your ﬁndings.
+
+
+```r
+names(Auto)
+```
+
+```
+## [1] "mpg"          "cylinders"    "displacement" "horsepower"  
+## [5] "weight"       "acceleration" "year"         "origin"      
+## [9] "name"
+```
+
+```r
+lm.fit.auto=lm(mpg~.-name,data=Auto)
+summary(lm.fit.auto)
+```
+
+```
+## 
+## Call:
+## lm(formula = mpg ~ . - name, data = Auto)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -9.5903 -2.1565 -0.1169  1.8690 13.0604 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  -17.218435   4.644294  -3.707  0.00024 ***
+## cylinders     -0.493376   0.323282  -1.526  0.12780    
+## displacement   0.019896   0.007515   2.647  0.00844 ** 
+## horsepower    -0.016951   0.013787  -1.230  0.21963    
+## weight        -0.006474   0.000652  -9.929  < 2e-16 ***
+## acceleration   0.080576   0.098845   0.815  0.41548    
+## year           0.750773   0.050973  14.729  < 2e-16 ***
+## origin         1.426141   0.278136   5.127 4.67e-07 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 3.328 on 384 degrees of freedom
+## Multiple R-squared:  0.8215,	Adjusted R-squared:  0.8182 
+## F-statistic: 252.4 on 7 and 384 DF,  p-value: < 2.2e-16
+```
+
+```r
+lm.fit.auto.log=lm(mpg~.-name -cylinders -horsepower -acceleration + log(cylinders) + log(horsepower) + log(acceleration),data=Auto)
+summary(lm.fit.auto.log)
+```
+
+```
+## 
+## Call:
+## lm(formula = mpg ~ . - name - cylinders - horsepower - acceleration + 
+##     log(cylinders) + log(horsepower) + log(acceleration), data = Auto)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -9.8832 -1.9489 -0.1685  1.7428 12.6920 
+## 
+## Coefficients:
+##                     Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)        4.509e+01  1.066e+01   4.231 2.92e-05 ***
+## displacement       1.846e-02  6.850e-03   2.695  0.00735 ** 
+## weight            -3.790e-03  7.039e-04  -5.384 1.27e-07 ***
+## year               7.060e-01  4.786e-02  14.751  < 2e-16 ***
+## origin             1.421e+00  2.564e-01   5.542 5.56e-08 ***
+## log(cylinders)    -3.463e+00  1.607e+00  -2.154  0.03186 *  
+## log(horsepower)   -1.045e+01  1.517e+00  -6.890 2.29e-11 ***
+## log(acceleration) -5.923e+00  1.645e+00  -3.600  0.00036 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 3.145 on 384 degrees of freedom
+## Multiple R-squared:  0.8405,	Adjusted R-squared:  0.8376 
+## F-statistic: 289.1 on 7 and 384 DF,  p-value: < 2.2e-16
+```
+
+```r
+lm.fit.auto.poly=lm(mpg~poly(cylinders+displacement+horsepower+weight+acceleration+year+origin,3),data=Auto)
+summary(lm.fit.auto.poly)
+```
+
+```
+## 
+## Call:
+## lm(formula = mpg ~ poly(cylinders + displacement + horsepower + 
+##     weight + acceleration + year + origin, 3), data = Auto)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -12.850  -2.750  -0.406   1.858  16.532 
+## 
+## Coefficients:
+##                                                                                          Estimate
+## (Intercept)                                                                               23.4459
+## poly(cylinders + displacement + horsepower + weight + acceleration + year + origin, 3)1 -128.8951
+## poly(cylinders + displacement + horsepower + weight + acceleration + year + origin, 3)2   24.1901
+## poly(cylinders + displacement + horsepower + weight + acceleration + year + origin, 3)3   -0.2818
+##                                                                                         Std. Error
+## (Intercept)                                                                                 0.2086
+## poly(cylinders + displacement + horsepower + weight + acceleration + year + origin, 3)1     4.1305
+## poly(cylinders + displacement + horsepower + weight + acceleration + year + origin, 3)2     4.1305
+## poly(cylinders + displacement + horsepower + weight + acceleration + year + origin, 3)3     4.1305
+##                                                                                         t value
+## (Intercept)                                                                             112.384
+## poly(cylinders + displacement + horsepower + weight + acceleration + year + origin, 3)1 -31.205
+## poly(cylinders + displacement + horsepower + weight + acceleration + year + origin, 3)2   5.856
+## poly(cylinders + displacement + horsepower + weight + acceleration + year + origin, 3)3  -0.068
+##                                                                                         Pr(>|t|)
+## (Intercept)                                                                              < 2e-16
+## poly(cylinders + displacement + horsepower + weight + acceleration + year + origin, 3)1  < 2e-16
+## poly(cylinders + displacement + horsepower + weight + acceleration + year + origin, 3)2 1.01e-08
+## poly(cylinders + displacement + horsepower + weight + acceleration + year + origin, 3)3    0.946
+##                                                                                            
+## (Intercept)                                                                             ***
+## poly(cylinders + displacement + horsepower + weight + acceleration + year + origin, 3)1 ***
+## poly(cylinders + displacement + horsepower + weight + acceleration + year + origin, 3)2 ***
+## poly(cylinders + displacement + horsepower + weight + acceleration + year + origin, 3)3    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 4.131 on 388 degrees of freedom
+## Multiple R-squared:  0.7221,	Adjusted R-squared:  0.7199 
+## F-statistic:   336 on 3 and 388 DF,  p-value: < 2.2e-16
+```
+
 
 10. This question should be answered using the Carseats data set.
 
@@ -705,4 +1555,4 @@ confint(lm.fit.Carseats.new)
 plot(lm.fit.Carseats.new)
 ```
 
-![](chapter3-3_files/figure-html/unnamed-chunk-12-1.png)<!-- -->![](chapter3-3_files/figure-html/unnamed-chunk-12-2.png)<!-- -->![](chapter3-3_files/figure-html/unnamed-chunk-12-3.png)<!-- -->![](chapter3-3_files/figure-html/unnamed-chunk-12-4.png)<!-- -->
+![](chapter3-3_files/figure-html/unnamed-chunk-15-1.png)<!-- -->![](chapter3-3_files/figure-html/unnamed-chunk-15-2.png)<!-- -->![](chapter3-3_files/figure-html/unnamed-chunk-15-3.png)<!-- -->![](chapter3-3_files/figure-html/unnamed-chunk-15-4.png)<!-- -->

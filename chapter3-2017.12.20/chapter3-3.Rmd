@@ -160,12 +160,45 @@ Do the residual plots suggest any unusually large outliers? Does
 the leverage plot identify any observations with unusually high
 leverage?
 
+```{r}
+lm.fit.auto=lm(mpg~.-name,data=Auto)
+summary(lm.fit.auto)
+par(mfrow=c(2,2)) 
+plot(lm.fit.auto)
+
+```
+> Potential Problems
+
+> 1. Non-linearity of the response-predictor relationships. 2. Not normal distribution. 3. Outliers. 4. High-leverage points.
+
 (e) Use the * and : symbols to ﬁt linear regression models with
 interaction eﬀects. Do any interactions appear to be statistically
 signiﬁcant?
 
+```{r}
+names(Auto)
+lm.fit.auto2=lm(mpg~.-name + cylinders*displacement*horsepower*weight*acceleration*year*origin,data=Auto)
+summary(lm.fit.auto2)
+```
+
+
 (f) Try a few diﬀerent transformations of the variables, such as
 log(X), √X, X 2 . Comment on your ﬁndings.
+
+```{r}
+names(Auto)
+
+lm.fit.auto=lm(mpg~.-name,data=Auto)
+summary(lm.fit.auto)
+
+lm.fit.auto.log=lm(mpg~.-name -cylinders -horsepower -acceleration + log(cylinders) + log(horsepower) + log(acceleration),data=Auto)
+summary(lm.fit.auto.log)
+
+lm.fit.auto.poly=lm(mpg~poly(cylinders+displacement+horsepower+weight+acceleration+year+origin,3),data=Auto)
+summary(lm.fit.auto.poly)
+
+```
+
 
 10. This question should be answered using the Carseats data set.
 

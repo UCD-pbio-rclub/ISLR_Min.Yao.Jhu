@@ -177,10 +177,27 @@ signiﬁcant?
 
 ```{r}
 names(Auto)
-lm.fit.auto2=lm(mpg~.-name + cylinders*displacement*horsepower*weight*acceleration*year*origin,data=Auto)
-summary(lm.fit.auto2)
+
+lm.fit.auto.2I=lm(mpg~(.-name)*(.-name),data=Auto)
+summary(lm.fit.auto.2I)
+
+lm.fit.auto.3I=lm(mpg~(.-name)*(.-name)*(.-name),data=Auto)
+summary(lm.fit.auto.3I)
+
+lm.fit.auto.4I=lm(mpg~(.-name)*(.-name)*(.-name)*(.-name),data=Auto)
+summary(lm.fit.auto.4I)
+
+lm.fit.auto.allI=lm(mpg~.-name + cylinders*displacement*horsepower*weight*acceleration*year*origin,data=Auto)
+summary(lm.fit.auto.allI)
 ```
 
+> 2 I: displacement:year, acceleration:year, acceleration:origin
+
+> 3 I: weight:year:origin, horsepower:year:origin, horsepower:acceleration:origin, horsepower:acceleration:year,displacement:horsepower:year, cylinders:displacement:origin
+
+> new 2I: displacement:horsepower, horsepower:acceleration, horsepower:origin, weight:origin, acceleration:origin
+
+> Why different?
 
 (f) Try a few diﬀerent transformations of the variables, such as
 log(X), √X, X 2 . Comment on your ﬁndings.

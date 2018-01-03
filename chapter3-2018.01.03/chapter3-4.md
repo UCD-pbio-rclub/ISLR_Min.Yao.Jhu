@@ -19,7 +19,7 @@ x 0 , represented by N 0 . It then estimates f(x 0 ) using the average of all th
 set.seed (1)
 x1 = runif (100)
 x2 = 0.5* x1 + rnorm (100) /10
-y=2+2* x1 +0.3* x2+rnorm (100)
+y = 2+2* x1 +0.3* x2+rnorm (100)
 ```
 
 The last line corresponds to creating a linear model in which y is
@@ -73,17 +73,42 @@ abline(lm.fitx,lwd=3,col="red")
 
 ![](chapter3-4_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
 
-
 (c) Using this data, ﬁt a least squares regression to predict y using
-x1 and x2. Describe the results obtained. What are
-ˆ
-β 0 ,
-ˆ
-β 1 , and
-ˆ
-β 2 ? How do these relate to the true β 0 , β 1 , and β 2 ? Can you
-reject the null hypothesis H 0 : β 1 = 0? How about the null
-hypothesis H 0 : β 2 = 0?
+x1 and x2. Describe the results obtained. What are ˆβ 0 , ˆβ 1 , and ˆβ 2 ? How do these relate to the true β 0 , β 1 , and β 2 ? Can you reject the null hypothesis H 0 : β 1 = 0? How about the null hypothesis H 0 : β 2 = 0?
+
+
+```r
+lm.fity=lm(y ~ x1 + x2)
+summary(lm.fity)
+```
+
+```
+## 
+## Call:
+## lm(formula = y ~ x1 + x2)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -2.8311 -0.7273 -0.0537  0.6338  2.3359 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)   2.1305     0.2319   9.188 7.61e-15 ***
+## x1            1.4396     0.7212   1.996   0.0487 *  
+## x2            1.0097     1.1337   0.891   0.3754    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1.056 on 97 degrees of freedom
+## Multiple R-squared:  0.2088,	Adjusted R-squared:  0.1925 
+## F-statistic:  12.8 on 2 and 97 DF,  p-value: 1.164e-05
+```
+
+> ˆβ 0 = 2.1305, ˆβ 1 = 1.4396, ˆβ 2 = 1.0097
+
+> We can reject the null hypothesis H 0 : β 1 = 0, because Pr(>|t|) = 0.0487.
+
+> We cannot reject the null hypothesis H 0 : β 2 = 0, because Pr(>|t|) = 0.3754.
 
 (d) Now ﬁt a least squares regression to predict y using only x1.
 Comment on your results. Can you reject the null hypothesis
@@ -98,9 +123,15 @@ your answer.
 
 (g) Now suppose we obtain one additional observation, which was
 unfortunately mismeasured.
-> x1=c(x1 , 0.1)
-> x2=c(x2 , 0.8)
-> y=c(y ,6)
+
+
+```r
+x1=c(x1 , 0.1)
+x2=c(x2 , 0.8)
+y=c(y ,6)
+```
+
+
 Re-ﬁt the linear models from (c) to (e) using this new data. What
 eﬀect does this new observation have on the each of the models?
 In each model, is this observation an outlier? A high-leverage

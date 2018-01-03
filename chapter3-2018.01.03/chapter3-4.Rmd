@@ -53,20 +53,45 @@ summary(lm.fity)
 
 > ˆβ 0 = 2.1305, ˆβ 1 = 1.4396, ˆβ 2 = 1.0097
 
-> We can reject the null hypothesis H 0 : β 1 = 0, because Pr(>|t|) = 0.0487.
+> Yes, we can reject the null hypothesis H 0 : β 1 = 0, because Pr(>|t|) = 0.0487.
 
-> We cannot reject the null hypothesis H 0 : β 2 = 0, because Pr(>|t|) = 0.3754.
+> No, we cannot reject the null hypothesis H 0 : β 2 = 0, because Pr(>|t|) = 0.3754.
 
 (d) Now ﬁt a least squares regression to predict y using only x1.
 Comment on your results. Can you reject the null hypothesis
 H 0 : β 1 = 0?
 
+```{r}
+lm.fit.y.x1=lm(y ~ x1)
+summary(lm.fit.y.x1)
+```
+
+> Yes, we reject the null hypothesis H 0 : β 1 = 0 because Pr(>|t|) = 2.66e-06.
+
 (e) Now ﬁt a least squares regression to predict y using only x2.
 Comment on your results. Can you reject the null hypothesis
 H 0 : β 1 = 0?
 
+```{r}
+lm.fit.y.x2=lm(y ~ x2)
+summary(lm.fit.y.x2)
+```
+
+> Yes, we reject the null hypothesis H 0 : β 2 = 0, because Pr(>|t|) = 1.37e-05.
+
 (f) Do the results obtained in (c)–(e) contradict each other? Explain
 your answer.
+
+> Yes, we reject the null hypothesis H 0 : β 2 = 0 in (e), but we cannot reject the null hypothesis H 0 : β 2 = 0 in (c). This may because of the collinearity between x1 and x2, so we calculate their VIF. 
+
+>  The variance inﬂation factor (VIF) is the ratio of the variance of ˆβ j when ﬁtting the full model divided by the variance of ˆβ j if ﬁt on its own. The smallest possible value for VIF is 1, which indicates the complete absence of collinearity. Typically in practice there is a small amount of collinearity among the predictors. As a rule of thumb, a VIF value that exceeds 5 or 10 indicates a problematic amount of collinearity.
+
+```{r}
+library(car)
+vif(lm.fity)
+```
+
+
 
 (g) Now suppose we obtain one additional observation, which was
 unfortunately mismeasured.
@@ -77,7 +102,6 @@ x2=c(x2 , 0.8)
 y=c(y ,6)
 ```
 
-
 Re-ﬁt the linear models from (c) to (e) using this new data. What
 eﬀect does this new observation have on the each of the models?
 In each model, is this observation an outlier? A high-leverage
@@ -85,5 +109,35 @@ point? Both? Explain your answers.
 
 ```{r}
 
+lm.fitx=lm(x2~x1)
+summary(lm.fitx)
+plot(x1,x2)
+abline(lm.fitx,lwd=3,col="red")
+
+lm.fity=lm(y ~ x1 + x2)
+summary(lm.fity)
+par(mfrow=c(2,2))
+plot(lm.fity)
+
+lm.fit.y.x1=lm(y ~ x1)
+summary(lm.fit.y.x1)
+par(mfrow=c(1,1))
+plot(x1,y)
+abline(lm.fit.y.x1,lwd=3,col="red")
+par(mfrow=c(2,2))
+plot(lm.fit.y.x1)
+
+lm.fit.y.x2=lm(y ~ x2)
+summary(lm.fit.y.x2)
+par(mfrow=c(1,1))
+plot(x2,y)
+abline(lm.fit.y.x2,lwd=3,col="red")
+par(mfrow=c(2,2))
+plot(lm.fit.y.x2)
+
 ```
+
+> For the `y ~ x1 + x2` model, x1 is not significant (Pr(>|t|)=0.94) but x2 is significant (Pr(>|t|)=1.96e-06). However, for the `y ~ x1` model, x1 is significant (Pr(>|t|)=0.002).
+
+> For the `y ~ x1 + x2` and `y ~ x2` model, this observation is a high-leverage point. For the `y ~ x1` model, this observation is an outlier.
 

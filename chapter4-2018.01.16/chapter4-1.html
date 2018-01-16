@@ -256,8 +256,8 @@ table(glm.pred,Direction)</code></pre>
 Smarket.2005=Smarket[!train,]
 dim(Smarket.2005)</code></pre>
 <pre><code>## [1] 252   9</code></pre>
-<pre class="r"><code>Direction.2005=Direction[!train]
-glm.fits=glm(Direction~Lag1+Lag2+Lag3+Lag4+Lag5+Volume,data=Smarket,family=binomial,subset=train)
+<pre class="r"><code>Direction.2005=Direction[!train]</code></pre>
+<pre class="r"><code>glm.fits=glm(Direction~Lag1+Lag2+Lag3+Lag4+Lag5+Volume,data=Smarket,family=binomial,subset=train)
 glm.probs=predict(glm.fits,Smarket.2005,type=&quot;response&quot;)
 glm.pred=rep(&quot;Down&quot;,252)
 glm.pred[glm.probs&gt;.5]=&quot;Up&quot;
@@ -287,11 +287,11 @@ table(glm.pred,Direction.2005)</code></pre>
 <pre><code>##         1         2 
 ## 0.4791462 0.4960939</code></pre>
 <ol start="6" style="list-style-type: decimal">
-<li>Suppose we collect data for a group of students in a statistics class with variables X 1 = hours studied, X 2 = undergrad GPA, and Y = receive an A. We ﬁt a logistic regression and produce estimated coeﬃcient, ˆ β 0 = − 6, ˆ β 1 = 0.05, ˆ β 2 = 1.</li>
+<li>Suppose we collect data for a group of students in a statistics class with variables X 1 = hours studied, X 2 = undergrad GPA, and Y = receive an A. We ﬁt a logistic regression and produce estimated coeﬃcient, ˆβ 0 = − 6, ˆβ 1 = 0.05, ˆβ 2 = 1.</li>
 </ol>
 <ol style="list-style-type: lower-alpha">
-<li>Estimate the probability that a student who studies for 40 h and has an undergrad GPA of 3.5 gets an A in the class.</li>
-<li>How many hours would the student in part (a) need to study to have a 50 % chance of getting an A in the class?</li>
+<li><p>Estimate the probability that a student who studies for 40 h and has an undergrad GPA of 3.5 gets an A in the class.</p></li>
+<li><p>How many hours would the student in part (a) need to study to have a 50 % chance of getting an A in the class?</p></li>
 </ol>
 <ol start="10" style="list-style-type: decimal">
 <li>This question should be answered using the Weekly data set, which is part of the ISLR package. This data is similar in nature to the Smarket data from this chapter’s lab, except that it contains 1, 089 weekly returns for 21 years, from the beginning of 1990 to the end of</li>

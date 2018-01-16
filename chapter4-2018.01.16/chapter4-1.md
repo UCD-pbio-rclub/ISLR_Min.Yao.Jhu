@@ -298,3 +298,55 @@ predict(glm.fits,newdata=data.frame(Lag1=c(1.2,1.5),Lag2=c(1.1,-0.8)),type="resp
 ## 0.4791462 0.4960939
 ```
 
+6. Suppose we collect data for a group of students in a statistics class
+with variables X 1 = hours studied, X 2 = undergrad GPA, and Y =
+receive an A. We ﬁt a logistic regression and produce estimated
+coeﬃcient,
+ˆ
+β 0 = − 6,
+ˆ
+β 1 = 0.05,
+ˆ
+β 2 = 1.
+(a) Estimate the probability that a student who studies for 40 h and
+has an undergrad GPA of 3.5 gets an A in the class.
+(b) How many hours would the student in part (a) need to study to
+have a 50 % chance of getting an A in the class?
+
+10. This question should be answered using the Weekly data set, which
+is part of the ISLR package. This data is similar in nature to the
+Smarket data from this chapter’s lab, except that it contains 1, 089
+weekly returns for 21 years, from the beginning of 1990 to the end of
+2010.
+(a) Produce some numerical and graphical summaries of the Weekly
+data. Do there appear to be any patterns?
+(b) Use the full data set to perform a logistic regression with
+Direction as the response and the ﬁve lag variables plus Volume
+as predictors. Use the summary function to print the results. Do
+any of the predictors appear to be statistically signiﬁcant? If so,
+which ones?
+(c) Compute the confusion matrix and overall fraction of correct
+predictions. Explain what the confusion matrix is telling you
+about the types of mistakes made by logistic regression.
+(d) Now ﬁt the logistic regression model using a training data period
+from 1990 to 2008, with Lag2 as the only predictor. Compute the
+confusion matrix and the overall fraction of correct predictions
+for the held out data (that is, the data from 2009 and 2010).
+
+11. In this problem, you will develop a model to predict whether a given
+car gets high or low gas mileage based on the Auto data set.
+(a) Create a binary variable, mpg01, that contains a 1 if mpg contains
+a value above its median, and a 0 if mpg contains a value below
+its median. You can compute the median using the median()
+function. Note you may ﬁnd it helpful to use the data.frame()
+function to create a single data set containing both mpg01 and
+the other Auto variables.
+(b) Explore the data graphically in order to investigate the associ-
+ation between mpg01 and the other features. Which of the other
+features seem most likely to be useful in predicting mpg01? Scat-
+terplots and boxplots may be useful tools to answer this ques-
+tion. Describe your ﬁndings.
+(c) Split the data into a training set and a test set.
+(f) Perform logistic regression on the training data in order to pre-
+dict mpg01 using the variables that seemed most associated with
+mpg01 in (b). What is the test error of the model obtained?

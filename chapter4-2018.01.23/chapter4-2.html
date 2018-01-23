@@ -185,9 +185,11 @@ table(lda.class,Direction.2005)</code></pre>
 <pre class="r"><code>sum(lda.pred$posterior[,1]&gt;.9)</code></pre>
 <pre><code>## [1] 0</code></pre>
 </div>
-<div id="this-question-should-be-answered-using-the-weekly-data-set-which" class="section level1">
-<h1>10. This question should be answered using the Weekly data set, which</h1>
-<p>is part of the ISLR package. This data is similar in nature to the Smarket data from this chapter’s lab, except that it contains 1, 089 weekly returns for 21 years, from the beginning of 1990 to the end of 2010. # (a) Produce some numerical and graphical summaries of the Weekly data. Do there appear to be any patterns?</p>
+<div id="this-question-should-be-answered-using-the-weekly-data-set-which-is-part-of-the-islr-package.-this-data-is-similar-in-nature-to-the-smarket-data-from-this-chapters-lab-except-that-it-contains-1-089-weekly-returns-for-21-years-from-the-beginning-of-1990-to-the-end-of" class="section level1">
+<h1>10. This question should be answered using the Weekly data set, which is part of the ISLR package. This data is similar in nature to the Smarket data from this chapter’s lab, except that it contains 1, 089 weekly returns for 21 years, from the beginning of 1990 to the end of</h1>
+<ol start="2010" style="list-style-type: decimal">
+<li><h2 id="a-produce-some-numerical-and-graphical-summaries-of-the-weekly-data.-do-there-appear-to-be-any-patterns">(a) Produce some numerical and graphical summaries of the Weekly data. Do there appear to be any patterns?</h2></li>
+</ol>
 <pre class="r"><code>library(ISLR)
 names(Weekly)</code></pre>
 <pre><code>## [1] &quot;Year&quot;      &quot;Lag1&quot;      &quot;Lag2&quot;      &quot;Lag3&quot;      &quot;Lag4&quot;      &quot;Lag5&quot;     
@@ -246,10 +248,8 @@ names(Weekly)</code></pre>
 <blockquote>
 <p>Volume is increasing over time but decreasing recently. In other words, the average number of shares traded daily increased and then decreased.</p>
 </blockquote>
-</div>
-<div id="b-use-the-full-data-set-to-perform-a-logistic-regression-with" class="section level1">
-<h1>(b) Use the full data set to perform a logistic regression with</h1>
-<p>Direction as the response and the ﬁve lag variables plus Volume as predictors. Use the summary function to print the results. Do any of the predictors appear to be statistically signiﬁcant? If so, which ones?</p>
+<div id="b-use-the-full-data-set-to-perform-a-logistic-regression-with-direction-as-the-response-and-the-ve-lag-variables-plus-volume-as-predictors.-use-the-summary-function-to-print-the-results.-do-any-of-the-predictors-appear-to-be-statistically-signicant-if-so-which-ones" class="section level2">
+<h2>(b) Use the full data set to perform a logistic regression with Direction as the response and the ﬁve lag variables plus Volume as predictors. Use the summary function to print the results. Do any of the predictors appear to be statistically signiﬁcant? If so, which ones?</h2>
 <pre class="r"><code>glm.fits.Weekly=glm(Direction~Lag1+Lag2+Lag3+Lag4+Lag5+Volume,data=Weekly,family=binomial)
 summary(glm.fits.Weekly)</code></pre>
 <pre><code>## 
@@ -298,9 +298,8 @@ summary(glm.fits.Weekly)</code></pre>
 <p>Yes, Lag2 appears to be statistically signiﬁcant.</p>
 </blockquote>
 </div>
-<div id="c-compute-the-confusion-matrix-and-overall-fraction-of-correct" class="section level1">
-<h1>(c) Compute the confusion matrix and overall fraction of correct</h1>
-<p>predictions. Explain what the confusion matrix is telling you about the types of mistakes made by logistic regression.</p>
+<div id="c-compute-the-confusion-matrix-and-overall-fraction-of-correct-predictions.-explain-what-the-confusion-matrix-is-telling-you-about-the-types-of-mistakes-made-by-logistic-regression." class="section level2">
+<h2>(c) Compute the confusion matrix and overall fraction of correct predictions. Explain what the confusion matrix is telling you about the types of mistakes made by logistic regression.</h2>
 <pre class="r"><code>glm.probs.Weekly=predict(glm.fits.Weekly,type=&quot;response&quot;)
 
 glm.pred.Weekly=rep(&quot;Down&quot;,1089)
@@ -318,9 +317,8 @@ table(glm.pred.Weekly,Direction)</code></pre>
 <p>430 type I error (false positive), 48 type II error (false negative)</p>
 </blockquote>
 </div>
-<div id="d-now-t-the-logistic-regression-model-using-a-training-data-period" class="section level1">
-<h1>(d) Now ﬁt the logistic regression model using a training data period</h1>
-<p>from 1990 to 2008, with Lag2 as the only predictor. Compute the confusion matrix and the overall fraction of correct predictions for the held out data (that is, the data from 2009 and 2010).</p>
+<div id="d-now-t-the-logistic-regression-model-using-a-training-data-period-from-1990-to-2008-with-lag2-as-the-only-predictor.-compute-the-confusion-matrix-and-the-overall-fraction-of-correct-predictions-for-the-held-out-data-that-is-the-data-from-2009-and-2010." class="section level2">
+<h2>(d) Now ﬁt the logistic regression model using a training data period from 1990 to 2008, with Lag2 as the only predictor. Compute the confusion matrix and the overall fraction of correct predictions for the held out data (that is, the data from 2009 and 2010).</h2>
 <pre class="r"><code>train.1990to2008=(Year&lt;2009)
 Weekly.2009to2010=Weekly[!train.1990to2008,]
 dim(Weekly.2009to2010)</code></pre>
@@ -330,6 +328,7 @@ dim(Weekly.2009to2010)</code></pre>
 glm.fits.Lag2=glm(Direction~Lag2,data=Weekly,family=binomial,subset=train.1990to2008)
 
 glm.probs=predict(glm.fits.Lag2,Weekly.2009to2010,type=&quot;response&quot;)
+
 glm.pred=rep(&quot;Down&quot;,104)
 glm.pred[glm.probs&gt;.5]=&quot;Up&quot;
 table(glm.pred,Direction.1990to2008)</code></pre>
@@ -341,19 +340,51 @@ table(glm.pred,Direction.1990to2008)</code></pre>
 <pre><code>## [1] 0.625</code></pre>
 <pre class="r"><code>(9+56)/104</code></pre>
 <pre><code>## [1] 0.625</code></pre>
-</div>
-<div id="e-repeat-d-using-lda." class="section level1">
-<h1>(e) Repeat (d) using LDA.</h1>
 <blockquote>
 <p>62.5% accuracy rate</p>
 </blockquote>
 </div>
+<div id="e-repeat-d-using-lda." class="section level2">
+<h2>(e) Repeat (d) using LDA.</h2>
+<pre class="r"><code>lda.fit.train=lda(Direction~Lag2,data=Weekly,subset=train.1990to2008)
+lda.fit.train</code></pre>
+<pre><code>## Call:
+## lda(Direction ~ Lag2, data = Weekly, subset = train.1990to2008)
+## 
+## Prior probabilities of groups:
+##      Down        Up 
+## 0.4477157 0.5522843 
+## 
+## Group means:
+##             Lag2
+## Down -0.03568254
+## Up    0.26036581
+## 
+## Coefficients of linear discriminants:
+##            LD1
+## Lag2 0.4414162</code></pre>
+<pre class="r"><code>plot(lda.fit.train)</code></pre>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<pre class="r"><code>lda.pred.test=predict(lda.fit.train, Weekly.2009to2010)
+names(lda.pred.test)</code></pre>
+<pre><code>## [1] &quot;class&quot;     &quot;posterior&quot; &quot;x&quot;</code></pre>
+<pre class="r"><code>lda.class=lda.pred.test$class
+table(lda.class,Direction.1990to2008)</code></pre>
+<pre><code>##          Direction.1990to2008
+## lda.class Down Up
+##      Down    9  5
+##      Up     34 56</code></pre>
+<pre class="r"><code>mean(lda.class==Direction.1990to2008)</code></pre>
+<pre><code>## [1] 0.625</code></pre>
+<blockquote>
+<p>the same 62.5% accuracy rate</p>
+</blockquote>
+</div>
+</div>
 <div id="in-this-problem-you-will-develop-a-model-to-predict-whether-a-given-car-gets-high-or-low-gas-mileage-based-on-the-auto-data-set." class="section level1">
 <h1>11. In this problem, you will develop a model to predict whether a given car gets high or low gas mileage based on the Auto data set.</h1>
-</div>
-<div id="a-create-a-binary-variable-mpg01-that-contains-a-1-if-mpg-contains" class="section level1">
-<h1>(a) Create a binary variable, mpg01, that contains a 1 if mpg contains</h1>
-<p>a value above its median, and a 0 if mpg contains a value below its median. You can compute the median using the median() function. Note you may ﬁnd it helpful to use the data.frame() function to create a single data set containing both mpg01 and the other Auto variables.</p>
+<div id="a-create-a-binary-variable-mpg01-that-contains-a-1-if-mpg-contains-a-value-above-its-median-and-a-0-if-mpg-contains-a-value-below-its-median.-you-can-compute-the-median-using-the-median-function.-note-you-may-nd-it-helpful-to-use-the-data.frame-function-to-create-a-single-data-set-containing-both-mpg01-and-the-other-auto-variables." class="section level2">
+<h2>(a) Create a binary variable, mpg01, that contains a 1 if mpg contains a value above its median, and a 0 if mpg contains a value below its median. You can compute the median using the median() function. Note you may ﬁnd it helpful to use the data.frame() function to create a single data set containing both mpg01 and the other Auto variables.</h2>
 <pre class="r"><code>library(ISLR)
 names(Auto)</code></pre>
 <pre><code>## [1] &quot;mpg&quot;          &quot;cylinders&quot;    &quot;displacement&quot; &quot;horsepower&quot;  
@@ -393,19 +424,9 @@ median(mpg)</code></pre>
 
 mpg01=rep(0,392)
 mpg01[mpg&gt;22.75]=1
-mpg01</code></pre>
-<pre><code>##   [1] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 1 1 1 1 1 1 0 0 0 0 0 1 1 1 0 0 0
-##  [36] 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0
-##  [71] 0 0 0 0 0 0 0 0 1 0 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0 0
-## [106] 0 0 0 0 0 0 0 0 1 0 0 1 1 0 0 0 1 0 0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 0 1
-## [141] 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 1 1 1 1 0 1 0
-## [176] 1 1 0 1 1 1 1 1 1 1 0 0 0 0 0 0 1 0 1 1 1 1 0 0 0 0 1 1 1 1 0 0 0 0 0
-## [211] 0 0 0 0 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 1 1 1
-## [246] 1 1 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 1 1 1 0 0 0 0 1 1 0 0
-## [281] 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0
-## [316] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-## [351] 1 1 1 1 1 1 1 1 0 1 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1
-## [386] 1 1 1 1 1 1 1</code></pre>
+summary(mpg01)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##     0.0     0.0     0.5     0.5     1.0     1.0</code></pre>
 <pre class="r"><code>str(Auto)</code></pre>
 <pre><code>## 'data.frame':    392 obs. of  9 variables:
 ##  $ mpg         : num  18 15 18 16 17 15 14 14 14 15 ...
@@ -432,9 +453,8 @@ str(new.Auto)</code></pre>
 ##  $ name        : Factor w/ 304 levels &quot;amc ambassador brougham&quot;,..: 49 36 231 14 161 141 54 223 241 2 ...
 ##  $ mpg01       : num  0 0 0 0 0 0 0 0 0 0 ...</code></pre>
 </div>
-<div id="b-explore-the-data-graphically-in-order-to-investigate-the-associ-" class="section level1">
-<h1>(b) Explore the data graphically in order to investigate the associ-</h1>
-<p>ation between mpg01 and the other features. Which of the other features seem most likely to be useful in predicting mpg01? Scat- terplots and boxplots may be useful tools to answer this ques- tion. Describe your ﬁndings.</p>
+<div id="b-explore-the-data-graphically-in-order-to-investigate-the-association-between-mpg01-and-the-other-features.-which-of-the-other-features-seem-most-likely-to-be-useful-in-predicting-mpg01-scatterplots-and-boxplots-may-be-useful-tools-to-answer-this-question.-describe-your-ndings." class="section level2">
+<h2>(b) Explore the data graphically in order to investigate the association between mpg01 and the other features. Which of the other features seem most likely to be useful in predicting mpg01? Scatterplots and boxplots may be useful tools to answer this question. Describe your ﬁndings.</h2>
 <pre class="r"><code>summary(new.Auto)</code></pre>
 <pre><code>##       mpg          cylinders      displacement     horsepower   
 ##  Min.   : 9.00   Min.   :3.000   Min.   : 68.0   Min.   : 46.0  
@@ -531,9 +551,12 @@ cor(new.Auto[,-9])</code></pre>
 ## acceleration  5.987776e+00   3751.36484  0.0015961593 0.9987264
 ## year         -3.687494e+00   1534.00536 -0.0024038340 0.9980820
 ## origin       -8.621655e+00   8107.82456 -0.0010633746 0.9991515</code></pre>
+<blockquote>
+<p>Except mpg, horsepower and year seem most likely to be useful in predicting mpg01, and displacement, acceleration, and origin may also be useful in predicting mpg01.</p>
+</blockquote>
 </div>
-<div id="c-split-the-data-into-a-training-set-and-a-test-set." class="section level1">
-<h1>(c) Split the data into a training set and a test set.</h1>
+<div id="c-split-the-data-into-a-training-set-and-a-test-set." class="section level2">
+<h2>(c) Split the data into a training set and a test set.</h2>
 <pre class="r"><code>summary(new.Auto)</code></pre>
 <pre><code>##       mpg          cylinders      displacement     horsepower   
 ##  Min.   : 9.00   Min.   :3.000   Min.   : 68.0   Min.   : 46.0  
@@ -569,86 +592,174 @@ cor(new.Auto[,-9])</code></pre>
 ## 
 ##     acceleration, cylinders, displacement, horsepower, mpg, name,
 ##     origin, weight, year</code></pre>
-<pre class="r"><code>train=(cylinders&lt;5)
+<pre class="r"><code>train=(weight&lt;3000)
 test = new.Auto[!train,]
 dim(test)</code></pre>
-<pre><code>## [1] 189  10</code></pre>
+<pre><code>## [1] 167  10</code></pre>
 <pre class="r"><code>summary(test)</code></pre>
 <pre><code>##       mpg          cylinders      displacement     horsepower   
-##  Min.   : 9.00   Min.   :5.000   Min.   :121.0   Min.   : 67.0  
-##  1st Qu.:14.00   1st Qu.:6.000   1st Qu.:231.0   1st Qu.:100.0  
-##  Median :17.00   Median :8.000   Median :302.0   Median :130.0  
-##  Mean   :17.36   Mean   :7.074   Mean   :286.2   Mean   :132.2  
-##  3rd Qu.:19.40   3rd Qu.:8.000   3rd Qu.:350.0   3rd Qu.:150.0  
+##  Min.   : 9.00   Min.   :4.000   Min.   :120.0   Min.   : 67.0  
+##  1st Qu.:14.00   1st Qu.:6.000   1st Qu.:241.0   1st Qu.:105.0  
+##  Median :16.00   Median :8.000   Median :304.0   Median :140.0  
+##  Mean   :16.81   Mean   :7.156   Mean   :297.4   Mean   :135.3  
+##  3rd Qu.:19.00   3rd Qu.:8.000   3rd Qu.:350.0   3rd Qu.:154.0  
 ##  Max.   :38.00   Max.   :8.000   Max.   :455.0   Max.   :230.0  
 ##                                                                 
-##      weight      acceleration        year           origin     
-##  Min.   :2472   Min.   : 8.00   Min.   :70.00   Min.   :1.000  
-##  1st Qu.:3211   1st Qu.:12.50   1st Qu.:72.00   1st Qu.:1.000  
-##  Median :3645   Median :14.50   Median :75.00   Median :1.000  
-##  Mean   :3698   Mean   :14.49   Mean   :74.88   Mean   :1.101  
-##  3rd Qu.:4190   3rd Qu.:16.20   3rd Qu.:78.00   3rd Qu.:1.000  
-##  Max.   :5140   Max.   :22.20   Max.   :82.00   Max.   :3.000  
-##                                                                
+##      weight      acceleration        year           origin    
+##  Min.   :3003   Min.   : 8.00   Min.   :70.00   Min.   :1.00  
+##  1st Qu.:3390   1st Qu.:12.50   1st Qu.:72.00   1st Qu.:1.00  
+##  Median :3761   Median :14.30   Median :75.00   Median :1.00  
+##  Mean   :3825   Mean   :14.67   Mean   :74.86   Mean   :1.06  
+##  3rd Qu.:4247   3rd Qu.:16.65   3rd Qu.:77.50   3rd Qu.:1.00  
+##  Max.   :5140   Max.   :24.80   Max.   :82.00   Max.   :2.00  
+##                                                               
 ##                         name         mpg01        
 ##  amc matador              :  5   Min.   :0.00000  
-##  amc gremlin              :  4   1st Qu.:0.00000  
-##  amc hornet               :  4   Median :0.00000  
-##  chevrolet impala         :  4   Mean   :0.08466  
-##  ford maverick            :  4   3rd Qu.:0.00000  
-##  chevrolet caprice classic:  3   Max.   :1.00000  
-##  (Other)                  :165</code></pre>
+##  chevrolet impala         :  4   1st Qu.:0.00000  
+##  chevrolet caprice classic:  3   Median :0.00000  
+##  chevrolet nova           :  3   Mean   :0.06587  
+##  ford galaxie 500         :  3   3rd Qu.:0.00000  
+##  ford gran torino         :  3   Max.   :1.00000  
+##  (Other)                  :146</code></pre>
 <pre class="r"><code>training = new.Auto[train,]
 dim(training)</code></pre>
-<pre><code>## [1] 203  10</code></pre>
+<pre><code>## [1] 225  10</code></pre>
 <pre class="r"><code>summary(training)</code></pre>
-<pre><code>##       mpg          cylinders     displacement     horsepower    
-##  Min.   :18.00   Min.   :3.00   Min.   : 68.0   Min.   : 46.00  
-##  1st Qu.:25.00   1st Qu.:4.00   1st Qu.: 91.0   1st Qu.: 68.00  
-##  Median :28.00   Median :4.00   Median :105.0   Median : 78.00  
-##  Mean   :29.11   Mean   :3.98   Mean   :108.9   Mean   : 78.69  
-##  3rd Qu.:32.85   3rd Qu.:4.00   3rd Qu.:121.0   3rd Qu.: 90.00  
-##  Max.   :46.60   Max.   :4.00   Max.   :156.0   Max.   :115.00  
-##                                                                 
-##      weight      acceleration        year        origin    
-##  Min.   :1613   Min.   :11.60   Min.   :70   Min.   :1.00  
-##  1st Qu.:2050   1st Qu.:14.70   1st Qu.:74   1st Qu.:1.00  
-##  Median :2234   Median :16.10   Median :77   Median :2.00  
-##  Mean   :2307   Mean   :16.52   Mean   :77   Mean   :2.02  
-##  3rd Qu.:2562   3rd Qu.:18.00   3rd Qu.:80   3rd Qu.:3.00  
-##  Max.   :3270   Max.   :24.80   Max.   :82   Max.   :3.00  
-##                                                            
+<pre><code>##       mpg          cylinders      displacement   horsepower    
+##  Min.   :18.00   Min.   :3.000   Min.   : 68   Min.   : 46.00  
+##  1st Qu.:24.00   1st Qu.:4.000   1st Qu.: 97   1st Qu.: 69.00  
+##  Median :27.90   Median :4.000   Median :108   Median : 82.00  
+##  Mean   :28.37   Mean   :4.222   Mean   :118   Mean   : 81.56  
+##  3rd Qu.:32.30   3rd Qu.:4.000   3rd Qu.:135   3rd Qu.: 92.00  
+##  Max.   :46.60   Max.   :6.000   Max.   :258   Max.   :132.00  
+##                                                                
+##      weight      acceleration        year           origin    
+##  Min.   :1613   Min.   :11.30   Min.   :70.00   Min.   :1.00  
+##  1st Qu.:2075   1st Qu.:14.50   1st Qu.:73.00   1st Qu.:1.00  
+##  Median :2288   Median :15.90   Median :77.00   Median :2.00  
+##  Mean   :2348   Mean   :16.19   Mean   :76.81   Mean   :1.96  
+##  3rd Qu.:2635   3rd Qu.:17.50   3rd Qu.:80.00   3rd Qu.:3.00  
+##  Max.   :2990   Max.   :24.60   Max.   :82.00   Max.   :3.00  
+##                                                               
 ##                  name         mpg01       
-##  toyota corolla    :  5   Min.   :0.0000  
-##  chevrolet chevette:  4   1st Qu.:1.0000  
-##  ford pinto        :  4   Median :1.0000  
-##  peugeot 504       :  4   Mean   :0.8867  
+##  ford pinto        :  5   Min.   :0.0000  
+##  toyota corolla    :  5   1st Qu.:1.0000  
+##  amc gremlin       :  4   Median :1.0000  
+##  chevrolet chevette:  4   Mean   :0.8222  
 ##  toyota corona     :  4   3rd Qu.:1.0000  
-##  chevrolet vega    :  3   Max.   :1.0000  
-##  (Other)           :179</code></pre>
+##  amc hornet        :  3   Max.   :1.0000  
+##  (Other)           :200</code></pre>
+<pre class="r"><code>mpg01.test=mpg01[!train]</code></pre>
 </div>
-<div id="d-perform-lda-on-the-training-data-in-order-to-predict-mpg01" class="section level1">
-<h1>(d) Perform LDA on the training data in order to predict mpg01</h1>
-<p>using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?</p>
-</div>
-<div id="f-perform-logistic-regression-on-the-training-data-in-order-to-pre-" class="section level1">
-<h1>(f) Perform logistic regression on the training data in order to pre-</h1>
-<p>dict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?</p>
-<pre class="r"><code>mpg01.test=mpg01[!train]
+<div id="d-perform-lda-on-the-training-data-in-order-to-predict-mpg01-using-the-variables-that-seemed-most-associated-with-mpg01-in-b.-what-is-the-test-error-of-the-model-obtained" class="section level2">
+<h2>(d) Perform LDA on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?</h2>
+<pre class="r"><code>lda.fit.horsepower=lda(mpg01~horsepower,data=new.Auto,subset=train)
+lda.fit.horsepower</code></pre>
+<pre><code>## Call:
+## lda(mpg01 ~ horsepower, data = new.Auto, subset = train)
+## 
+## Prior probabilities of groups:
+##         0         1 
+## 0.1777778 0.8222222 
+## 
+## Group means:
+##   horsepower
+## 0   96.17500
+## 1   78.39459
+## 
+## Coefficients of linear discriminants:
+##                   LD1
+## horsepower 0.06584186</code></pre>
+<pre class="r"><code>plot(lda.fit.horsepower)</code></pre>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAqAAAAHgCAMAAABNUi8GAAAAV1BMVEUAAAAAADoAAGYAOpAAZrYA//86AAA6ADo6AGY6kNtmAABmADpmkJBmtrZmtv+QOgCQkGaQtpCQ2/+2ZgC2tma2///bkDrb////tmb/25D//7b//9v///9mNGXlAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAONElEQVR4nO3dbVviVhhF4WgtFtrqVDppRP7/72xCQByBvJzzbNgJ6/4wl+PIMRzWhBBCUmwBY8WtFwDoQqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqCwRqBBilO3XqRZYBaDFL9/x9RGYBaDEKgGsxiEQDWYxSAEqhEzi7wwIFCR4Fm83weFQDUINAiBaoybxfXjz+37oige3kKGmxMC1Rg1i7s+n+s4N6uXgOFmhUA1xsziZrWsI31qvix/+y97uHkhUI1xgb5sP16XzZdVvS7NHW5eCFRj3FN8vfYsWYOeRaAao2Zxs3r8uVuFVpdeJd3vg0KgGiNnsWp3xz8FDTcjBKrBftAgBKpBoEHOBJpyhOiZG933caaJ97bkVfw3ZwJNWaee3Oje18wcLBKEQDV4ig9CoBoEGoRANcbd24/X9on8whYogRJotFH3tiyW7RfV4Yus4WaFQDXG3Nv9+/AN3ur8jkA1xh4sssfBIt8RqAZr0CAEqjFyG3S/CmUb9ASBaoy7t5tV+yr+wvqTQAk0GvtBgxCoBoEGIVANAg1CoBocLBKEQDVYgwYhUA0CDZIU6JmjkWMyn89xzwQaJC3Q/hvFrIenuyIm0CAEqkGgQQhUg0CDEKgGgQYhUA0CDUKgGgQahEA17i5Q1Q7BWwbavzeVQDXDCageqZsGOuBGorstR6AEao1ACdTa3R3NRKChd1uONSiBWiNQArU2bjFncOobAg2923IjP3Y8/VPfEGjo3Za7uxM3DMkmZV/+oCYSdqgPGSUt0P476XCU85jfOItT36St15LG7f9OzI9E3ShlruRYgxLo4RspcyU3cht0+qe+IdCLN0qZK7lxv3EGp74h0Is3SpkrOfaDEujhGylzJUegBHr4RspcySX+xuleJ4lAL94oZa7krnGwyJndabgnWWnl3BhQI1BYCz5YZMsTOk5cLdD+g0XGjjiCbF0/tQWe2rh5Awe/1Zm7OB08549xxQMHHyySuzgdPOePccUDswad3AJPbdzrBTrgYJHcxengOX+MKx44+GCR3MXp4Dl/jCseOH6p7mv+GFc8MIFOboGnNi6Bmg7MuBED81YnrBEorBEorBEorBEorBEorBEorBEorBEorBEorBEorBEorBEorMUHWhbFw1v4qO0nni8fx5/l/Y+Oj1GnqTSzsJUsrHJ2c3MID7Q5a1MV/9h8vNZjlsVT9LiNzarrc/5JmhkQzMJWsrDK2c3OITrQzWrZ3N/wu/q+aD4OdemcZVmq7hNRpGg/XrgWPOCChd0KZzc/B8k2qCDQlmKlVBXLjg9Rp5E94IqFPQ4u2ijxC7QU3dPtWvPgxAf6/KYYdkcXqGh283IQBFrJXsx0fdo5a9zoR6ZdF2nWSLJARbObmYPoKb7rc8nJKs1rJAJtx1XNbl4Omv2gkodGtf7kKX43rGx283IIDLQ87kprXyTEjluGz+DnAk/nRdJWFWj87H6Rk0P0GrRdFsEkfp52RyB8cXW7mUSBqmY3P4fwp/h1vb3x5SxjUd4Xwv/h8Y+5bke9JFDd7GbnEL8Nuq6fOOP/O5btSaEm85iL3vDdagIVzm5uDhwsAmsECmsECmsECmsECmsECmsECmsECmsECmsECmsECmsECmsECmsECmsECmsECmsECmsECmsECmsECmsECmsECmsECmsECmsECmsECmsECmsEehO6q9TMDYHegvDkd3NDoDegPH3o3BBomHX9tP3j4W3z54/mUkZVe/rmzepl98f78z+Lbyeg1pyAeW4INMp6V2Ud6Kq5ZEBVvNRdPh0DXdTfqPZnylSewn5uCDRIu1ZcN4EuD0/iVfO3Q6DNN8r2chfKi4DMDYEGadeHhyTbXOs/j4G+bD+bJNDhCDRIeSbQ+svjNuiXJnmKH45Ag/StQX8JlBdJgxFokH10+0C/bIMud//WboOu221QdjMNR6BRjq/id1ub+1fxzWUAP16LOtBm3/zhehfsqB+MQMOsi+Lx38efbaCH/aB1pUXxd/Mi6a/Fl+ux6K5SMzcEGuriC5/Qi0PeEwINsitwt8V5+Z8xHoFGaZ7TL19TjUATESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisESisxQRafAoZDjgILopAEYtAYW1cUevHn9v3RVE8vIUMB/QZVdSuz+c6zs3qJWA4oNeYojarZR3pU/Nl+dt/2cMB/cYF+rL9eF02X1b1ujR3OKDfuKf4eu1ZsgbFFY0qarN6/LlbhVaXXiURKGKNLKpqd8c/BQ0H9GA/KKwRKKwlFlXyKr5XcerWizRBHCwiU/z+HbMzHk/xMgQagUBlCDTCuDn7eG2fyC9sgRLoVwQaYdSclcWy/aI6fJE13BXc8oUKgUYYM2f79+EbU3mr85aREGiEsQeL7E3lYBECnTrWoLP83fMxcht0vwqdzjboaSRX2yol0Ajj5myzah/SC+vPSQQ6IFnZ744Z+K7MfD/ooEBFHRFoBAIlUGsESqDW5nWwyOnmJIFO3LzWoKetEejEESiBWiNQArVGoARqjUAJ1BqBEqg1Ak0LdMD7owQagUATA+2/EYFGINBbBsonk3sR6E0D7f+Re0egQwI9s6Yj0Osg0EGBBt0o4Ufu3ZQDHbJeI9CJm/LRTEOy6f8RArU26TXogGz6f+TMjVKO2hsU6IBxrzmBU2ASaNL+FlmgSTdKqvr0RxIncLZMTn2T9Eh5BRp0o8QJnC2TU98Q6OE7Cc8ks2Zy4gYCvfgjiTM6Fzc59c2g7bUBw9wumxkEOpF19U3WoIMezJBhrFozC/RqvynLTU59Q6AjfmTgY/PrzAxYPc4x0KhT3xDoiB8Z/uh0zkz/z8wh0LThUvYQDjo0LaQA8xududv9q0cCHTVc2oOZVHXSb7K+Udp/5tMf6Z/PIdsFQxKIGeZzuLSbjbpOkncB5jeKCjTpN6WkETTM53A5Nz6O0vmfZdCzFOYrK62cGwNqBAprwQeLbHlCx4mrBdp/sMjYEUfQvaXCuNJx8wYOfqszd3E6eM4f44oHDj5YJHdxOnjOH+OKB2YNOrkFntq41wt0wMEiuYvTwXP+GFc8cPDBIrmL08Fz/hhXPHD8Ut3X/DGueGACndwCT21cAjUdmHEjBuatTlgjUFgjUFgjUFgjUFgjUFgjUFgjUFgjUFgjUFgjUFgjUFgjUFiLD7Qsioe38FHbTzxfPo4/y/sfHR+jTlNpZmErWVjl7ObmEB5oc9amKv6x+XitxyyLp+hxG5tV1+f8kzQzIJiFrWRhlbObnUN0oJvVsrm/4Xf1fdF8HOrSOcuyVN0nokjRfrxwLXjABQu7Fc5ufg6SbVBBoC3FSqkqlh0fok4je8AVC3scXLRR4hdoKbqn27XmwYkP9PlNMeyOLlDR7OblIAi0kr2Y6fq0c9a40Y9Muy7SrJFkgYpmNzMH0VN81+eSk1Wa10gE2o6rmt28HDT7QSUPjWr9yVP8bljZ7OblEBhoedyV1r5IiB23DJ/BzwWezoukrSrQ+Nn9IieH6DVouyyCSfw87Y5A+OLqdjOJAlXNbn4O4U/x63p748tZxqK8L4T/w+Mfc92OekmgutnNziF+G3RdP3HG/3cs25NCTeYxF73hu9UEKpzd3Bw4WATWCBTWCBTWCBTWCBTWCBTWCBTWCBTWCBTWCBTWCBTWCBTWCBTWCBTWCBTWCBTWCBTWCBTWCBTWCBTWCBTWCBTWCBTWCBTWCBTWCBTWCBTWCPRGJFeTmSECvQ3J1WTmiEBvQnM1mTki0DDronj48fC2+fNHE1/Vnr55s3rZ/fH+/M/ieDUB6dVk5oVAo6x3VdaBrppLBlTFS93l0zHQRf2N6suZMgl0GAIN0p7set0EujycA7xq/nYItPlGebzcBYEOQ6BB2uAOSba51n8eA33Z/nK5CwIdhkCDlGcCrb88boN+u3ISgQ5DoEH61qAEmoZAg+wvjbQP9Ms26HL3b+026Jpt0LEINMrxVfxua3P/Kr65DODHa1EH2lyYhlfxoxFomHVRPP77+LMN9LAftK60KP5uXiT9tfjleiwEOgyBhrqYXejFIe8JgQbZFbjb4rz8zxiPQKM0z+mXr6lGoIkIFNYIFNYIFNYIFNYIFNYIFNYIFNYIFNYIFNYIFNYIFNYIFNYIFNYIFNYIFNYIFNYIFNYIFNYIFNYIFNYIFNb+B7jrD+hQkMxcAAAAAElFTkSuQmCC" /><!-- --></p>
+<pre class="r"><code>lda.pred.horsepower=predict(lda.fit.horsepower, test)
+names(lda.pred.horsepower)</code></pre>
+<pre><code>## [1] &quot;class&quot;     &quot;posterior&quot; &quot;x&quot;</code></pre>
+<pre class="r"><code>lda.class.horsepower=lda.pred.horsepower$class
+table(lda.class.horsepower,mpg01.test)</code></pre>
+<pre><code>##                     mpg01.test
+## lda.class.horsepower   0   1
+##                    0 115   1
+##                    1  41  10</code></pre>
+<pre class="r"><code>mean(lda.class.horsepower==mpg01.test)</code></pre>
+<pre><code>## [1] 0.748503</code></pre>
+<pre class="r"><code>test_error=1-mean(lda.class.horsepower==mpg01.test)
+test_error</code></pre>
+<pre><code>## [1] 0.251497</code></pre>
+<pre class="r"><code>#
 
-glm.fits.horsepower=glm(mpg01~horsepower,data=new.Auto,family=binomial,subset=train)
+lda.fit.mpg=lda(mpg01~mpg,data=new.Auto,subset=train)
+lda.fit.mpg</code></pre>
+<pre><code>## Call:
+## lda(mpg01 ~ mpg, data = new.Auto, subset = train)
+## 
+## Prior probabilities of groups:
+##         0         1 
+## 0.1777778 0.8222222 
+## 
+## Group means:
+##        mpg
+## 0 20.25750
+## 1 30.12378
+## 
+## Coefficients of linear discriminants:
+##           LD1
+## mpg 0.2106734</code></pre>
+<pre class="r"><code>plot(lda.fit.mpg)</code></pre>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<pre class="r"><code>lda.pred.mpg=predict(lda.fit.mpg, test)
+names(lda.pred.mpg)</code></pre>
+<pre><code>## [1] &quot;class&quot;     &quot;posterior&quot; &quot;x&quot;</code></pre>
+<pre class="r"><code>lda.class.mpg=lda.pred.mpg$class
+table(lda.class.mpg,mpg01.test)</code></pre>
+<pre><code>##              mpg01.test
+## lda.class.mpg   0   1
+##             0 152   0
+##             1   4  11</code></pre>
+<pre class="r"><code>mean(lda.class.mpg==mpg01.test)</code></pre>
+<pre><code>## [1] 0.9760479</code></pre>
+<pre class="r"><code>test_error=1-mean(lda.class.mpg==mpg01.test)
+test_error</code></pre>
+<pre><code>## [1] 0.0239521</code></pre>
+</div>
+<div id="f-perform-logistic-regression-on-the-training-data-in-order-to-predict-mpg01-using-the-variables-that-seemed-most-associated-with-mpg01-in-b.-what-is-the-test-error-of-the-model-obtained" class="section level2">
+<h2>(f) Perform logistic regression on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?</h2>
+<pre class="r"><code>glm.fits.horsepower=glm(mpg01~horsepower,data=new.Auto,family=binomial,subset=train)
 
 glm.probs=predict(glm.fits.horsepower,test,type=&quot;response&quot;)
 
-glm.pred=rep(&quot;0&quot;,189)
+glm.pred=rep(&quot;0&quot;,167)
 glm.pred[glm.probs&gt;0.5]=&quot;1&quot;
 table(glm.pred,mpg01.test)</code></pre>
 <pre><code>##         mpg01.test
 ## glm.pred   0   1
-##        0 118   8
-##        1  55   8</code></pre>
+##        0 115   1
+##        1  41  10</code></pre>
 <pre class="r"><code>mean(glm.pred==mpg01.test)</code></pre>
-<pre><code>## [1] 0.6666667</code></pre>
+<pre><code>## [1] 0.748503</code></pre>
+<pre class="r"><code>test_error=1-mean(glm.pred==mpg01.test)
+test_error</code></pre>
+<pre><code>## [1] 0.251497</code></pre>
+<pre class="r"><code>#
+
+glm.fits.mpg=glm(mpg01~mpg,data=new.Auto,family=binomial,subset=train)</code></pre>
+<pre><code>## Warning: glm.fit: algorithm did not converge</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre class="r"><code>glm.probs=predict(glm.fits.mpg,test,type=&quot;response&quot;)
+
+glm.pred=rep(&quot;0&quot;,167)
+glm.pred[glm.probs&gt;0.5]=&quot;1&quot;
+table(glm.pred,mpg01.test)</code></pre>
+<pre><code>##         mpg01.test
+## glm.pred   0   1
+##        0 156   0
+##        1   0  11</code></pre>
+<pre class="r"><code>mean(glm.pred==mpg01.test)</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre class="r"><code>test_error=1-mean(glm.pred==mpg01.test)
+test_error</code></pre>
+<pre><code>## [1] 0</code></pre>
+</div>
 </div>
 
 

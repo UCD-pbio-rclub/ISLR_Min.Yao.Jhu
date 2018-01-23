@@ -128,13 +128,9 @@ sum(lda.pred$posterior[,1]>.9)
 ## [1] 0
 ```
 
-# 10. This question should be answered using the Weekly data set, which
-is part of the ISLR package. This data is similar in nature to the
-Smarket data from this chapter’s lab, except that it contains 1, 089
-weekly returns for 21 years, from the beginning of 1990 to the end of
+# 10. This question should be answered using the Weekly data set, which is part of the ISLR package. This data is similar in nature to the Smarket data from this chapter’s lab, except that it contains 1, 089 weekly returns for 21 years, from the beginning of 1990 to the end of
 2010.
-# (a) Produce some numerical and graphical summaries of the Weekly
-data. Do there appear to be any patterns?
+## (a) Produce some numerical and graphical summaries of the Weekly data. Do there appear to be any patterns?
 
 
 ```r
@@ -232,11 +228,7 @@ plot(Volume)
 
 >  Volume is increasing over time but decreasing recently.  In other words, the average number of shares traded daily increased and then decreased.
 
-# (b) Use the full data set to perform a logistic regression with
-Direction as the response and the ﬁve lag variables plus Volume
-as predictors. Use the summary function to print the results. Do
-any of the predictors appear to be statistically signiﬁcant? If so,
-which ones?
+## (b) Use the full data set to perform a logistic regression with Direction as the response and the ﬁve lag variables plus Volume as predictors. Use the summary function to print the results. Do any of the predictors appear to be statistically signiﬁcant? If so, which ones?
 
 
 ```r
@@ -303,9 +295,7 @@ summary(glm.fits.Weekly)$coef
 
 > Yes, Lag2 appears to be statistically signiﬁcant.
 
-# (c) Compute the confusion matrix and overall fraction of correct
-predictions. Explain what the confusion matrix is telling you
-about the types of mistakes made by logistic regression.
+## (c) Compute the confusion matrix and overall fraction of correct predictions. Explain what the confusion matrix is telling you about the types of mistakes made by logistic regression.
 
 
 ```r
@@ -341,10 +331,7 @@ mean(glm.pred.Weekly==Direction)
 
 > 430 type I error (false positive), 48 type II error (false negative)
 
-# (d) Now ﬁt the logistic regression model using a training data period
-from 1990 to 2008, with Lag2 as the only predictor. Compute the
-confusion matrix and the overall fraction of correct predictions
-for the held out data (that is, the data from 2009 and 2010).
+## (d) Now ﬁt the logistic regression model using a training data period from 1990 to 2008, with Lag2 as the only predictor. Compute the confusion matrix and the overall fraction of correct predictions for the held out data (that is, the data from 2009 and 2010).
 
 
 ```r
@@ -363,6 +350,7 @@ Direction.1990to2008=Direction[!train.1990to2008]
 glm.fits.Lag2=glm(Direction~Lag2,data=Weekly,family=binomial,subset=train.1990to2008)
 
 glm.probs=predict(glm.fits.Lag2,Weekly.2009to2010,type="response")
+
 glm.pred=rep("Down",104)
 glm.pred[glm.probs>.5]="Up"
 table(glm.pred,Direction.1990to2008)
@@ -391,20 +379,74 @@ mean(glm.pred==Direction.1990to2008)
 ## [1] 0.625
 ```
 
-# (e) Repeat (d) using LDA.
-
-
-
 > 62.5%  accuracy rate
+
+## (e) Repeat (d) using LDA.
+
+
+```r
+lda.fit.train=lda(Direction~Lag2,data=Weekly,subset=train.1990to2008)
+lda.fit.train
+```
+
+```
+## Call:
+## lda(Direction ~ Lag2, data = Weekly, subset = train.1990to2008)
+## 
+## Prior probabilities of groups:
+##      Down        Up 
+## 0.4477157 0.5522843 
+## 
+## Group means:
+##             Lag2
+## Down -0.03568254
+## Up    0.26036581
+## 
+## Coefficients of linear discriminants:
+##            LD1
+## Lag2 0.4414162
+```
+
+```r
+plot(lda.fit.train)
+```
+
+![](chapter4-2_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+
+```r
+lda.pred.test=predict(lda.fit.train, Weekly.2009to2010)
+names(lda.pred.test)
+```
+
+```
+## [1] "class"     "posterior" "x"
+```
+
+```r
+lda.class=lda.pred.test$class
+table(lda.class,Direction.1990to2008)
+```
+
+```
+##          Direction.1990to2008
+## lda.class Down Up
+##      Down    9  5
+##      Up     34 56
+```
+
+```r
+mean(lda.class==Direction.1990to2008)
+```
+
+```
+## [1] 0.625
+```
+
+> the same 62.5%  accuracy rate
 
 # 11. In this problem, you will develop a model to predict whether a given car gets high or low gas mileage based on the Auto data set.
 
-# (a) Create a binary variable, mpg01, that contains a 1 if mpg contains
-a value above its median, and a 0 if mpg contains a value below
-its median. You can compute the median using the median()
-function. Note you may ﬁnd it helpful to use the data.frame()
-function to create a single data set containing both mpg01 and
-the other Auto variables.
+## (a) Create a binary variable, mpg01, that contains a 1 if mpg contains a value above its median, and a 0 if mpg contains a value below its median. You can compute the median using the median() function. Note you may ﬁnd it helpful to use the data.frame() function to create a single data set containing both mpg01 and the other Auto variables.
 
 
 ```r
@@ -471,22 +513,12 @@ median(mpg)
 
 mpg01=rep(0,392)
 mpg01[mpg>22.75]=1
-mpg01
+summary(mpg01)
 ```
 
 ```
-##   [1] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 1 1 1 1 1 1 0 0 0 0 0 1 1 1 0 0 0
-##  [36] 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0
-##  [71] 0 0 0 0 0 0 0 0 1 0 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0 0
-## [106] 0 0 0 0 0 0 0 0 1 0 0 1 1 0 0 0 1 0 0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 0 1
-## [141] 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 1 1 1 1 0 1 0
-## [176] 1 1 0 1 1 1 1 1 1 1 0 0 0 0 0 0 1 0 1 1 1 1 0 0 0 0 1 1 1 1 0 0 0 0 0
-## [211] 0 0 0 0 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 1 1 1
-## [246] 1 1 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 1 1 1 0 0 0 0 1 1 0 0
-## [281] 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0
-## [316] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-## [351] 1 1 1 1 1 1 1 1 0 1 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1
-## [386] 1 1 1 1 1 1 1
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##     0.0     0.0     0.5     0.5     1.0     1.0
 ```
 
 ```r
@@ -526,11 +558,7 @@ str(new.Auto)
 ##  $ mpg01       : num  0 0 0 0 0 0 0 0 0 0 ...
 ```
 
-# (b) Explore the data graphically in order to investigate the associ-
-ation between mpg01 and the other features. Which of the other
-features seem most likely to be useful in predicting mpg01? Scat-
-terplots and boxplots may be useful tools to answer this ques-
-tion. Describe your ﬁndings.
+## (b) Explore the data graphically in order to investigate the association between mpg01 and the other features. Which of the other features seem most likely to be useful in predicting mpg01? Scatterplots and boxplots may be useful tools to answer this question. Describe your ﬁndings.
 
 
 ```r
@@ -672,7 +700,9 @@ summary(glm.fits.new.Auto)$coef
 ## origin       -8.621655e+00   8107.82456 -0.0010633746 0.9991515
 ```
 
-# (c) Split the data into a training set and a test set.
+> Except mpg, horsepower and year seem most likely to be useful in predicting mpg01, and displacement, acceleration, and origin may also be useful in predicting mpg01.
+
+## (c) Split the data into a training set and a test set.
 
 
 ```r
@@ -732,13 +762,13 @@ attach(new.Auto)
 ```
 
 ```r
-train=(cylinders<5)
+train=(weight<3000)
 test = new.Auto[!train,]
 dim(test)
 ```
 
 ```
-## [1] 189  10
+## [1] 167  10
 ```
 
 ```r
@@ -747,29 +777,29 @@ summary(test)
 
 ```
 ##       mpg          cylinders      displacement     horsepower   
-##  Min.   : 9.00   Min.   :5.000   Min.   :121.0   Min.   : 67.0  
-##  1st Qu.:14.00   1st Qu.:6.000   1st Qu.:231.0   1st Qu.:100.0  
-##  Median :17.00   Median :8.000   Median :302.0   Median :130.0  
-##  Mean   :17.36   Mean   :7.074   Mean   :286.2   Mean   :132.2  
-##  3rd Qu.:19.40   3rd Qu.:8.000   3rd Qu.:350.0   3rd Qu.:150.0  
+##  Min.   : 9.00   Min.   :4.000   Min.   :120.0   Min.   : 67.0  
+##  1st Qu.:14.00   1st Qu.:6.000   1st Qu.:241.0   1st Qu.:105.0  
+##  Median :16.00   Median :8.000   Median :304.0   Median :140.0  
+##  Mean   :16.81   Mean   :7.156   Mean   :297.4   Mean   :135.3  
+##  3rd Qu.:19.00   3rd Qu.:8.000   3rd Qu.:350.0   3rd Qu.:154.0  
 ##  Max.   :38.00   Max.   :8.000   Max.   :455.0   Max.   :230.0  
 ##                                                                 
-##      weight      acceleration        year           origin     
-##  Min.   :2472   Min.   : 8.00   Min.   :70.00   Min.   :1.000  
-##  1st Qu.:3211   1st Qu.:12.50   1st Qu.:72.00   1st Qu.:1.000  
-##  Median :3645   Median :14.50   Median :75.00   Median :1.000  
-##  Mean   :3698   Mean   :14.49   Mean   :74.88   Mean   :1.101  
-##  3rd Qu.:4190   3rd Qu.:16.20   3rd Qu.:78.00   3rd Qu.:1.000  
-##  Max.   :5140   Max.   :22.20   Max.   :82.00   Max.   :3.000  
-##                                                                
+##      weight      acceleration        year           origin    
+##  Min.   :3003   Min.   : 8.00   Min.   :70.00   Min.   :1.00  
+##  1st Qu.:3390   1st Qu.:12.50   1st Qu.:72.00   1st Qu.:1.00  
+##  Median :3761   Median :14.30   Median :75.00   Median :1.00  
+##  Mean   :3825   Mean   :14.67   Mean   :74.86   Mean   :1.06  
+##  3rd Qu.:4247   3rd Qu.:16.65   3rd Qu.:77.50   3rd Qu.:1.00  
+##  Max.   :5140   Max.   :24.80   Max.   :82.00   Max.   :2.00  
+##                                                               
 ##                         name         mpg01        
 ##  amc matador              :  5   Min.   :0.00000  
-##  amc gremlin              :  4   1st Qu.:0.00000  
-##  amc hornet               :  4   Median :0.00000  
-##  chevrolet impala         :  4   Mean   :0.08466  
-##  ford maverick            :  4   3rd Qu.:0.00000  
-##  chevrolet caprice classic:  3   Max.   :1.00000  
-##  (Other)                  :165
+##  chevrolet impala         :  4   1st Qu.:0.00000  
+##  chevrolet caprice classic:  3   Median :0.00000  
+##  chevrolet nova           :  3   Mean   :0.06587  
+##  ford galaxie 500         :  3   3rd Qu.:0.00000  
+##  ford gran torino         :  3   Max.   :1.00000  
+##  (Other)                  :146
 ```
 
 ```r
@@ -778,7 +808,7 @@ dim(training)
 ```
 
 ```
-## [1] 203  10
+## [1] 225  10
 ```
 
 ```r
@@ -786,52 +816,185 @@ summary(training)
 ```
 
 ```
-##       mpg          cylinders     displacement     horsepower    
-##  Min.   :18.00   Min.   :3.00   Min.   : 68.0   Min.   : 46.00  
-##  1st Qu.:25.00   1st Qu.:4.00   1st Qu.: 91.0   1st Qu.: 68.00  
-##  Median :28.00   Median :4.00   Median :105.0   Median : 78.00  
-##  Mean   :29.11   Mean   :3.98   Mean   :108.9   Mean   : 78.69  
-##  3rd Qu.:32.85   3rd Qu.:4.00   3rd Qu.:121.0   3rd Qu.: 90.00  
-##  Max.   :46.60   Max.   :4.00   Max.   :156.0   Max.   :115.00  
-##                                                                 
-##      weight      acceleration        year        origin    
-##  Min.   :1613   Min.   :11.60   Min.   :70   Min.   :1.00  
-##  1st Qu.:2050   1st Qu.:14.70   1st Qu.:74   1st Qu.:1.00  
-##  Median :2234   Median :16.10   Median :77   Median :2.00  
-##  Mean   :2307   Mean   :16.52   Mean   :77   Mean   :2.02  
-##  3rd Qu.:2562   3rd Qu.:18.00   3rd Qu.:80   3rd Qu.:3.00  
-##  Max.   :3270   Max.   :24.80   Max.   :82   Max.   :3.00  
-##                                                            
+##       mpg          cylinders      displacement   horsepower    
+##  Min.   :18.00   Min.   :3.000   Min.   : 68   Min.   : 46.00  
+##  1st Qu.:24.00   1st Qu.:4.000   1st Qu.: 97   1st Qu.: 69.00  
+##  Median :27.90   Median :4.000   Median :108   Median : 82.00  
+##  Mean   :28.37   Mean   :4.222   Mean   :118   Mean   : 81.56  
+##  3rd Qu.:32.30   3rd Qu.:4.000   3rd Qu.:135   3rd Qu.: 92.00  
+##  Max.   :46.60   Max.   :6.000   Max.   :258   Max.   :132.00  
+##                                                                
+##      weight      acceleration        year           origin    
+##  Min.   :1613   Min.   :11.30   Min.   :70.00   Min.   :1.00  
+##  1st Qu.:2075   1st Qu.:14.50   1st Qu.:73.00   1st Qu.:1.00  
+##  Median :2288   Median :15.90   Median :77.00   Median :2.00  
+##  Mean   :2348   Mean   :16.19   Mean   :76.81   Mean   :1.96  
+##  3rd Qu.:2635   3rd Qu.:17.50   3rd Qu.:80.00   3rd Qu.:3.00  
+##  Max.   :2990   Max.   :24.60   Max.   :82.00   Max.   :3.00  
+##                                                               
 ##                  name         mpg01       
-##  toyota corolla    :  5   Min.   :0.0000  
-##  chevrolet chevette:  4   1st Qu.:1.0000  
-##  ford pinto        :  4   Median :1.0000  
-##  peugeot 504       :  4   Mean   :0.8867  
+##  ford pinto        :  5   Min.   :0.0000  
+##  toyota corolla    :  5   1st Qu.:1.0000  
+##  amc gremlin       :  4   Median :1.0000  
+##  chevrolet chevette:  4   Mean   :0.8222  
 ##  toyota corona     :  4   3rd Qu.:1.0000  
-##  chevrolet vega    :  3   Max.   :1.0000  
-##  (Other)           :179
+##  amc hornet        :  3   Max.   :1.0000  
+##  (Other)           :200
 ```
-
-# (d) Perform LDA on the training data in order to predict mpg01
-using the variables that seemed most associated with mpg01 in
-(b). What is the test error of the model obtained?
-
-
-
-
-# (f) Perform logistic regression on the training data in order to pre-
-dict mpg01 using the variables that seemed most associated with
-mpg01 in (b). What is the test error of the model obtained?
-
 
 ```r
 mpg01.test=mpg01[!train]
+```
 
+## (d) Perform LDA on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?
+
+
+```r
+lda.fit.horsepower=lda(mpg01~horsepower,data=new.Auto,subset=train)
+lda.fit.horsepower
+```
+
+```
+## Call:
+## lda(mpg01 ~ horsepower, data = new.Auto, subset = train)
+## 
+## Prior probabilities of groups:
+##         0         1 
+## 0.1777778 0.8222222 
+## 
+## Group means:
+##   horsepower
+## 0   96.17500
+## 1   78.39459
+## 
+## Coefficients of linear discriminants:
+##                   LD1
+## horsepower 0.06584186
+```
+
+```r
+plot(lda.fit.horsepower)
+```
+
+![](chapter4-2_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+
+```r
+lda.pred.horsepower=predict(lda.fit.horsepower, test)
+names(lda.pred.horsepower)
+```
+
+```
+## [1] "class"     "posterior" "x"
+```
+
+```r
+lda.class.horsepower=lda.pred.horsepower$class
+table(lda.class.horsepower,mpg01.test)
+```
+
+```
+##                     mpg01.test
+## lda.class.horsepower   0   1
+##                    0 115   1
+##                    1  41  10
+```
+
+```r
+mean(lda.class.horsepower==mpg01.test)
+```
+
+```
+## [1] 0.748503
+```
+
+```r
+test_error=1-mean(lda.class.horsepower==mpg01.test)
+test_error
+```
+
+```
+## [1] 0.251497
+```
+
+```r
+#
+
+lda.fit.mpg=lda(mpg01~mpg,data=new.Auto,subset=train)
+lda.fit.mpg
+```
+
+```
+## Call:
+## lda(mpg01 ~ mpg, data = new.Auto, subset = train)
+## 
+## Prior probabilities of groups:
+##         0         1 
+## 0.1777778 0.8222222 
+## 
+## Group means:
+##        mpg
+## 0 20.25750
+## 1 30.12378
+## 
+## Coefficients of linear discriminants:
+##           LD1
+## mpg 0.2106734
+```
+
+```r
+plot(lda.fit.mpg)
+```
+
+![](chapter4-2_files/figure-html/unnamed-chunk-10-2.png)<!-- -->
+
+```r
+lda.pred.mpg=predict(lda.fit.mpg, test)
+names(lda.pred.mpg)
+```
+
+```
+## [1] "class"     "posterior" "x"
+```
+
+```r
+lda.class.mpg=lda.pred.mpg$class
+table(lda.class.mpg,mpg01.test)
+```
+
+```
+##              mpg01.test
+## lda.class.mpg   0   1
+##             0 152   0
+##             1   4  11
+```
+
+```r
+mean(lda.class.mpg==mpg01.test)
+```
+
+```
+## [1] 0.9760479
+```
+
+```r
+test_error=1-mean(lda.class.mpg==mpg01.test)
+test_error
+```
+
+```
+## [1] 0.0239521
+```
+
+
+## (f) Perform logistic regression on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?
+
+
+```r
 glm.fits.horsepower=glm(mpg01~horsepower,data=new.Auto,family=binomial,subset=train)
 
 glm.probs=predict(glm.fits.horsepower,test,type="response")
 
-glm.pred=rep("0",189)
+glm.pred=rep("0",167)
 glm.pred[glm.probs>0.5]="1"
 table(glm.pred,mpg01.test)
 ```
@@ -839,8 +1002,8 @@ table(glm.pred,mpg01.test)
 ```
 ##         mpg01.test
 ## glm.pred   0   1
-##        0 118   8
-##        1  55   8
+##        0 115   1
+##        1  41  10
 ```
 
 ```r
@@ -848,5 +1011,60 @@ mean(glm.pred==mpg01.test)
 ```
 
 ```
-## [1] 0.6666667
+## [1] 0.748503
+```
+
+```r
+test_error=1-mean(glm.pred==mpg01.test)
+test_error
+```
+
+```
+## [1] 0.251497
+```
+
+```r
+#
+
+glm.fits.mpg=glm(mpg01~mpg,data=new.Auto,family=binomial,subset=train)
+```
+
+```
+## Warning: glm.fit: algorithm did not converge
+```
+
+```
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+```
+
+```r
+glm.probs=predict(glm.fits.mpg,test,type="response")
+
+glm.pred=rep("0",167)
+glm.pred[glm.probs>0.5]="1"
+table(glm.pred,mpg01.test)
+```
+
+```
+##         mpg01.test
+## glm.pred   0   1
+##        0 156   0
+##        1   0  11
+```
+
+```r
+mean(glm.pred==mpg01.test)
+```
+
+```
+## [1] 1
+```
+
+```r
+test_error=1-mean(glm.pred==mpg01.test)
+test_error
+```
+
+```
+## [1] 0
 ```

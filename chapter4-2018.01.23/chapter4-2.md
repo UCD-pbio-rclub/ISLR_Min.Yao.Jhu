@@ -128,8 +128,7 @@ sum(lda.pred$posterior[,1]>.9)
 ## [1] 0
 ```
 
-# 10. This question should be answered using the Weekly data set, which is part of the ISLR package. This data is similar in nature to the Smarket data from this chapter’s lab, except that it contains 1, 089 weekly returns for 21 years, from the beginning of 1990 to the end of
-2010.
+# 10. This question should be answered using the Weekly data set, which is part of the ISLR package. This data is similar in nature to the Smarket data from this chapter’s lab, except that it contains 1, 089 weekly returns for 21 years, from the beginning of 1990 to the end of 2010.
 ## (a) Produce some numerical and graphical summaries of the Weekly data. Do there appear to be any patterns?
 
 
@@ -181,9 +180,29 @@ summary(Weekly)
 
 ```r
 pairs(Weekly)
+
+library(GGally)
 ```
 
 ![](chapter4-2_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
+```r
+library(ggplot2)
+ggpairs(Weekly, aes(colour = Direction))
+```
+
+```
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+```
+
+![](chapter4-2_files/figure-html/unnamed-chunk-2-2.png)<!-- -->
 
 ```r
 cor(Weekly[,-9])
@@ -224,7 +243,7 @@ attach(Weekly)
 plot(Volume)
 ```
 
-![](chapter4-2_files/figure-html/unnamed-chunk-2-2.png)<!-- -->
+![](chapter4-2_files/figure-html/unnamed-chunk-2-3.png)<!-- -->
 
 >  Volume is increasing over time but decreasing recently.  In other words, the average number of shares traded daily increased and then decreased.
 
@@ -501,6 +520,15 @@ summary(Auto)
 
 ```r
 attach(Auto)
+```
+
+```
+## The following object is masked from package:ggplot2:
+## 
+##     mpg
+```
+
+```r
 median(mpg)
 ```
 
@@ -597,6 +625,53 @@ pairs(new.Auto)
 ```
 
 ![](chapter4-2_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+
+```r
+mpg01=rep(0,392)
+mpg01[mpg>22.75]="1"
+summary(mpg01)
+```
+
+```
+##    Length     Class      Mode 
+##       392 character character
+```
+
+```r
+new.Auto.F <- cbind(Auto, mpg01)
+str(new.Auto.F)
+```
+
+```
+## 'data.frame':	392 obs. of  10 variables:
+##  $ mpg         : num  18 15 18 16 17 15 14 14 14 15 ...
+##  $ cylinders   : num  8 8 8 8 8 8 8 8 8 8 ...
+##  $ displacement: num  307 350 318 304 302 429 454 440 455 390 ...
+##  $ horsepower  : num  130 165 150 150 140 198 220 215 225 190 ...
+##  $ weight      : num  3504 3693 3436 3433 3449 ...
+##  $ acceleration: num  12 11.5 11 12 10.5 10 9 8.5 10 8.5 ...
+##  $ year        : num  70 70 70 70 70 70 70 70 70 70 ...
+##  $ origin      : num  1 1 1 1 1 1 1 1 1 1 ...
+##  $ name        : Factor w/ 304 levels "amc ambassador brougham",..: 49 36 231 14 161 141 54 223 241 2 ...
+##  $ mpg01       : Factor w/ 2 levels "0","1": 1 1 1 1 1 1 1 1 1 1 ...
+```
+
+```r
+ggpairs(new.Auto.F[,-9], aes(colour = mpg01))
+```
+
+```
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+```
+
+![](chapter4-2_files/figure-html/unnamed-chunk-8-2.png)<!-- -->
 
 ```r
 #cor(new.Auto)
@@ -700,7 +775,7 @@ summary(glm.fits.new.Auto)$coef
 ## origin       -8.621655e+00   8107.82456 -0.0010633746 0.9991515
 ```
 
-> Except mpg, horsepower and year seem most likely to be useful in predicting mpg01, and displacement, acceleration, and origin may also be useful in predicting mpg01.
+> Except mpg, horsepower seem most likely to be useful in predicting mpg01, and displacement, acceleration, weight may also be useful in predicting mpg01.
 
 ## (c) Split the data into a training set and a test set.
 
@@ -761,14 +836,20 @@ attach(new.Auto)
 ##     origin, weight, year
 ```
 
+```
+## The following object is masked from package:ggplot2:
+## 
+##     mpg
+```
+
 ```r
-train=(weight<3000)
+train=(year<80)
 test = new.Auto[!train,]
 dim(test)
 ```
 
 ```
-## [1] 167  10
+## [1] 85 10
 ```
 
 ```r
@@ -776,30 +857,30 @@ summary(test)
 ```
 
 ```
-##       mpg          cylinders      displacement     horsepower   
-##  Min.   : 9.00   Min.   :4.000   Min.   :120.0   Min.   : 67.0  
-##  1st Qu.:14.00   1st Qu.:6.000   1st Qu.:241.0   1st Qu.:105.0  
-##  Median :16.00   Median :8.000   Median :304.0   Median :140.0  
-##  Mean   :16.81   Mean   :7.156   Mean   :297.4   Mean   :135.3  
-##  3rd Qu.:19.00   3rd Qu.:8.000   3rd Qu.:350.0   3rd Qu.:154.0  
-##  Max.   :38.00   Max.   :8.000   Max.   :455.0   Max.   :230.0  
-##                                                                 
-##      weight      acceleration        year           origin    
-##  Min.   :3003   Min.   : 8.00   Min.   :70.00   Min.   :1.00  
-##  1st Qu.:3390   1st Qu.:12.50   1st Qu.:72.00   1st Qu.:1.00  
-##  Median :3761   Median :14.30   Median :75.00   Median :1.00  
-##  Mean   :3825   Mean   :14.67   Mean   :74.86   Mean   :1.06  
-##  3rd Qu.:4247   3rd Qu.:16.65   3rd Qu.:77.50   3rd Qu.:1.00  
-##  Max.   :5140   Max.   :24.80   Max.   :82.00   Max.   :2.00  
-##                                                               
-##                         name         mpg01        
-##  amc matador              :  5   Min.   :0.00000  
-##  chevrolet impala         :  4   1st Qu.:0.00000  
-##  chevrolet caprice classic:  3   Median :0.00000  
-##  chevrolet nova           :  3   Mean   :0.06587  
-##  ford galaxie 500         :  3   3rd Qu.:0.00000  
-##  ford gran torino         :  3   Max.   :1.00000  
-##  (Other)                  :146
+##       mpg          cylinders      displacement     horsepower    
+##  Min.   :17.60   Min.   :3.000   Min.   : 70.0   Min.   : 48.00  
+##  1st Qu.:27.20   1st Qu.:4.000   1st Qu.: 97.0   1st Qu.: 67.00  
+##  Median :32.10   Median :4.000   Median :112.0   Median : 78.00  
+##  Mean   :31.98   Mean   :4.329   Mean   :127.1   Mean   : 80.06  
+##  3rd Qu.:36.00   3rd Qu.:4.000   3rd Qu.:145.0   3rd Qu.: 90.00  
+##  Max.   :46.60   Max.   :8.000   Max.   :350.0   Max.   :132.00  
+##                                                                  
+##      weight      acceleration        year           origin     
+##  Min.   :1755   Min.   :11.40   Min.   :80.00   Min.   :1.000  
+##  1st Qu.:2120   1st Qu.:14.90   1st Qu.:80.00   1st Qu.:1.000  
+##  Median :2395   Median :16.40   Median :81.00   Median :2.000  
+##  Mean   :2468   Mean   :16.61   Mean   :81.04   Mean   :1.953  
+##  3rd Qu.:2735   3rd Qu.:18.00   3rd Qu.:82.00   3rd Qu.:3.000  
+##  Max.   :3725   Max.   :24.60   Max.   :82.00   Max.   :3.000  
+##                                                                
+##                  name        mpg01       
+##  toyota corolla    : 3   Min.   :0.0000  
+##  chevrolet citation: 2   1st Qu.:1.0000  
+##  honda accord      : 2   Median :1.0000  
+##  mazda 626         : 2   Mean   :0.9412  
+##  plymouth reliant  : 2   3rd Qu.:1.0000  
+##  amc concord       : 1   Max.   :1.0000  
+##  (Other)           :73
 ```
 
 ```r
@@ -808,7 +889,7 @@ dim(training)
 ```
 
 ```
-## [1] 225  10
+## [1] 307  10
 ```
 
 ```r
@@ -816,30 +897,30 @@ summary(training)
 ```
 
 ```
-##       mpg          cylinders      displacement   horsepower    
-##  Min.   :18.00   Min.   :3.000   Min.   : 68   Min.   : 46.00  
-##  1st Qu.:24.00   1st Qu.:4.000   1st Qu.: 97   1st Qu.: 69.00  
-##  Median :27.90   Median :4.000   Median :108   Median : 82.00  
-##  Mean   :28.37   Mean   :4.222   Mean   :118   Mean   : 81.56  
-##  3rd Qu.:32.30   3rd Qu.:4.000   3rd Qu.:135   3rd Qu.: 92.00  
-##  Max.   :46.60   Max.   :6.000   Max.   :258   Max.   :132.00  
+##       mpg          cylinders      displacement     horsepower   
+##  Min.   : 9.00   Min.   :3.000   Min.   : 68.0   Min.   : 46.0  
+##  1st Qu.:16.00   1st Qu.:4.000   1st Qu.:112.0   1st Qu.: 83.0  
+##  Median :20.00   Median :6.000   Median :200.0   Median :100.0  
+##  Mean   :21.08   Mean   :5.788   Mean   :213.1   Mean   :111.2  
+##  3rd Qu.:26.00   3rd Qu.:8.000   3rd Qu.:305.0   3rd Qu.:141.0  
+##  Max.   :43.10   Max.   :8.000   Max.   :455.0   Max.   :230.0  
+##                                                                 
+##      weight      acceleration        year           origin     
+##  Min.   :1613   Min.   : 8.00   Min.   :70.00   Min.   :1.000  
+##  1st Qu.:2284   1st Qu.:13.50   1st Qu.:72.00   1st Qu.:1.000  
+##  Median :3070   Median :15.00   Median :75.00   Median :1.000  
+##  Mean   :3119   Mean   :15.25   Mean   :74.58   Mean   :1.472  
+##  3rd Qu.:3835   3rd Qu.:16.95   3rd Qu.:77.00   3rd Qu.:2.000  
+##  Max.   :5140   Max.   :24.80   Max.   :79.00   Max.   :3.000  
 ##                                                                
-##      weight      acceleration        year           origin    
-##  Min.   :1613   Min.   :11.30   Min.   :70.00   Min.   :1.00  
-##  1st Qu.:2075   1st Qu.:14.50   1st Qu.:73.00   1st Qu.:1.00  
-##  Median :2288   Median :15.90   Median :77.00   Median :2.00  
-##  Mean   :2348   Mean   :16.19   Mean   :76.81   Mean   :1.96  
-##  3rd Qu.:2635   3rd Qu.:17.50   3rd Qu.:80.00   3rd Qu.:3.00  
-##  Max.   :2990   Max.   :24.60   Max.   :82.00   Max.   :3.00  
-##                                                               
-##                  name         mpg01       
-##  ford pinto        :  5   Min.   :0.0000  
-##  toyota corolla    :  5   1st Qu.:1.0000  
-##  amc gremlin       :  4   Median :1.0000  
-##  chevrolet chevette:  4   Mean   :0.8222  
-##  toyota corona     :  4   3rd Qu.:1.0000  
-##  amc hornet        :  3   Max.   :1.0000  
-##  (Other)           :200
+##                name         mpg01       
+##  amc matador     :  5   Min.   :0.0000  
+##  ford pinto      :  5   1st Qu.:0.0000  
+##  amc gremlin     :  4   Median :0.0000  
+##  amc hornet      :  4   Mean   :0.3779  
+##  chevrolet impala:  4   3rd Qu.:1.0000  
+##  ford maverick   :  4   Max.   :1.0000  
+##  (Other)         :281
 ```
 
 ```r
@@ -860,16 +941,16 @@ lda.fit.horsepower
 ## 
 ## Prior probabilities of groups:
 ##         0         1 
-## 0.1777778 0.8222222 
+## 0.6221498 0.3778502 
 ## 
 ## Group means:
 ##   horsepower
-## 0   96.17500
-## 1   78.39459
+## 0   130.9791
+## 1    78.7069
 ## 
 ## Coefficients of linear discriminants:
 ##                   LD1
-## horsepower 0.06584186
+## horsepower 0.03217633
 ```
 
 ```r
@@ -894,9 +975,9 @@ table(lda.class.horsepower,mpg01.test)
 
 ```
 ##                     mpg01.test
-## lda.class.horsepower   0   1
-##                    0 115   1
-##                    1  41  10
+## lda.class.horsepower  0  1
+##                    0  2 10
+##                    1  3 70
 ```
 
 ```r
@@ -904,7 +985,7 @@ mean(lda.class.horsepower==mpg01.test)
 ```
 
 ```
-## [1] 0.748503
+## [1] 0.8470588
 ```
 
 ```r
@@ -913,7 +994,7 @@ test_error
 ```
 
 ```
-## [1] 0.251497
+## [1] 0.1529412
 ```
 
 ```r
@@ -929,16 +1010,16 @@ lda.fit.mpg
 ## 
 ## Prior probabilities of groups:
 ##         0         1 
-## 0.1777778 0.8222222 
+## 0.6221498 0.3778502 
 ## 
 ## Group means:
 ##        mpg
-## 0 20.25750
-## 1 30.12378
+## 0 16.83455
+## 1 28.08190
 ## 
 ## Coefficients of linear discriminants:
 ##           LD1
-## mpg 0.2106734
+## mpg 0.2859802
 ```
 
 ```r
@@ -963,9 +1044,9 @@ table(lda.class.mpg,mpg01.test)
 
 ```
 ##              mpg01.test
-## lda.class.mpg   0   1
-##             0 152   0
-##             1   4  11
+## lda.class.mpg  0  1
+##             0  5  0
+##             1  0 80
 ```
 
 ```r
@@ -973,7 +1054,7 @@ mean(lda.class.mpg==mpg01.test)
 ```
 
 ```
-## [1] 0.9760479
+## [1] 1
 ```
 
 ```r
@@ -982,7 +1063,7 @@ test_error
 ```
 
 ```
-## [1] 0.0239521
+## [1] 0
 ```
 
 
@@ -994,16 +1075,24 @@ glm.fits.horsepower=glm(mpg01~horsepower,data=new.Auto,family=binomial,subset=tr
 
 glm.probs=predict(glm.fits.horsepower,test,type="response")
 
-glm.pred=rep("0",167)
+dim(test)
+```
+
+```
+## [1] 85 10
+```
+
+```r
+glm.pred=rep("0",85)
 glm.pred[glm.probs>0.5]="1"
 table(glm.pred,mpg01.test)
 ```
 
 ```
 ##         mpg01.test
-## glm.pred   0   1
-##        0 115   1
-##        1  41  10
+## glm.pred  0  1
+##        0  2 14
+##        1  3 66
 ```
 
 ```r
@@ -1011,7 +1100,7 @@ mean(glm.pred==mpg01.test)
 ```
 
 ```
-## [1] 0.748503
+## [1] 0.8
 ```
 
 ```r
@@ -1020,7 +1109,7 @@ test_error
 ```
 
 ```
-## [1] 0.251497
+## [1] 0.2
 ```
 
 ```r
@@ -1040,16 +1129,24 @@ glm.fits.mpg=glm(mpg01~mpg,data=new.Auto,family=binomial,subset=train)
 ```r
 glm.probs=predict(glm.fits.mpg,test,type="response")
 
-glm.pred=rep("0",167)
+dim(test)
+```
+
+```
+## [1] 85 10
+```
+
+```r
+glm.pred=rep("0",85)
 glm.pred[glm.probs>0.5]="1"
 table(glm.pred,mpg01.test)
 ```
 
 ```
 ##         mpg01.test
-## glm.pred   0   1
-##        0 156   0
-##        1   0  11
+## glm.pred  0  1
+##        0  5  0
+##        1  0 80
 ```
 
 ```r

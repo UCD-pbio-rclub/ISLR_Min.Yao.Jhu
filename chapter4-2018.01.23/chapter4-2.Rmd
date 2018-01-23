@@ -36,8 +36,7 @@ lda.class[1:20]
 sum(lda.pred$posterior[,1]>.9)
 ```
 
-# 10. This question should be answered using the Weekly data set, which is part of the ISLR package. This data is similar in nature to the Smarket data from this chapter’s lab, except that it contains 1, 089 weekly returns for 21 years, from the beginning of 1990 to the end of
-2010.
+# 10. This question should be answered using the Weekly data set, which is part of the ISLR package. This data is similar in nature to the Smarket data from this chapter’s lab, except that it contains 1, 089 weekly returns for 21 years, from the beginning of 1990 to the end of 2010.
 ## (a) Produce some numerical and graphical summaries of the Weekly data. Do there appear to be any patterns?
 
 ```{r}
@@ -46,6 +45,10 @@ names(Weekly)
 dim(Weekly)
 summary(Weekly)
 pairs(Weekly)
+
+library(GGally)
+library(ggplot2)
+ggpairs(Weekly, aes(colour = Direction))
 
 cor(Weekly[,-9])
 attach(Weekly)
@@ -152,6 +155,14 @@ str(new.Auto)
 ```{r}
 summary(new.Auto)
 pairs(new.Auto)
+
+mpg01=rep(0,392)
+mpg01[mpg>22.75]="1"
+summary(mpg01)
+new.Auto.F <- cbind(Auto, mpg01)
+str(new.Auto.F)
+ggpairs(new.Auto.F[,-9], aes(colour = mpg01))
+
 #cor(new.Auto)
 cor(new.Auto[,-9])
 
@@ -162,7 +173,7 @@ coef(glm.fits.new.Auto)
 summary(glm.fits.new.Auto)$coef
 ```
 
-> Except mpg, horsepower and year seem most likely to be useful in predicting mpg01, and displacement, acceleration, and origin may also be useful in predicting mpg01.
+> Except mpg, horsepower seem most likely to be useful in predicting mpg01, and displacement, acceleration, weight may also be useful in predicting mpg01.
 
 ## (c) Split the data into a training set and a test set.
 
@@ -170,7 +181,7 @@ summary(glm.fits.new.Auto)$coef
 summary(new.Auto)
 dim(new.Auto)
 attach(new.Auto)
-train=(weight<3000)
+train=(year<80)
 test = new.Auto[!train,]
 dim(test)
 summary(test)
@@ -220,7 +231,8 @@ glm.fits.horsepower=glm(mpg01~horsepower,data=new.Auto,family=binomial,subset=tr
 
 glm.probs=predict(glm.fits.horsepower,test,type="response")
 
-glm.pred=rep("0",167)
+dim(test)
+glm.pred=rep("0",85)
 glm.pred[glm.probs>0.5]="1"
 table(glm.pred,mpg01.test)
 mean(glm.pred==mpg01.test)
@@ -233,7 +245,8 @@ glm.fits.mpg=glm(mpg01~mpg,data=new.Auto,family=binomial,subset=train)
 
 glm.probs=predict(glm.fits.mpg,test,type="response")
 
-glm.pred=rep("0",167)
+dim(test)
+glm.pred=rep("0",85)
 glm.pred[glm.probs>0.5]="1"
 table(glm.pred,mpg01.test)
 mean(glm.pred==mpg01.test)

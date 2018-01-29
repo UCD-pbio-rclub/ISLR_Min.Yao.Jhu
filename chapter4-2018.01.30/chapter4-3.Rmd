@@ -1,0 +1,368 @@
+---
+title: "chapter4-3"
+author: "Min-Yao"
+date: "2018年1月29日"
+output: 
+  html_document: 
+    keep_md: yes
+---
+# Linear Discriminant Analysis
+
+```{r}
+library(ISLR)
+library(MASS)
+attach(Smarket)
+train=(Year<2005)
+Smarket.2005=Smarket[!train,]
+dim(Smarket.2005)
+Direction.2005=Direction[!train]
+
+lda.fit=lda(Direction~Lag1+Lag2,data=Smarket,subset=train)
+lda.fit
+plot(lda.fit)
+
+#Smarket.2005=subset(Smarket, Year==2005)
+
+lda.pred=predict(lda.fit, Smarket.2005)
+names(lda.pred)
+lda.class=lda.pred$class
+table(lda.class,Direction.2005)
+mean(lda.class==Direction.2005)
+sum(lda.pred$posterior[,1]>=.5)
+sum(lda.pred$posterior[,1]<.5)
+lda.pred$posterior[1:20,1]
+lda.class[1:20]
+sum(lda.pred$posterior[,1]>.9)
+```
+
+# Quadratic Discriminant Analysis
+
+```{r}
+qda.fit=qda(Direction~Lag1+Lag2,data=Smarket,subset=train)
+qda.fit
+qda.class=predict(qda.fit,Smarket.2005)$class
+table(qda.class,Direction.2005)
+mean(qda.class==Direction.2005)
+```
+
+# K-Nearest Neighbors
+
+```{r}
+library(class)
+train.X=cbind(Lag1,Lag2)[train,]
+test.X=cbind(Lag1,Lag2)[!train,]
+train.Direction=Direction[train]
+#?knn
+set.seed(1)
+knn.pred=knn(train.X,test.X,train.Direction,k=1)
+table(knn.pred,Direction.2005)
+mean(knn.pred==Direction.2005)
+(83+43)/252
+knn.pred=knn(train.X,test.X,train.Direction,k=3)
+table(knn.pred,Direction.2005)
+mean(knn.pred==Direction.2005)
+
+```
+
+# An Application to Caravan Insurance Data
+
+```{r}
+dim(Caravan)
+attach(Caravan)
+summary(Purchase)
+348/5822
+```
+
+```{r}
+standardized.X=scale(Caravan[,-86])
+var(Caravan[,1])
+var(Caravan[,2])
+var(standardized.X[,1])
+var(standardized.X[,2])
+test=1:1000
+```
+
+
+```{r}
+train.X=standardized.X[-test,]
+test.X=standardized.X[test,]
+train.Y=Purchase[-test]
+test.Y=Purchase[test]
+set.seed(1)
+knn.pred=knn(train.X,test.X,train.Y,k=1)
+mean(test.Y!=knn.pred)
+mean(test.Y!="No")
+```
+
+```{r}
+table(knn.pred,test.Y)
+9/(68+9)
+knn.pred=knn(train.X,test.X,train.Y,k=3)
+table(knn.pred,test.Y)
+5/26
+knn.pred=knn(train.X,test.X,train.Y,k=5)
+table(knn.pred,test.Y)
+4/15
+```
+
+```{r}
+glm.fits=glm(Purchase~.,data=Caravan,family=binomial,subset=-test)
+glm.probs=predict(glm.fits,Caravan[test,],type="response")
+glm.pred=rep("No",1000)
+glm.pred[glm.probs>.5]="Yes"
+table(glm.pred,test.Y)
+glm.pred=rep("No",1000)
+glm.pred[glm.probs>.25]="Yes"
+table(glm.pred,test.Y)
+11/(22+11)
+```
+
+
+# 5. We now examine the diﬀerences between LDA and QDA.
+##(a) If the Bayes decision boundary is linear, do we expect LDA or QDA to perform better on the training set? On the test set?
+
+## (b) If the Bayes decision boundary is non-linear, do we expect LDA or QDA to perform better on the training set? On the test set?
+
+## (c) In general, as the sample size n increases, do we expect the test prediction accuracy of QDA relative to LDA to improve, decline, or be unchanged? Why?
+
+## (d) True or False: Even if the Bayes decision boundary for a given problem is linear, we will probably achieve a superior test error rate using QDA rather than LDA because QDA is ﬂexible enough to model a linear decision boundary. Justify your answer.
+
+# 8. Suppose that we take a data set, divide it into equally-sized training and test sets, and then try out two diﬀerent classiﬁcation procedures. First we use logistic regression and get an error rate of 20 % on the training data and 30 % on the test data. Next we use 1-nearest neighbors (i.e. K = 1) and get an average error rate (averaged over both test and training data sets) of 18 %. Based on these results, which method should we prefer to use for classiﬁcation of new observations? Why?
+
+# 9. This problem has to do with odds.
+## (a) On average, what fraction of people with an odds of 0.37 of defaulting on their credit card payment will in fact default?
+
+## (b) Suppose that an individual has a 16 % chance of defaulting on her credit card payment. What are the odds that she will default?
+
+# 10. This question should be answered using the Weekly data set, which is part of the ISLR package. This data is similar in nature to the Smarket data from this chapter’s lab, except that it contains 1, 089 weekly returns for 21 years, from the beginning of 1990 to the end of 2010.
+## (a) Produce some numerical and graphical summaries of the Weekly data. Do there appear to be any patterns?
+
+```{r}
+library(ISLR)
+names(Weekly)
+dim(Weekly)
+summary(Weekly)
+pairs(Weekly)
+
+library(GGally)
+library(ggplot2)
+ggpairs(Weekly, aes(colour = Direction))
+
+cor(Weekly[,-9])
+attach(Weekly)
+plot(Volume)
+```
+
+>  Volume is increasing over time but decreasing recently.  In other words, the average number of shares traded daily increased and then decreased.
+
+## (b) Use the full data set to perform a logistic regression with Direction as the response and the ﬁve lag variables plus Volume as predictors. Use the summary function to print the results. Do any of the predictors appear to be statistically signiﬁcant? If so, which ones?
+
+```{r}
+glm.fits.Weekly=glm(Direction~Lag1+Lag2+Lag3+Lag4+Lag5+Volume,data=Weekly,family=binomial)
+summary(glm.fits.Weekly)
+
+coef(glm.fits.Weekly)
+summary(glm.fits.Weekly)$coef
+```
+
+> Yes, Lag2 appears to be statistically signiﬁcant.
+
+## (c) Compute the confusion matrix and overall fraction of correct predictions. Explain what the confusion matrix is telling you about the types of mistakes made by logistic regression.
+
+```{r}
+glm.probs.Weekly=predict(glm.fits.Weekly,type="response")
+
+glm.pred.Weekly=rep("Down",1089)
+glm.pred.Weekly[glm.probs.Weekly>.5]="Up"
+table(glm.pred.Weekly,Direction)
+
+(54+557)/1089
+mean(glm.pred.Weekly==Direction)
+```
+
+> 430 type I error (false positive), 48 type II error (false negative)
+
+## (d) Now ﬁt the logistic regression model using a training data period from 1990 to 2008, with Lag2 as the only predictor. Compute the confusion matrix and the overall fraction of correct predictions for the held out data (that is, the data from 2009 and 2010).
+
+```{r}
+train.1990to2008=(Year<2009)
+Weekly.2009to2010=Weekly[!train.1990to2008,]
+dim(Weekly.2009to2010)
+Direction.1990to2008=Direction[!train.1990to2008]
+
+glm.fits.Lag2=glm(Direction~Lag2,data=Weekly,family=binomial,subset=train.1990to2008)
+
+glm.probs=predict(glm.fits.Lag2,Weekly.2009to2010,type="response")
+
+glm.pred=rep("Down",104)
+glm.pred[glm.probs>.5]="Up"
+table(glm.pred,Direction.1990to2008)
+mean(glm.pred==Direction.1990to2008)
+(9+56)/104
+
+```
+
+> 62.5%  accuracy rate
+
+## (e) Repeat (d) using LDA.
+
+```{r}
+lda.fit.train=lda(Direction~Lag2,data=Weekly,subset=train.1990to2008)
+lda.fit.train
+plot(lda.fit.train)
+
+lda.pred.test=predict(lda.fit.train, Weekly.2009to2010)
+names(lda.pred.test)
+lda.class=lda.pred.test$class
+table(lda.class,Direction.1990to2008)
+mean(lda.class==Direction.1990to2008)
+
+```
+
+> the same 62.5%  accuracy rate
+
+(f) Repeat (d) using QDA.
+(g) Repeat (d) using KNN with K = 1.
+(h) Which of these methods appears to provide the best results on
+this data?
+(i) Experiment with diﬀerent combinations of predictors, includ-
+ing possible transformations and interactions, for each of the
+methods. Report the variables, method, and associated confu-
+sion matrix that appears to provide the best results on the held
+out data. Note that you should also experiment with values for
+K in the KNN classiﬁer.
+
+# 11. In this problem, you will develop a model to predict whether a given car gets high or low gas mileage based on the Auto data set.
+
+## (a) Create a binary variable, mpg01, that contains a 1 if mpg contains a value above its median, and a 0 if mpg contains a value below its median. You can compute the median using the median() function. Note you may ﬁnd it helpful to use the data.frame() function to create a single data set containing both mpg01 and the other Auto variables.
+
+```{r}
+library(ISLR)
+names(Auto)
+
+dim(Auto)
+summary(Auto)
+
+attach(Auto)
+median(mpg)
+#22.75
+
+mpg01=rep(0,392)
+mpg01[mpg>22.75]=1
+summary(mpg01)
+
+str(Auto)
+
+new.Auto <- cbind(Auto, mpg01)
+#new.Auto
+str(new.Auto)
+
+```
+
+## (b) Explore the data graphically in order to investigate the association between mpg01 and the other features. Which of the other features seem most likely to be useful in predicting mpg01? Scatterplots and boxplots may be useful tools to answer this question. Describe your ﬁndings.
+
+```{r}
+summary(new.Auto)
+pairs(new.Auto)
+
+mpg01=rep(0,392)
+mpg01[mpg>22.75]="1"
+summary(mpg01)
+new.Auto.F <- cbind(Auto, mpg01)
+str(new.Auto.F)
+ggpairs(new.Auto.F[,-9], aes(colour = mpg01))
+
+#cor(new.Auto)
+cor(new.Auto[,-9])
+
+glm.fits.new.Auto=glm(mpg01~.-name,data=new.Auto,family=binomial)
+summary(glm.fits.new.Auto)
+
+coef(glm.fits.new.Auto)
+summary(glm.fits.new.Auto)$coef
+```
+
+> Except mpg, horsepower seem most likely to be useful in predicting mpg01, and displacement, acceleration, weight may also be useful in predicting mpg01.
+
+## (c) Split the data into a training set and a test set.
+
+```{r}
+summary(new.Auto)
+dim(new.Auto)
+attach(new.Auto)
+train=(year<80)
+test = new.Auto[!train,]
+dim(test)
+summary(test)
+training = new.Auto[train,]
+dim(training)
+summary(training)
+
+mpg01.test=mpg01[!train]
+```
+
+## (d) Perform LDA on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?
+
+```{r}
+lda.fit.horsepower=lda(mpg01~horsepower,data=new.Auto,subset=train)
+lda.fit.horsepower
+plot(lda.fit.horsepower)
+
+lda.pred.horsepower=predict(lda.fit.horsepower, test)
+names(lda.pred.horsepower)
+
+lda.class.horsepower=lda.pred.horsepower$class
+table(lda.class.horsepower,mpg01.test)
+mean(lda.class.horsepower==mpg01.test)
+test_error=1-mean(lda.class.horsepower==mpg01.test)
+test_error
+#
+
+lda.fit.mpg=lda(mpg01~mpg,data=new.Auto,subset=train)
+lda.fit.mpg
+plot(lda.fit.mpg)
+
+lda.pred.mpg=predict(lda.fit.mpg, test)
+names(lda.pred.mpg)
+
+lda.class.mpg=lda.pred.mpg$class
+table(lda.class.mpg,mpg01.test)
+mean(lda.class.mpg==mpg01.test)
+test_error=1-mean(lda.class.mpg==mpg01.test)
+test_error
+```
+
+## (f) Perform logistic regression on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?
+
+```{r}
+glm.fits.horsepower=glm(mpg01~horsepower,data=new.Auto,family=binomial,subset=train)
+
+glm.probs=predict(glm.fits.horsepower,test,type="response")
+
+dim(test)
+glm.pred=rep("0",85)
+glm.pred[glm.probs>0.5]="1"
+table(glm.pred,mpg01.test)
+mean(glm.pred==mpg01.test)
+test_error=1-mean(glm.pred==mpg01.test)
+test_error
+
+#
+
+glm.fits.mpg=glm(mpg01~mpg,data=new.Auto,family=binomial,subset=train)
+
+glm.probs=predict(glm.fits.mpg,test,type="response")
+
+dim(test)
+glm.pred=rep("0",85)
+glm.pred[glm.probs>0.5]="1"
+table(glm.pred,mpg01.test)
+mean(glm.pred==mpg01.test)
+test_error=1-mean(glm.pred==mpg01.test)
+test_error
+
+```
+
+## (g) Perform KNN on the training data, with several values of K, in order to predict mpg01. Use only the variables that seemed most associated with mpg01 in (b). What test errors do you obtain? Which value of K seems to perform the best on this data set?
+
+## 13. Using the Boston data set, ﬁt classiﬁcation models in order to predict whether a given suburb has a crime rate above or below the median. Explore logistic regression, LDA, and KNN models using various subsets of the predictors. Describe your ﬁndings.

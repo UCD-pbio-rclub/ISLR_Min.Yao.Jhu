@@ -425,18 +425,57 @@ table(glm.pred,test.Y)
 # 5. We now examine the diﬀerences between LDA and QDA.
 ##(a) If the Bayes decision boundary is linear, do we expect LDA or QDA to perform better on the training set? On the test set?
 
+> If the Bayes decision boundary is linear, LDA more accurately
+approximates this boundary than does QDA on the test set. The QDA decision boundary is inferior, because it suﬀers from higher variance without a corresponding decrease in bias. However, QDA may perform better on the training set by overﬁtting.
+
 ## (b) If the Bayes decision boundary is non-linear, do we expect LDA or QDA to perform better on the training set? On the test set?
+
+> If the Bayes decision boundary is non-linear, QDA more accurately approximates this boundary than does LDA on both the training set and the test set.
 
 ## (c) In general, as the sample size n increases, do we expect the test prediction accuracy of QDA relative to LDA to improve, decline, or be unchanged? Why?
 
+> Roughly speaking, LDA tends to be a better bet than QDA if there are relatively few training observations and so reducing variance is crucial. In contrast, QDA is recommended if the training set is very large, so that the variance of the classiﬁer is not a major concern, or if the assumption of a common covariance matrix for the K classes is clearly
+untenable.
+
 ## (d) True or False: Even if the Bayes decision boundary for a given problem is linear, we will probably achieve a superior test error rate using QDA rather than LDA because QDA is ﬂexible enough to model a linear decision boundary. Justify your answer.
 
+> False. If the Bayes decision boundary for a given problem is linear, the QDA decision boundary is inferior, because it suﬀers from higher variance without a corresponding decrease in bias.  
+
 # 8. Suppose that we take a data set, divide it into equally-sized training and test sets, and then try out two diﬀerent classiﬁcation procedures. First we use logistic regression and get an error rate of 20 % on the training data and 30 % on the test data. Next we use 1-nearest neighbors (i.e. K = 1) and get an average error rate (averaged over both test and training data sets) of 18 %. Based on these results, which method should we prefer to use for classiﬁcation of new observations? Why?
+
+> We prefer to use logistic regression for classification of new observations, because using 1-nearest neighbors (i.e. K = 1), we should get an error rate of 0 % on the training data, which indicates that we get an error rate of 36 % on the test data.
 
 # 9. This problem has to do with odds.
 ## (a) On average, what fraction of people with an odds of 0.37 of defaulting on their credit card payment will in fact default?
 
+p(X)/1-p(x) = 0.37
+p(x) = 0.37- 0.37*p(x)
+1.37*p(x) = 0.37
+p(x) = 0.37/1.37
+
+
+```r
+0.37/1.37
+```
+
+```
+## [1] 0.270073
+```
+
+> 0.270073
+
 ## (b) Suppose that an individual has a 16 % chance of defaulting on her credit card payment. What are the odds that she will default?
+
+
+```r
+0.16/(1-0.16)
+```
+
+```
+## [1] 0.1904762
+```
+
+> odds = 0.1904762
 
 # 10. This question should be answered using the Weekly data set, which is part of the ISLR package. This data is similar in nature to the Smarket data from this chapter’s lab, except that it contains 1, 089 weekly returns for 21 years, from the beginning of 1990 to the end of 2010.
 ## (a) Produce some numerical and graphical summaries of the Weekly data. Do there appear to be any patterns?
@@ -494,7 +533,7 @@ pairs(Weekly)
 library(GGally)
 ```
 
-![](chapter4-3_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+![](chapter4-3_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
 
 ```r
 library(ggplot2)
@@ -512,7 +551,7 @@ ggpairs(Weekly, aes(colour = Direction))
 ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 ```
 
-![](chapter4-3_files/figure-html/unnamed-chunk-9-2.png)<!-- -->
+![](chapter4-3_files/figure-html/unnamed-chunk-11-2.png)<!-- -->
 
 ```r
 cor(Weekly[,-9])
@@ -553,7 +592,7 @@ attach(Weekly)
 plot(Volume)
 ```
 
-![](chapter4-3_files/figure-html/unnamed-chunk-9-3.png)<!-- -->
+![](chapter4-3_files/figure-html/unnamed-chunk-11-3.png)<!-- -->
 
 >  Volume is increasing over time but decreasing recently.  In other words, the average number of shares traded daily increased and then decreased.
 
@@ -665,6 +704,7 @@ mean(glm.pred.Weekly==Direction)
 
 ```r
 train.1990to2008=(Year<2009)
+Weekly.1990to2008=Weekly[train.1990to2008,]
 Weekly.2009to2010=Weekly[!train.1990to2008,]
 dim(Weekly.2009to2010)
 ```
@@ -674,7 +714,7 @@ dim(Weekly.2009to2010)
 ```
 
 ```r
-Direction.1990to2008=Direction[!train.1990to2008]
+Direction.2009=Direction[!train.1990to2008]
 
 glm.fits.Lag2=glm(Direction~Lag2,data=Weekly,family=binomial,subset=train.1990to2008)
 
@@ -682,18 +722,18 @@ glm.probs=predict(glm.fits.Lag2,Weekly.2009to2010,type="response")
 
 glm.pred=rep("Down",104)
 glm.pred[glm.probs>.5]="Up"
-table(glm.pred,Direction.1990to2008)
+table(glm.pred,Direction.2009)
 ```
 
 ```
-##         Direction.1990to2008
+##         Direction.2009
 ## glm.pred Down Up
 ##     Down    9  5
 ##     Up     34 56
 ```
 
 ```r
-mean(glm.pred==Direction.1990to2008)
+mean(glm.pred==Direction.2009)
 ```
 
 ```
@@ -740,7 +780,7 @@ lda.fit.train
 plot(lda.fit.train)
 ```
 
-![](chapter4-3_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
+![](chapter4-3_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
 
 ```r
 lda.pred.test=predict(lda.fit.train, Weekly.2009to2010)
@@ -753,18 +793,18 @@ names(lda.pred.test)
 
 ```r
 lda.class=lda.pred.test$class
-table(lda.class,Direction.1990to2008)
+table(lda.class,Direction.2009)
 ```
 
 ```
-##          Direction.1990to2008
+##          Direction.2009
 ## lda.class Down Up
 ##      Down    9  5
 ##      Up     34 56
 ```
 
 ```r
-mean(lda.class==Direction.1990to2008)
+mean(lda.class==Direction.2009)
 ```
 
 ```
@@ -773,16 +813,109 @@ mean(lda.class==Direction.1990to2008)
 
 > the same 62.5%  accuracy rate
 
-(f) Repeat (d) using QDA.
-(g) Repeat (d) using KNN with K = 1.
-(h) Which of these methods appears to provide the best results on
-this data?
-(i) Experiment with diﬀerent combinations of predictors, includ-
-ing possible transformations and interactions, for each of the
-methods. Report the variables, method, and associated confu-
-sion matrix that appears to provide the best results on the held
-out data. Note that you should also experiment with values for
-K in the KNN classiﬁer.
+##(f) Repeat (d) using QDA.
+
+
+```r
+qda.fit.train=qda(Direction~Lag2,data=Weekly,subset=train.1990to2008)
+qda.fit.train
+```
+
+```
+## Call:
+## qda(Direction ~ Lag2, data = Weekly, subset = train.1990to2008)
+## 
+## Prior probabilities of groups:
+##      Down        Up 
+## 0.4477157 0.5522843 
+## 
+## Group means:
+##             Lag2
+## Down -0.03568254
+## Up    0.26036581
+```
+
+```r
+qda.class=predict(qda.fit.train,Weekly.2009to2010)$class
+table(qda.class,Direction.2009)
+```
+
+```
+##          Direction.2009
+## qda.class Down Up
+##      Down    0  0
+##      Up     43 61
+```
+
+```r
+mean(qda.class==Direction.2009)
+```
+
+```
+## [1] 0.5865385
+```
+
+> 58.6 % accuracy rate, lower than LDA
+
+## (g) Repeat (d) using KNN with K = 1.
+
+
+```r
+library(class)
+train.X=data.frame(Weekly.1990to2008[,"Lag2"])
+test.X=data.frame(Weekly.2009to2010[,"Lag2"])
+train.Direction=Weekly.1990to2008$Direction
+
+set.seed(2)
+knn.pred=knn(train.X,test.X,train.Direction,k=1)
+table(knn.pred,Direction.2009)
+```
+
+```
+##         Direction.2009
+## knn.pred Down Up
+##     Down   21 30
+##     Up     22 31
+```
+
+```r
+mean(knn.pred==Direction.2009)
+```
+
+```
+## [1] 0.5
+```
+
+> K=1, 50% accuracy rate
+
+## (h) Which of these methods appears to provide the best results on this data?
+
+> Logistic regression and LDA
+
+## (i) Experiment with diﬀerent combinations of predictors, including possible transformations and interactions, for each of the methods. Report the variables, method, and associated confusion matrix that appears to provide the best results on the held out data. Note that you should also experiment with values for K in the KNN classiﬁer.
+
+
+```r
+knn.pred=knn(train.X,test.X,train.Direction,k=3)
+table(knn.pred,Direction.2009)
+```
+
+```
+##         Direction.2009
+## knn.pred Down Up
+##     Down   16 19
+##     Up     27 42
+```
+
+```r
+mean(knn.pred==Direction.2009)
+```
+
+```
+## [1] 0.5576923
+```
+
+> K=3, 55.8% accuracy rate
 
 # 11. In this problem, you will develop a model to predict whether a given car gets high or low gas mileage based on the Auto data set.
 
@@ -945,7 +1078,7 @@ summary(new.Auto)
 pairs(new.Auto)
 ```
 
-![](chapter4-3_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
+![](chapter4-3_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
 
 ```r
 mpg01=rep(0,392)
@@ -992,7 +1125,7 @@ ggpairs(new.Auto.F[,-9], aes(colour = mpg01))
 ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 ```
 
-![](chapter4-3_files/figure-html/unnamed-chunk-15-2.png)<!-- -->
+![](chapter4-3_files/figure-html/unnamed-chunk-20-2.png)<!-- -->
 
 ```r
 #cor(new.Auto)
@@ -1252,70 +1385,74 @@ mpg01.test=mpg01[!train]
 
 
 ```r
-lda.fit.horsepower=lda(mpg01~horsepower,data=new.Auto,subset=train)
-lda.fit.horsepower
+lda.fit.hwd=lda(mpg01~horsepower+weight+displacement,data=new.Auto,subset=train)
+lda.fit.hwd
 ```
 
 ```
 ## Call:
-## lda(mpg01 ~ horsepower, data = new.Auto, subset = train)
+## lda(mpg01 ~ horsepower + weight + displacement, data = new.Auto, 
+##     subset = train)
 ## 
 ## Prior probabilities of groups:
 ##         0         1 
 ## 0.6221498 0.3778502 
 ## 
 ## Group means:
-##   horsepower
-## 0   130.9791
-## 1    78.7069
+##   horsepower   weight displacement
+## 0   130.9791 3630.592     274.4817
+## 1    78.7069 2275.664     111.9095
 ## 
 ## Coefficients of linear discriminants:
-##                   LD1
-## horsepower 0.03217633
+##                       LD1
+## horsepower    0.008048494
+## weight       -0.001274017
+## displacement -0.006517617
 ```
 
 ```r
-plot(lda.fit.horsepower)
+plot(lda.fit.hwd)
 ```
 
-![](chapter4-3_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
-
-```r
-lda.pred.horsepower=predict(lda.fit.horsepower, test)
-names(lda.pred.horsepower)
-```
-
-```
-## [1] "class"     "posterior" "x"
-```
+![](chapter4-3_files/figure-html/unnamed-chunk-22-1.png)<!-- -->
 
 ```r
-lda.class.horsepower=lda.pred.horsepower$class
-table(lda.class.horsepower,mpg01.test)
+lda.pred.hwd=predict(lda.fit.hwd, test)
+names(lda.fit.hwd)
 ```
 
 ```
-##                     mpg01.test
-## lda.class.horsepower  0  1
-##                    0  2 10
-##                    1  3 70
+##  [1] "prior"   "counts"  "means"   "scaling" "lev"     "svd"     "N"      
+##  [8] "call"    "terms"   "xlevels"
 ```
 
 ```r
-mean(lda.class.horsepower==mpg01.test)
+lda.class.hwd=lda.pred.hwd$class
+table(lda.class.hwd,mpg01.test)
 ```
 
 ```
-## [1] 0.8470588
+##              mpg01.test
+## lda.class.hwd  0  1
+##             0  5  9
+##             1  0 71
 ```
 
 ```r
-test_error=1-mean(lda.class.horsepower==mpg01.test)
+mean(lda.class.hwd==mpg01.test)
+```
+
+```
+## [1] 0.8941176
+```
+
+```r
+test_error=1-mean(lda.class.hwd==mpg01.test)
 test_error
 ```
 
 ```
-## [1] 0.1529412
+## [1] 0.1058824
 ```
 
 ```r
@@ -1347,7 +1484,7 @@ lda.fit.mpg
 plot(lda.fit.mpg)
 ```
 
-![](chapter4-3_files/figure-html/unnamed-chunk-17-2.png)<!-- -->
+![](chapter4-3_files/figure-html/unnamed-chunk-22-2.png)<!-- -->
 
 ```r
 lda.pred.mpg=predict(lda.fit.mpg, test)
@@ -1387,13 +1524,17 @@ test_error
 ## [1] 0
 ```
 
+> Using horsepower+weight+displacement, test error = 0.1058824
+
+> Using mpg, test error = 0
+
 ## (f) Perform logistic regression on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?
 
 
 ```r
-glm.fits.horsepower=glm(mpg01~horsepower,data=new.Auto,family=binomial,subset=train)
+glm.fits.hwd=glm(mpg01~horsepower+weight+displacement,data=new.Auto,family=binomial,subset=train)
 
-glm.probs=predict(glm.fits.horsepower,test,type="response")
+glm.probs=predict(glm.fits.hwd,test,type="response")
 
 dim(test)
 ```
@@ -1411,8 +1552,8 @@ table(glm.pred,mpg01.test)
 ```
 ##         mpg01.test
 ## glm.pred  0  1
-##        0  2 14
-##        1  3 66
+##        0  5 15
+##        1  0 65
 ```
 
 ```r
@@ -1420,7 +1561,7 @@ mean(glm.pred==mpg01.test)
 ```
 
 ```
-## [1] 0.8
+## [1] 0.8235294
 ```
 
 ```r
@@ -1429,7 +1570,7 @@ test_error
 ```
 
 ```
-## [1] 0.2
+## [1] 0.1764706
 ```
 
 ```r
@@ -1486,6 +1627,701 @@ test_error
 ## [1] 0
 ```
 
+> Using horsepower+weight+displacement, test error = 0.1764706
+
+> Using mpg, test error = 0
+
 ## (g) Perform KNN on the training data, with several values of K, in order to predict mpg01. Use only the variables that seemed most associated with mpg01 in (b). What test errors do you obtain? Which value of K seems to perform the best on this data set?
 
+
+```r
+library(class)
+train.01=cbind(horsepower,weight,displacement)[train,]
+test.01=cbind(horsepower,weight,displacement)[!train,]
+train.Direction.01=training$mpg01
+
+set.seed(1)
+knn.pred.01=knn(train.01,test.01,train.Direction.01,k=1)
+table(knn.pred.01,mpg01.test)
+```
+
+```
+##            mpg01.test
+## knn.pred.01  0  1
+##           0  5 17
+##           1  0 63
+```
+
+```r
+mean(knn.pred.01==mpg01.test)
+```
+
+```
+## [1] 0.8
+```
+
+```r
+test_error=1-mean(knn.pred.01==mpg01.test)
+test_error
+```
+
+```
+## [1] 0.2
+```
+
+```r
+knn.pred.01.2=knn(train.01,test.01,train.Direction.01,k=2)
+table(knn.pred.01.2,mpg01.test)
+```
+
+```
+##              mpg01.test
+## knn.pred.01.2  0  1
+##             0  5 19
+##             1  0 61
+```
+
+```r
+mean(knn.pred.01.2==mpg01.test)
+```
+
+```
+## [1] 0.7764706
+```
+
+```r
+test_error=1-mean(knn.pred.01.2==mpg01.test)
+test_error
+```
+
+```
+## [1] 0.2235294
+```
+
+```r
+knn.pred.01.3=knn(train.01,test.01,train.Direction.01,k=3)
+table(knn.pred.01.3,mpg01.test)
+```
+
+```
+##              mpg01.test
+## knn.pred.01.3  0  1
+##             0  5 22
+##             1  0 58
+```
+
+```r
+mean(knn.pred.01.3==mpg01.test)
+```
+
+```
+## [1] 0.7411765
+```
+
+```r
+test_error=1-mean(knn.pred.01.3==mpg01.test)
+test_error
+```
+
+```
+## [1] 0.2588235
+```
+
+```r
+knn.pred.01.5=knn(train.01,test.01,train.Direction.01,k=5)
+table(knn.pred.01.5,mpg01.test)
+```
+
+```
+##              mpg01.test
+## knn.pred.01.5  0  1
+##             0  5 19
+##             1  0 61
+```
+
+```r
+mean(knn.pred.01.5==mpg01.test)
+```
+
+```
+## [1] 0.7764706
+```
+
+```r
+test_error=1-mean(knn.pred.01.5==mpg01.test)
+test_error
+```
+
+```
+## [1] 0.2235294
+```
+
+```r
+knn.pred.01.10=knn(train.01,test.01,train.Direction.01,k=10)
+table(knn.pred.01.10,mpg01.test)
+```
+
+```
+##               mpg01.test
+## knn.pred.01.10  0  1
+##              0  5 18
+##              1  0 62
+```
+
+```r
+mean(knn.pred.01.10==mpg01.test)
+```
+
+```
+## [1] 0.7882353
+```
+
+```r
+test_error=1-mean(knn.pred.01.10==mpg01.test)
+test_error
+```
+
+```
+## [1] 0.2117647
+```
+
+> K=1, seems to perform the best on this data set. test error = 0.2
+
 ## 13. Using the Boston data set, ﬁt classiﬁcation models in order to predict whether a given suburb has a crime rate above or below the median. Explore logistic regression, LDA, and KNN models using various subsets of the predictors. Describe your ﬁndings.
+
+
+```r
+attach (Boston)
+summary(Boston)
+```
+
+```
+##       crim                zn             indus            chas        
+##  Min.   : 0.00632   Min.   :  0.00   Min.   : 0.46   Min.   :0.00000  
+##  1st Qu.: 0.08204   1st Qu.:  0.00   1st Qu.: 5.19   1st Qu.:0.00000  
+##  Median : 0.25651   Median :  0.00   Median : 9.69   Median :0.00000  
+##  Mean   : 3.61352   Mean   : 11.36   Mean   :11.14   Mean   :0.06917  
+##  3rd Qu.: 3.67708   3rd Qu.: 12.50   3rd Qu.:18.10   3rd Qu.:0.00000  
+##  Max.   :88.97620   Max.   :100.00   Max.   :27.74   Max.   :1.00000  
+##       nox               rm             age              dis        
+##  Min.   :0.3850   Min.   :3.561   Min.   :  2.90   Min.   : 1.130  
+##  1st Qu.:0.4490   1st Qu.:5.886   1st Qu.: 45.02   1st Qu.: 2.100  
+##  Median :0.5380   Median :6.208   Median : 77.50   Median : 3.207  
+##  Mean   :0.5547   Mean   :6.285   Mean   : 68.57   Mean   : 3.795  
+##  3rd Qu.:0.6240   3rd Qu.:6.623   3rd Qu.: 94.08   3rd Qu.: 5.188  
+##  Max.   :0.8710   Max.   :8.780   Max.   :100.00   Max.   :12.127  
+##       rad              tax           ptratio          black       
+##  Min.   : 1.000   Min.   :187.0   Min.   :12.60   Min.   :  0.32  
+##  1st Qu.: 4.000   1st Qu.:279.0   1st Qu.:17.40   1st Qu.:375.38  
+##  Median : 5.000   Median :330.0   Median :19.05   Median :391.44  
+##  Mean   : 9.549   Mean   :408.2   Mean   :18.46   Mean   :356.67  
+##  3rd Qu.:24.000   3rd Qu.:666.0   3rd Qu.:20.20   3rd Qu.:396.23  
+##  Max.   :24.000   Max.   :711.0   Max.   :22.00   Max.   :396.90  
+##      lstat            medv      
+##  Min.   : 1.73   Min.   : 5.00  
+##  1st Qu.: 6.95   1st Qu.:17.02  
+##  Median :11.36   Median :21.20  
+##  Mean   :12.65   Mean   :22.53  
+##  3rd Qu.:16.95   3rd Qu.:25.00  
+##  Max.   :37.97   Max.   :50.00
+```
+
+```r
+dim(Boston)
+```
+
+```
+## [1] 506  14
+```
+
+```r
+names(Boston)
+```
+
+```
+##  [1] "crim"    "zn"      "indus"   "chas"    "nox"     "rm"      "age"    
+##  [8] "dis"     "rad"     "tax"     "ptratio" "black"   "lstat"   "medv"
+```
+
+```r
+median(crim)
+```
+
+```
+## [1] 0.25651
+```
+
+```r
+crim.F=rep("below",506)
+crim.F[crim>0.25651]="above"
+summary(crim.F)
+```
+
+```
+##    Length     Class      Mode 
+##       506 character character
+```
+
+```r
+str(Boston)
+```
+
+```
+## 'data.frame':	506 obs. of  14 variables:
+##  $ crim   : num  0.00632 0.02731 0.02729 0.03237 0.06905 ...
+##  $ zn     : num  18 0 0 0 0 0 12.5 12.5 12.5 12.5 ...
+##  $ indus  : num  2.31 7.07 7.07 2.18 2.18 2.18 7.87 7.87 7.87 7.87 ...
+##  $ chas   : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ nox    : num  0.538 0.469 0.469 0.458 0.458 0.458 0.524 0.524 0.524 0.524 ...
+##  $ rm     : num  6.58 6.42 7.18 7 7.15 ...
+##  $ age    : num  65.2 78.9 61.1 45.8 54.2 58.7 66.6 96.1 100 85.9 ...
+##  $ dis    : num  4.09 4.97 4.97 6.06 6.06 ...
+##  $ rad    : int  1 2 2 3 3 3 5 5 5 5 ...
+##  $ tax    : num  296 242 242 222 222 222 311 311 311 311 ...
+##  $ ptratio: num  15.3 17.8 17.8 18.7 18.7 18.7 15.2 15.2 15.2 15.2 ...
+##  $ black  : num  397 397 393 395 397 ...
+##  $ lstat  : num  4.98 9.14 4.03 2.94 5.33 ...
+##  $ medv   : num  24 21.6 34.7 33.4 36.2 28.7 22.9 27.1 16.5 18.9 ...
+```
+
+```r
+new.Boston <- cbind(Boston, crim.F)
+str(new.Boston)
+```
+
+```
+## 'data.frame':	506 obs. of  15 variables:
+##  $ crim   : num  0.00632 0.02731 0.02729 0.03237 0.06905 ...
+##  $ zn     : num  18 0 0 0 0 0 12.5 12.5 12.5 12.5 ...
+##  $ indus  : num  2.31 7.07 7.07 2.18 2.18 2.18 7.87 7.87 7.87 7.87 ...
+##  $ chas   : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ nox    : num  0.538 0.469 0.469 0.458 0.458 0.458 0.524 0.524 0.524 0.524 ...
+##  $ rm     : num  6.58 6.42 7.18 7 7.15 ...
+##  $ age    : num  65.2 78.9 61.1 45.8 54.2 58.7 66.6 96.1 100 85.9 ...
+##  $ dis    : num  4.09 4.97 4.97 6.06 6.06 ...
+##  $ rad    : int  1 2 2 3 3 3 5 5 5 5 ...
+##  $ tax    : num  296 242 242 222 222 222 311 311 311 311 ...
+##  $ ptratio: num  15.3 17.8 17.8 18.7 18.7 18.7 15.2 15.2 15.2 15.2 ...
+##  $ black  : num  397 397 393 395 397 ...
+##  $ lstat  : num  4.98 9.14 4.03 2.94 5.33 ...
+##  $ medv   : num  24 21.6 34.7 33.4 36.2 28.7 22.9 27.1 16.5 18.9 ...
+##  $ crim.F : Factor w/ 2 levels "above","below": 2 2 2 2 2 2 2 2 2 2 ...
+```
+
+```r
+summary(new.Boston)
+```
+
+```
+##       crim                zn             indus            chas        
+##  Min.   : 0.00632   Min.   :  0.00   Min.   : 0.46   Min.   :0.00000  
+##  1st Qu.: 0.08204   1st Qu.:  0.00   1st Qu.: 5.19   1st Qu.:0.00000  
+##  Median : 0.25651   Median :  0.00   Median : 9.69   Median :0.00000  
+##  Mean   : 3.61352   Mean   : 11.36   Mean   :11.14   Mean   :0.06917  
+##  3rd Qu.: 3.67708   3rd Qu.: 12.50   3rd Qu.:18.10   3rd Qu.:0.00000  
+##  Max.   :88.97620   Max.   :100.00   Max.   :27.74   Max.   :1.00000  
+##       nox               rm             age              dis        
+##  Min.   :0.3850   Min.   :3.561   Min.   :  2.90   Min.   : 1.130  
+##  1st Qu.:0.4490   1st Qu.:5.886   1st Qu.: 45.02   1st Qu.: 2.100  
+##  Median :0.5380   Median :6.208   Median : 77.50   Median : 3.207  
+##  Mean   :0.5547   Mean   :6.285   Mean   : 68.57   Mean   : 3.795  
+##  3rd Qu.:0.6240   3rd Qu.:6.623   3rd Qu.: 94.08   3rd Qu.: 5.188  
+##  Max.   :0.8710   Max.   :8.780   Max.   :100.00   Max.   :12.127  
+##       rad              tax           ptratio          black       
+##  Min.   : 1.000   Min.   :187.0   Min.   :12.60   Min.   :  0.32  
+##  1st Qu.: 4.000   1st Qu.:279.0   1st Qu.:17.40   1st Qu.:375.38  
+##  Median : 5.000   Median :330.0   Median :19.05   Median :391.44  
+##  Mean   : 9.549   Mean   :408.2   Mean   :18.46   Mean   :356.67  
+##  3rd Qu.:24.000   3rd Qu.:666.0   3rd Qu.:20.20   3rd Qu.:396.23  
+##  Max.   :24.000   Max.   :711.0   Max.   :22.00   Max.   :396.90  
+##      lstat            medv         crim.F   
+##  Min.   : 1.73   Min.   : 5.00   above:253  
+##  1st Qu.: 6.95   1st Qu.:17.02   below:253  
+##  Median :11.36   Median :21.20              
+##  Mean   :12.65   Mean   :22.53              
+##  3rd Qu.:16.95   3rd Qu.:25.00              
+##  Max.   :37.97   Max.   :50.00
+```
+
+
+```r
+pairs(new.Boston)
+```
+
+![](chapter4-3_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
+
+```r
+ggpairs(new.Boston, aes(colour = crim.F))
+```
+
+```
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+```
+
+![](chapter4-3_files/figure-html/unnamed-chunk-26-2.png)<!-- -->
+
+
+```r
+glm.fits.nB=glm(crim.F~.-crim,data=new.Boston,family=binomial)
+summary(glm.fits.nB)
+```
+
+```
+## 
+## Call:
+## glm(formula = crim.F ~ . - crim, family = binomial, data = new.Boston)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.4239  -0.0023   0.0004   0.1585   2.3946  
+## 
+## Coefficients:
+##               Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)  34.103704   6.530014   5.223 1.76e-07 ***
+## zn            0.079918   0.033731   2.369  0.01782 *  
+## indus         0.059389   0.043722   1.358  0.17436    
+## chas         -0.785327   0.728930  -1.077  0.28132    
+## nox         -48.523782   7.396497  -6.560 5.37e-11 ***
+## rm            0.425596   0.701104   0.607  0.54383    
+## age          -0.022172   0.012221  -1.814  0.06963 .  
+## dis          -0.691400   0.218308  -3.167  0.00154 ** 
+## rad          -0.656465   0.152452  -4.306 1.66e-05 ***
+## tax           0.006412   0.002689   2.385  0.01709 *  
+## ptratio      -0.368716   0.122136  -3.019  0.00254 ** 
+## black         0.013524   0.006536   2.069  0.03853 *  
+## lstat        -0.043862   0.048981  -0.895  0.37052    
+## medv         -0.167130   0.066940  -2.497  0.01254 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 701.46  on 505  degrees of freedom
+## Residual deviance: 211.93  on 492  degrees of freedom
+## AIC: 239.93
+## 
+## Number of Fisher Scoring iterations: 9
+```
+
+
+```r
+summary(new.Boston)
+```
+
+```
+##       crim                zn             indus            chas        
+##  Min.   : 0.00632   Min.   :  0.00   Min.   : 0.46   Min.   :0.00000  
+##  1st Qu.: 0.08204   1st Qu.:  0.00   1st Qu.: 5.19   1st Qu.:0.00000  
+##  Median : 0.25651   Median :  0.00   Median : 9.69   Median :0.00000  
+##  Mean   : 3.61352   Mean   : 11.36   Mean   :11.14   Mean   :0.06917  
+##  3rd Qu.: 3.67708   3rd Qu.: 12.50   3rd Qu.:18.10   3rd Qu.:0.00000  
+##  Max.   :88.97620   Max.   :100.00   Max.   :27.74   Max.   :1.00000  
+##       nox               rm             age              dis        
+##  Min.   :0.3850   Min.   :3.561   Min.   :  2.90   Min.   : 1.130  
+##  1st Qu.:0.4490   1st Qu.:5.886   1st Qu.: 45.02   1st Qu.: 2.100  
+##  Median :0.5380   Median :6.208   Median : 77.50   Median : 3.207  
+##  Mean   :0.5547   Mean   :6.285   Mean   : 68.57   Mean   : 3.795  
+##  3rd Qu.:0.6240   3rd Qu.:6.623   3rd Qu.: 94.08   3rd Qu.: 5.188  
+##  Max.   :0.8710   Max.   :8.780   Max.   :100.00   Max.   :12.127  
+##       rad              tax           ptratio          black       
+##  Min.   : 1.000   Min.   :187.0   Min.   :12.60   Min.   :  0.32  
+##  1st Qu.: 4.000   1st Qu.:279.0   1st Qu.:17.40   1st Qu.:375.38  
+##  Median : 5.000   Median :330.0   Median :19.05   Median :391.44  
+##  Mean   : 9.549   Mean   :408.2   Mean   :18.46   Mean   :356.67  
+##  3rd Qu.:24.000   3rd Qu.:666.0   3rd Qu.:20.20   3rd Qu.:396.23  
+##  Max.   :24.000   Max.   :711.0   Max.   :22.00   Max.   :396.90  
+##      lstat            medv         crim.F   
+##  Min.   : 1.73   Min.   : 5.00   above:253  
+##  1st Qu.: 6.95   1st Qu.:17.02   below:253  
+##  Median :11.36   Median :21.20              
+##  Mean   :12.65   Mean   :22.53              
+##  3rd Qu.:16.95   3rd Qu.:25.00              
+##  Max.   :37.97   Max.   :50.00
+```
+
+```r
+dim(new.Boston)
+```
+
+```
+## [1] 506  15
+```
+
+```r
+attach(new.Boston)
+```
+
+```
+## The following object is masked _by_ .GlobalEnv:
+## 
+##     crim.F
+```
+
+```
+## The following objects are masked from Boston:
+## 
+##     age, black, chas, crim, dis, indus, lstat, medv, nox, ptratio,
+##     rad, rm, tax, zn
+```
+
+```r
+train=(rm<6.5)
+test = new.Boston[!train,]
+dim(test)
+```
+
+```
+## [1] 152  15
+```
+
+```r
+summary(test)
+```
+
+```
+##       crim                zn             indus             chas        
+##  Min.   : 0.00632   Min.   :  0.00   Min.   : 0.460   Min.   :0.00000  
+##  1st Qu.: 0.04615   1st Qu.:  0.00   1st Qu.: 2.930   1st Qu.:0.00000  
+##  Median : 0.10046   Median :  8.75   Median : 4.940   Median :0.00000  
+##  Mean   : 2.17212   Mean   : 24.16   Mean   : 7.323   Mean   :0.09868  
+##  3rd Qu.: 0.58664   3rd Qu.: 40.00   3rd Qu.: 9.900   3rd Qu.:0.00000  
+##  Max.   :88.97620   Max.   :100.00   Max.   :19.580   Max.   :1.00000  
+##       nox               rm             age              dis        
+##  Min.   :0.3940   Min.   :6.510   Min.   :  2.90   Min.   : 1.202  
+##  1st Qu.:0.4345   1st Qu.:6.682   1st Qu.: 33.42   1st Qu.: 2.524  
+##  Median :0.4880   Median :6.941   Median : 61.80   Median : 3.652  
+##  Mean   :0.5117   Mean   :7.083   Mean   : 59.74   Mean   : 4.325  
+##  3rd Qu.:0.5750   3rd Qu.:7.293   3rd Qu.: 86.60   3rd Qu.: 5.904  
+##  Max.   :0.8710   Max.   :8.780   Max.   :100.00   Max.   :12.127  
+##       rad              tax           ptratio          black       
+##  Min.   : 1.000   Min.   :187.0   Min.   :12.60   Min.   :  0.32  
+##  1st Qu.: 3.000   1st Qu.:255.8   1st Qu.:15.28   1st Qu.:383.66  
+##  Median : 5.000   Median :302.0   Median :17.60   Median :391.96  
+##  Mean   : 7.592   Mean   :351.0   Mean   :17.28   Mean   :368.33  
+##  3rd Qu.: 8.000   3rd Qu.:398.0   3rd Qu.:19.02   3rd Qu.:395.58  
+##  Max.   :24.000   Max.   :666.0   Max.   :21.00   Max.   :396.90  
+##      lstat             medv         crim.F  
+##  Min.   : 1.730   Min.   : 7.50   above:60  
+##  1st Qu.: 4.433   1st Qu.:24.48   below:92  
+##  Median : 5.900   Median :30.40             
+##  Mean   : 7.450   Mean   :31.06             
+##  3rd Qu.: 8.227   3rd Qu.:36.12             
+##  Max.   :25.790   Max.   :50.00
+```
+
+```r
+training = new.Boston[train,]
+dim(training)
+```
+
+```
+## [1] 354  15
+```
+
+```r
+summary(training)
+```
+
+```
+##       crim                zn             indus            chas       
+##  Min.   : 0.01096   Min.   : 0.000   Min.   : 0.74   Min.   :0.0000  
+##  1st Qu.: 0.11445   1st Qu.: 0.000   1st Qu.: 6.96   1st Qu.:0.0000  
+##  Median : 0.33014   Median : 0.000   Median :10.81   Median :0.0000  
+##  Mean   : 4.23243   Mean   : 5.869   Mean   :12.77   Mean   :0.0565  
+##  3rd Qu.: 4.79396   3rd Qu.: 0.000   3rd Qu.:18.10   3rd Qu.:0.0000  
+##  Max.   :73.53410   Max.   :85.000   Max.   :27.74   Max.   :1.0000  
+##       nox               rm             age              dis        
+##  Min.   :0.3850   Min.   :3.561   Min.   :  6.00   Min.   : 1.130  
+##  1st Qu.:0.4890   1st Qu.:5.784   1st Qu.: 52.35   1st Qu.: 1.979  
+##  Median :0.5470   Median :6.008   Median : 83.45   Median : 2.799  
+##  Mean   :0.5732   Mean   :5.942   Mean   : 72.37   Mean   : 3.567  
+##  3rd Qu.:0.6580   3rd Qu.:6.230   3rd Qu.: 95.40   3rd Qu.: 4.701  
+##  Max.   :0.8710   Max.   :6.495   Max.   :100.00   Max.   :10.710  
+##       rad             tax           ptratio          black       
+##  Min.   : 1.00   Min.   :188.0   Min.   :13.00   Min.   :  2.52  
+##  1st Qu.: 4.00   1st Qu.:296.0   1st Qu.:17.90   1st Qu.:369.11  
+##  Median : 5.00   Median :391.0   Median :19.65   Median :391.34  
+##  Mean   :10.39   Mean   :432.8   Mean   :18.96   Mean   :351.67  
+##  3rd Qu.:24.00   3rd Qu.:666.0   3rd Qu.:20.20   3rd Qu.:396.90  
+##  Max.   :24.00   Max.   :711.0   Max.   :22.00   Max.   :396.90  
+##      lstat             medv         crim.F   
+##  Min.   : 3.260   Min.   : 5.00   above:193  
+##  1st Qu.: 9.902   1st Qu.:15.32   below:161  
+##  Median :13.630   Median :19.50              
+##  Mean   :14.887   Mean   :18.87              
+##  3rd Qu.:18.115   3rd Qu.:22.20              
+##  Max.   :37.970   Max.   :50.00
+```
+
+```r
+crim.F.test=crim.F[!train]
+summary(crim.F.test)
+```
+
+```
+##    Length     Class      Mode 
+##       152 character character
+```
+
+
+```r
+lda.fit.nB=lda(crim.F~nox+rad,data=new.Boston,subset=train)
+lda.fit.nB
+```
+
+```
+## Call:
+## lda(crim.F ~ nox + rad, data = new.Boston, subset = train)
+## 
+## Prior probabilities of groups:
+##     above     below 
+## 0.5451977 0.4548023 
+## 
+## Group means:
+##             nox       rad
+## above 0.6481399 15.440415
+## below 0.4833031  4.335404
+## 
+## Coefficients of linear discriminants:
+##             LD1
+## nox -8.95079875
+## rad -0.06727636
+```
+
+```r
+plot(lda.fit.nB)
+```
+
+![](chapter4-3_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
+
+```r
+lda.pred.nB=predict(lda.fit.nB, test)
+names(lda.pred.nB)
+```
+
+```
+## [1] "class"     "posterior" "x"
+```
+
+```r
+lda.class.nB=lda.pred.nB$class
+table(lda.class.nB,crim.F.test)
+```
+
+```
+##             crim.F.test
+## lda.class.nB above below
+##        above    39     0
+##        below    21    92
+```
+
+```r
+mean(lda.class.nB==crim.F.test)
+```
+
+```
+## [1] 0.8618421
+```
+
+```r
+test_error=1-mean(lda.class.nB==crim.F.test)
+test_error
+```
+
+```
+## [1] 0.1381579
+```
+
+
+```r
+glm.fits.nB=glm(crim.F~nox+rad,data=new.Boston,family=binomial,subset=train)
+
+glm.probs=predict(glm.fits.nB,test,type="response")
+
+dim(test)
+```
+
+```
+## [1] 152  15
+```
+
+```r
+glm.pred=rep("above",152)
+glm.pred[glm.probs>0.5]="below"
+table(glm.pred,crim.F.test)
+```
+
+```
+##         crim.F.test
+## glm.pred above below
+##    above    41     1
+##    below    19    91
+```
+
+```r
+mean(glm.pred==crim.F.test)
+```
+
+```
+## [1] 0.8684211
+```
+
+```r
+test_error=1-mean(glm.pred==crim.F.test)
+test_error
+```
+
+```
+## [1] 0.1315789
+```
+
+
+```r
+library(class)
+train.nB=cbind(nox,rad)[train,]
+test.nB=cbind(nox,rad)[!train,]
+train.Direction.nB=training$crim.F
+
+set.seed(1)
+knn.pred.nB=knn(train.nB,test.nB,train.Direction.nB,k=1)
+table(knn.pred.nB,crim.F.test)
+```
+
+```
+##            crim.F.test
+## knn.pred.nB above below
+##       above    57     2
+##       below     3    90
+```
+
+```r
+mean(knn.pred.nB==crim.F.test)
+```
+
+```
+## [1] 0.9671053
+```
+
+```r
+test_error=1-mean(knn.pred.nB==crim.F.test)
+test_error
+```
+
+```
+## [1] 0.03289474
+```
+
+> KNN seems to perform the best on this data set

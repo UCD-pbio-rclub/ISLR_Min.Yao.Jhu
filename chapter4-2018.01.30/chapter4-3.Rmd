@@ -216,9 +216,10 @@ mean(glm.pred.Weekly==Direction)
 
 ```{r}
 train.1990to2008=(Year<2009)
+Weekly.1990to2008=Weekly[train.1990to2008,]
 Weekly.2009to2010=Weekly[!train.1990to2008,]
 dim(Weekly.2009to2010)
-Direction.1990to2008=Direction[!train.1990to2008]
+Direction.2009=Direction[!train.1990to2008]
 
 glm.fits.Lag2=glm(Direction~Lag2,data=Weekly,family=binomial,subset=train.1990to2008)
 
@@ -226,8 +227,8 @@ glm.probs=predict(glm.fits.Lag2,Weekly.2009to2010,type="response")
 
 glm.pred=rep("Down",104)
 glm.pred[glm.probs>.5]="Up"
-table(glm.pred,Direction.1990to2008)
-mean(glm.pred==Direction.1990to2008)
+table(glm.pred,Direction.2009)
+mean(glm.pred==Direction.2009)
 (9+56)/104
 
 ```
@@ -244,23 +245,55 @@ plot(lda.fit.train)
 lda.pred.test=predict(lda.fit.train, Weekly.2009to2010)
 names(lda.pred.test)
 lda.class=lda.pred.test$class
-table(lda.class,Direction.1990to2008)
-mean(lda.class==Direction.1990to2008)
+table(lda.class,Direction.2009)
+mean(lda.class==Direction.2009)
 
 ```
 
 > the same 62.5%  accuracy rate
 
-(f) Repeat (d) using QDA.
-(g) Repeat (d) using KNN with K = 1.
-(h) Which of these methods appears to provide the best results on
-this data?
-(i) Experiment with diﬀerent combinations of predictors, includ-
-ing possible transformations and interactions, for each of the
-methods. Report the variables, method, and associated confu-
-sion matrix that appears to provide the best results on the held
-out data. Note that you should also experiment with values for
-K in the KNN classiﬁer.
+##(f) Repeat (d) using QDA.
+
+```{r}
+qda.fit.train=qda(Direction~Lag2,data=Weekly,subset=train.1990to2008)
+qda.fit.train
+
+qda.class=predict(qda.fit.train,Weekly.2009to2010)$class
+table(qda.class,Direction.2009)
+mean(qda.class==Direction.2009)
+```
+
+> 58.6 % accuracy rate, lower than LDA
+
+## (g) Repeat (d) using KNN with K = 1.
+
+```{r}
+library(class)
+train.X=data.frame(Weekly.1990to2008[,"Lag2"])
+test.X=data.frame(Weekly.2009to2010[,"Lag2"])
+train.Direction=Weekly.1990to2008$Direction
+
+set.seed(2)
+knn.pred=knn(train.X,test.X,train.Direction,k=1)
+table(knn.pred,Direction.2009)
+mean(knn.pred==Direction.2009)
+```
+
+> K=1, 50% accuracy rate
+
+## (h) Which of these methods appears to provide the best results on this data?
+
+> Logistic regression and LDA
+
+## (i) Experiment with diﬀerent combinations of predictors, including possible transformations and interactions, for each of the methods. Report the variables, method, and associated confusion matrix that appears to provide the best results on the held out data. Note that you should also experiment with values for K in the KNN classiﬁer.
+
+```{r}
+knn.pred=knn(train.X,test.X,train.Direction,k=3)
+table(knn.pred,Direction.2009)
+mean(knn.pred==Direction.2009)
+```
+
+> K=3, 55.8% accuracy rate
 
 # 11. In this problem, you will develop a model to predict whether a given car gets high or low gas mileage based on the Auto data set.
 
@@ -334,17 +367,17 @@ mpg01.test=mpg01[!train]
 ## (d) Perform LDA on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?
 
 ```{r}
-lda.fit.horsepower=lda(mpg01~horsepower,data=new.Auto,subset=train)
-lda.fit.horsepower
-plot(lda.fit.horsepower)
+lda.fit.hwd=lda(mpg01~horsepower+weight+displacement,data=new.Auto,subset=train)
+lda.fit.hwd
+plot(lda.fit.hwd)
 
-lda.pred.horsepower=predict(lda.fit.horsepower, test)
-names(lda.pred.horsepower)
+lda.pred.hwd=predict(lda.fit.hwd, test)
+names(lda.fit.hwd)
 
-lda.class.horsepower=lda.pred.horsepower$class
-table(lda.class.horsepower,mpg01.test)
-mean(lda.class.horsepower==mpg01.test)
-test_error=1-mean(lda.class.horsepower==mpg01.test)
+lda.class.hwd=lda.pred.hwd$class
+table(lda.class.hwd,mpg01.test)
+mean(lda.class.hwd==mpg01.test)
+test_error=1-mean(lda.class.hwd==mpg01.test)
 test_error
 #
 
@@ -362,12 +395,16 @@ test_error=1-mean(lda.class.mpg==mpg01.test)
 test_error
 ```
 
+> Using horsepower+weight+displacement, test error = 0.1058824
+
+> Using mpg, test error = 0
+
 ## (f) Perform logistic regression on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?
 
 ```{r}
-glm.fits.horsepower=glm(mpg01~horsepower,data=new.Auto,family=binomial,subset=train)
+glm.fits.hwd=glm(mpg01~horsepower+weight+displacement,data=new.Auto,family=binomial,subset=train)
 
-glm.probs=predict(glm.fits.horsepower,test,type="response")
+glm.probs=predict(glm.fits.hwd,test,type="response")
 
 dim(test)
 glm.pred=rep("0",85)
@@ -393,6 +430,140 @@ test_error
 
 ```
 
+> Using horsepower+weight+displacement, test error = 0.1764706
+
+> Using mpg, test error = 0
+
 ## (g) Perform KNN on the training data, with several values of K, in order to predict mpg01. Use only the variables that seemed most associated with mpg01 in (b). What test errors do you obtain? Which value of K seems to perform the best on this data set?
 
+```{r}
+library(class)
+train.01=cbind(horsepower,weight,displacement)[train,]
+test.01=cbind(horsepower,weight,displacement)[!train,]
+train.Direction.01=training$mpg01
+
+set.seed(1)
+knn.pred.01=knn(train.01,test.01,train.Direction.01,k=1)
+table(knn.pred.01,mpg01.test)
+mean(knn.pred.01==mpg01.test)
+test_error=1-mean(knn.pred.01==mpg01.test)
+test_error
+
+knn.pred.01.2=knn(train.01,test.01,train.Direction.01,k=2)
+table(knn.pred.01.2,mpg01.test)
+mean(knn.pred.01.2==mpg01.test)
+test_error=1-mean(knn.pred.01.2==mpg01.test)
+test_error
+
+knn.pred.01.3=knn(train.01,test.01,train.Direction.01,k=3)
+table(knn.pred.01.3,mpg01.test)
+mean(knn.pred.01.3==mpg01.test)
+test_error=1-mean(knn.pred.01.3==mpg01.test)
+test_error
+
+knn.pred.01.5=knn(train.01,test.01,train.Direction.01,k=5)
+table(knn.pred.01.5,mpg01.test)
+mean(knn.pred.01.5==mpg01.test)
+test_error=1-mean(knn.pred.01.5==mpg01.test)
+test_error
+
+knn.pred.01.10=knn(train.01,test.01,train.Direction.01,k=10)
+table(knn.pred.01.10,mpg01.test)
+mean(knn.pred.01.10==mpg01.test)
+test_error=1-mean(knn.pred.01.10==mpg01.test)
+test_error
+```
+
+> K=1, seems to perform the best on this data set. test error = 0.2
+
 ## 13. Using the Boston data set, ﬁt classiﬁcation models in order to predict whether a given suburb has a crime rate above or below the median. Explore logistic regression, LDA, and KNN models using various subsets of the predictors. Describe your ﬁndings.
+
+```{r}
+attach (Boston)
+summary(Boston)
+dim(Boston)
+names(Boston)
+median(crim)
+
+crim.F=rep("below",506)
+crim.F[crim>0.25651]="above"
+summary(crim.F)
+
+str(Boston)
+
+new.Boston <- cbind(Boston, crim.F)
+str(new.Boston)
+summary(new.Boston)
+
+```
+
+```{r}
+pairs(new.Boston)
+ggpairs(new.Boston, aes(colour = crim.F))
+```
+
+```{r}
+glm.fits.nB=glm(crim.F~.-crim,data=new.Boston,family=binomial)
+summary(glm.fits.nB)
+```
+
+```{r}
+summary(new.Boston)
+dim(new.Boston)
+attach(new.Boston)
+train=(rm<6.5)
+test = new.Boston[!train,]
+dim(test)
+summary(test)
+training = new.Boston[train,]
+dim(training)
+summary(training)
+
+crim.F.test=crim.F[!train]
+summary(crim.F.test)
+```
+
+```{r}
+lda.fit.nB=lda(crim.F~nox+rad,data=new.Boston,subset=train)
+lda.fit.nB
+plot(lda.fit.nB)
+
+lda.pred.nB=predict(lda.fit.nB, test)
+names(lda.pred.nB)
+
+lda.class.nB=lda.pred.nB$class
+table(lda.class.nB,crim.F.test)
+mean(lda.class.nB==crim.F.test)
+test_error=1-mean(lda.class.nB==crim.F.test)
+test_error
+```
+
+```{r}
+glm.fits.nB=glm(crim.F~nox+rad,data=new.Boston,family=binomial,subset=train)
+
+glm.probs=predict(glm.fits.nB,test,type="response")
+
+dim(test)
+glm.pred=rep("above",152)
+glm.pred[glm.probs>0.5]="below"
+table(glm.pred,crim.F.test)
+mean(glm.pred==crim.F.test)
+test_error=1-mean(glm.pred==crim.F.test)
+test_error
+```
+
+```{r}
+library(class)
+train.nB=cbind(nox,rad)[train,]
+test.nB=cbind(nox,rad)[!train,]
+train.Direction.nB=training$crim.F
+
+set.seed(1)
+knn.pred.nB=knn(train.nB,test.nB,train.Direction.nB,k=1)
+table(knn.pred.nB,crim.F.test)
+mean(knn.pred.nB==crim.F.test)
+test_error=1-mean(knn.pred.nB==crim.F.test)
+test_error
+```
+
+> KNN seems to perform the best on this data set

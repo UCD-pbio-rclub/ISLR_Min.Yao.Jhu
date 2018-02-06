@@ -860,7 +860,7 @@ summary(glm.fits.Weekly2)</code></pre>
 for (i in 1:1089){
 glm.fits.Weeklyi=glm(Direction~Lag1+Lag2,data=Weekly[-i,],family=binomial)
 predi=predict(glm.fits.Weeklyi,Weekly[i,],type=&quot;response&quot;)
-predi=ifelse(predi&gt;0.5,&quot;Down&quot;,&quot;Up&quot;)
+predi=ifelse(predi&lt;0.5,&quot;Down&quot;,&quot;Up&quot;)
 error[i]=ifelse(predi!=Weekly[i,]$Direction,1,0)
 }</code></pre>
 </div>
@@ -868,11 +868,11 @@ error[i]=ifelse(predi!=Weekly[i,]$Direction,1,0)
 <div id="e-take-the-average-of-the-n-numbers-obtained-in-div-in-order-to-obtain-the-loocv-estimate-for-the-test-error.-comment-on-the-results." class="section level2">
 <h2>(e) Take the average of the n numbers obtained in (d)iv in order to obtain the LOOCV estimate for the test error. Comment on the results.</h2>
 <pre class="r"><code>str(error)</code></pre>
-<pre><code>##  num [1:1089] 0 0 1 0 1 0 1 1 1 0 ...</code></pre>
+<pre><code>##  num [1:1089] 1 1 0 1 0 1 0 0 0 1 ...</code></pre>
 <pre class="r"><code>mean(error)</code></pre>
-<pre><code>## [1] 0.5500459</code></pre>
+<pre><code>## [1] 0.4499541</code></pre>
 <blockquote>
-<p>error rate is 55%</p>
+<p>error rate is 45%</p>
 </blockquote>
 </div>
 </div>

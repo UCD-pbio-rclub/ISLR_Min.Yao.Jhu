@@ -1226,7 +1226,7 @@ attach(Weekly)
 for (i in 1:1089){
 glm.fits.Weeklyi=glm(Direction~Lag1+Lag2,data=Weekly[-i,],family=binomial)
 predi=predict(glm.fits.Weeklyi,Weekly[i,],type="response")
-predi=ifelse(predi>0.5,"Down","Up")
+predi=ifelse(predi<0.5,"Down","Up")
 error[i]=ifelse(predi!=Weekly[i,]$Direction,1,0)
 }
 ```
@@ -1241,7 +1241,7 @@ str(error)
 ```
 
 ```
-##  num [1:1089] 0 0 1 0 1 0 1 1 1 0 ...
+##  num [1:1089] 1 1 0 1 0 1 0 0 0 1 ...
 ```
 
 ```r
@@ -1249,10 +1249,10 @@ mean(error)
 ```
 
 ```
-## [1] 0.5500459
+## [1] 0.4499541
 ```
 
-> error rate is 55%
+> error rate is 45%
 
 # 8. We will now perform cross-validation on a simulated data set.
 

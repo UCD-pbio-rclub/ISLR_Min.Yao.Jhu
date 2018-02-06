@@ -122,28 +122,198 @@ summary(lm(mpg~horsepower+I(horsepower^2),data=Auto))$coef
 
 ## (a) Fit a logistic regression model that uses income and balance to predict default.
 
+```{r}
+library(ISLR)
+
+summary(Default)
+
+glm.fits.de=glm(default~income+balance,data=Default,family=binomial)
+summary(glm.fits.de)
+
+
+```
+
 
 ## (b) Using the validation set approach, estimate the test error of this model. In order to do this, you must perform the following steps:
 
 ### i. Split the sample set into a training set and a validation set.
 
+```{r}
+summary(Default)
+str(Default)
+
+set.seed(1)
+train=sample(10000,5000)
+default.train <- Default[train,]
+dim(default.train)
+default.test <- Default[-train,]
+dim(default.test)
+
+```
+
 ### ii. Fit a multiple logistic regression model using only the training observations.
+
+```{r}
+attach(Default)
+glm.fits.de1=glm(default~income+balance,data=Default,family=binomial,subset=train)
+summary(glm.fits.de1)
+
+glm.fits.de2=glm(default~poly(income,2)+poly(balance,2),data=Default,family=binomial,subset=train)
+summary(glm.fits.de2)
+
+```
+
 
 ### iii. Obtain a prediction of default status for each individual in the validation set by computing the posterior probability of default for that individual, and classifying the individual to the default category if the posterior probability is greater than 0.5.
 
+```{r}
+
+glm.pred1=predict(glm.fits.de1,default.test,type="response")
+summary(glm.pred1)
+glm.pred1=ifelse(glm.pred1<.5,"No","Yes")
+summary(glm.pred1)
+
+glm.pred2=predict(glm.fits.de2,default.test,type="response")
+summary(glm.pred2)
+glm.pred2=ifelse(glm.pred2<.5,"No","Yes")
+summary(glm.pred2)
+
+```
+
+
 ### iv. Compute the validation set error, which is the fraction of the observations in the validation set that are misclassiﬁed.
+
+```{r}
+
+
+table(glm.pred1,obs=default.train$default)
+error=1-(mean(glm.pred1==default.train$default))
+error
+
+table(glm.pred2,obs=default.train$default)
+error=1-(mean(glm.pred2==default.train$default))
+error
+
+
+```
+
 
 ## (c) Repeat the process in (b) three times, using three diﬀerent splits of the observations into a training set and a validation set. Comment on the results obtained.
 
+```{r}
+set.seed(2)
+train=sample(10000,5000)
+default.train <- Default[train,]
+dim(default.train)
+default.test <- Default[-train,]
+dim(default.test)
+attach(Default)
+glm.fits.de1=glm(default~income+balance,data=Default,family=binomial,subset=train)
+summary(glm.fits.de1)
+glm.pred1=predict(glm.fits.de1,default.test,type="response")
+summary(glm.pred1)
+glm.pred1=ifelse(glm.pred1<.5,"No","Yes")
+summary(glm.pred1)
+table(glm.pred1,obs=default.train$default)
+error=1-(mean(glm.pred1==default.train$default))
+error
+
+set.seed(3)
+train=sample(10000,5000)
+default.train <- Default[train,]
+dim(default.train)
+default.test <- Default[-train,]
+dim(default.test)
+attach(Default)
+glm.fits.de1=glm(default~income+balance,data=Default,family=binomial,subset=train)
+summary(glm.fits.de1)
+glm.pred1=predict(glm.fits.de1,default.test,type="response")
+summary(glm.pred1)
+glm.pred1=ifelse(glm.pred1<.5,"No","Yes")
+summary(glm.pred1)
+table(glm.pred1,obs=default.train$default)
+error=1-(mean(glm.pred1==default.train$default))
+error
+
+set.seed(4)
+train=sample(10000,5000)
+default.train <- Default[train,]
+dim(default.train)
+default.test <- Default[-train,]
+dim(default.test)
+attach(Default)
+glm.fits.de1=glm(default~income+balance,data=Default,family=binomial,subset=train)
+summary(glm.fits.de1)
+glm.pred1=predict(glm.fits.de1,default.test,type="response")
+summary(glm.pred1)
+glm.pred1=ifelse(glm.pred1<.5,"No","Yes")
+summary(glm.pred1)
+table(glm.pred1,obs=default.train$default)
+error=1-(mean(glm.pred1==default.train$default))
+error
+```
+
+
 ## (d) Now consider a logistic regression model that predicts the probability of default using income, balance, and a dummy variable for student. Estimate the test error for this model using the validation set approach. Comment on whether or not including a dummy variable for student leads to a reduction in the test error rate.
+
+```{r}
+summary(Default)
+student01 = rep(0,10000)
+student01[student=="Yes"]=1
+summary(student01)
+str(student01)
+
+new.Default <- cbind(Default, student01)
+summary(new.Default)
+
+set.seed(1)
+train=sample(10000,5000)
+default.train <- new.Default[train,]
+dim(default.train)
+default.test <- new.Default[-train,]
+dim(default.test)
+attach(new.Default)
+glm.fits.de1=glm(default~income+balance+student01,data=new.Default,family=binomial,subset=train)
+summary(glm.fits.de1)
+glm.pred1=predict(glm.fits.de1,default.test,type="response")
+summary(glm.pred1)
+glm.pred1=ifelse(glm.pred1<.5,"No","Yes")
+summary(glm.pred1)
+table(glm.pred1,obs=default.train$default)
+error=1-(mean(glm.pred1==default.train$default))
+error
+```
+
 
 # 7. In Sections 5.3.2 and 5.3.3, we saw that the cv.glm() function can be used in order to compute the LOOCV test error estimate. Alternatively, one could compute those quantities using just the glm() and predict.glm() functions, and a for loop. You will now take this approach in order to compute the LOOCV error for a simple logistic regression model on the Weekly data set. Recall that in the context of classiﬁcation problems, the LOOCV error is given in (5.4).
 
 ## (a) Fit a logistic regression model that predicts Direction using Lag1 and Lag2.
 
+```{r}
+summary(Weekly)
+glm.fits.Weekly=glm(Direction~Lag1+Lag2,data=Weekly,family=binomial)
+summary(glm.fits.Weekly)
+
+```
+
+
 ## (b) Fit a logistic regression model that predicts Direction using Lag1 and Lag2 using all but the ﬁrst observation.
 
+```{r}
+glm.fits.Weekly2=glm(Direction~Lag1+Lag2,data=Weekly[-1,],family=binomial)
+summary(glm.fits.Weekly2)
+```
+
+
 ## (c) Use the model from (b) to predict the direction of the ﬁrst observation. You can do this by predicting that the ﬁrst observation will go up if P (Direction="Up" | Lag1, Lag2) > 0.5. Was this observation correctly classiﬁed?
+
+```{r}
+predict(glm.fits.Weekly2,Weekly[1,],type="response")
+Weekly[1,]$Direction
+
+```
+
+> `0.57 > 0.5` up, wrong prediction
 
 ## (d) Write a for loop from i = 1 to i = n, where n is the number of observations in the data set, that performs each of the following steps:
 
@@ -155,21 +325,50 @@ summary(lm(mpg~horsepower+I(horsepower^2),data=Auto))$coef
 
 ### iv. Determine whether or not an error was made in predicting the direction for the ith observation. If an error was made, then indicate this as a 1, and otherwise indicate it as a 0.
 
+```{r}
+str(Weekly)
+attach(Weekly)
+
+for (i in 1:1089){
+glm.fits.Weeklyi=glm(Direction~Lag1+Lag2,data=Weekly[-i,],family=binomial)
+predi=predict(glm.fits.Weeklyi,Weekly[i,],type="response")
+predi=ifelse(predi==0,"Down","Up")
+error[i]=ifelse(predi!=Weekly[i,]$Direction,1,0)
+}
+
+```
+
+
+
 ## (e) Take the average of the n numbers obtained in (d)iv in order to obtain the LOOCV estimate for the test error. Comment on the results.
+
+```{r}
+str(error)
+mean(error)
+```
+
+> error rate is 44%
 
 # 8. We will now perform cross-validation on a simulated data set.
 
 ## (a) Generate a simulated data set as follows:
 
-> set .seed (1)
-
-> x= rnorm (100)
-
-> y=x -2* x^2+ rnorm (100)
+```{r}
+set.seed(1)
+x=rnorm(100)
+y=x-2*x^2+rnorm(100)
+```
 
 In this data set, what is n and what is p? Write out the model used to generate the data in equation form.
 
+> n=100, p = 1
+
 ## (b) Create a scatterplot of X against Y . Comment on what you ﬁnd.
+
+```{r}
+plot(x,y)
+```
+
 
 ## (c) Set a random seed, and then compute the LOOCV errors that result from ﬁtting the following four models using least squares:
 
@@ -180,8 +379,48 @@ iv. Y = β 0 + β 1 X + β 2 X 2 + β 3 X 3 + β 4 X 4 + .
 
 Note you may ﬁnd it helpful to use the data.frame() function to create a single data set containing both X and Y .
 
+```{r}
+Data8 = data.frame(x,y)
+
+summary(Data8)
+str(Data8)
+
+library(boot)
+set.seed(1)
+
+cv.error=rep(0,4)
+for (i in 1:4){
+ glm.fit=glm(y~poly(x,i),data=Data8)
+ cv.error[i]=cv.glm(Data8,glm.fit)$delta[1]
+ }
+cv.error
+```
+
+
 ## (d) Repeat (c) using another random seed, and report your results. Are your results the same as what you got in (c)? Why?
+
+```{r}
+set.seed(2)
+cv.error=rep(0,4)
+for (i in 1:4){
+ glm.fit=glm(y~poly(x,i),data=Data8)
+ cv.error[i]=cv.glm(Data8,glm.fit)$delta[1]
+ }
+cv.error
+```
+
+> the same, because no random selection
 
 ## (e) Which of the models in (c) had the smallest LOOCV error? Is this what you expected? Explain your answer.
 
+> the quadratic model had the smallest LOOCV error. Yes, because we use `y=x-2*x^2+rnorm(100)` to generate this data.
+
 ## (f) Comment on the statistical signiﬁcance of the coeﬃcient estimates that results from ﬁtting each of the models in (c) using least squares. Do these results agree with the conclusions drawn based on the cross-validation results?
+
+```{r}
+for (i in 1:4){
+ glm.fit=glm(y~poly(x,i),data=Data8)
+ print(summary(glm.fit))
+ }
+```
+

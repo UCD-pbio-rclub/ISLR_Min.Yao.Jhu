@@ -129,8 +129,6 @@ summary(Default)
 
 glm.fits.de=glm(default~income+balance,data=Default,family=binomial)
 summary(glm.fits.de)
-
-
 ```
 
 
@@ -149,6 +147,8 @@ dim(default.train)
 default.test <- Default[-train,]
 dim(default.test)
 
+# nrow(Default)
+# sample.split
 ```
 
 ### ii. Fit a multiple logistic regression model using only the training observations.
@@ -160,14 +160,12 @@ summary(glm.fits.de1)
 
 glm.fits.de2=glm(default~poly(income,2)+poly(balance,2),data=Default,family=binomial,subset=train)
 summary(glm.fits.de2)
-
 ```
 
 
 ### iii. Obtain a prediction of default status for each individual in the validation set by computing the posterior probability of default for that individual, and classifying the individual to the default category if the posterior probability is greater than 0.5.
 
 ```{r}
-
 glm.pred1=predict(glm.fits.de1,default.test,type="response")
 summary(glm.pred1)
 glm.pred1=ifelse(glm.pred1<.5,"No","Yes")
@@ -177,24 +175,19 @@ glm.pred2=predict(glm.fits.de2,default.test,type="response")
 summary(glm.pred2)
 glm.pred2=ifelse(glm.pred2<.5,"No","Yes")
 summary(glm.pred2)
-
 ```
 
 
 ### iv. Compute the validation set error, which is the fraction of the observations in the validation set that are misclassiﬁed.
 
 ```{r}
-
-
-table(glm.pred1,obs=default.train$default)
-error=1-(mean(glm.pred1==default.train$default))
+table(glm.pred1,obs=default.test$default)
+error=1-(mean(glm.pred1==default.test$default))
 error
 
-table(glm.pred2,obs=default.train$default)
-error=1-(mean(glm.pred2==default.train$default))
+table(glm.pred2,obs=default.test$default)
+error=1-(mean(glm.pred2==default.test$default))
 error
-
-
 ```
 
 
@@ -214,8 +207,8 @@ glm.pred1=predict(glm.fits.de1,default.test,type="response")
 summary(glm.pred1)
 glm.pred1=ifelse(glm.pred1<.5,"No","Yes")
 summary(glm.pred1)
-table(glm.pred1,obs=default.train$default)
-error=1-(mean(glm.pred1==default.train$default))
+table(glm.pred1,obs=default.test$default)
+error=1-(mean(glm.pred1==default.test$default))
 error
 
 set.seed(3)
@@ -231,8 +224,8 @@ glm.pred1=predict(glm.fits.de1,default.test,type="response")
 summary(glm.pred1)
 glm.pred1=ifelse(glm.pred1<.5,"No","Yes")
 summary(glm.pred1)
-table(glm.pred1,obs=default.train$default)
-error=1-(mean(glm.pred1==default.train$default))
+table(glm.pred1,obs=default.test$default)
+error=1-(mean(glm.pred1==default.test$default))
 error
 
 set.seed(4)
@@ -248,8 +241,8 @@ glm.pred1=predict(glm.fits.de1,default.test,type="response")
 summary(glm.pred1)
 glm.pred1=ifelse(glm.pred1<.5,"No","Yes")
 summary(glm.pred1)
-table(glm.pred1,obs=default.train$default)
-error=1-(mean(glm.pred1==default.train$default))
+table(glm.pred1,obs=default.test$default)
+error=1-(mean(glm.pred1==default.test$default))
 error
 ```
 
@@ -279,8 +272,8 @@ glm.pred1=predict(glm.fits.de1,default.test,type="response")
 summary(glm.pred1)
 glm.pred1=ifelse(glm.pred1<.5,"No","Yes")
 summary(glm.pred1)
-table(glm.pred1,obs=default.train$default)
-error=1-(mean(glm.pred1==default.train$default))
+table(glm.pred1,obs=default.test$default)
+error=1-(mean(glm.pred1==default.test$default))
 error
 ```
 
@@ -293,7 +286,6 @@ error
 summary(Weekly)
 glm.fits.Weekly=glm(Direction~Lag1+Lag2,data=Weekly,family=binomial)
 summary(glm.fits.Weekly)
-
 ```
 
 
@@ -332,7 +324,7 @@ attach(Weekly)
 for (i in 1:1089){
 glm.fits.Weeklyi=glm(Direction~Lag1+Lag2,data=Weekly[-i,],family=binomial)
 predi=predict(glm.fits.Weeklyi,Weekly[i,],type="response")
-predi=ifelse(predi==0,"Down","Up")
+predi=ifelse(predi>0.5,"Down","Up")
 error[i]=ifelse(predi!=Weekly[i,]$Direction,1,0)
 }
 

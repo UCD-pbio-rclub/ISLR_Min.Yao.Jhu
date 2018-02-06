@@ -399,6 +399,11 @@ dim(default.test)
 ## [1] 5000    4
 ```
 
+```r
+# nrow(Default)
+# sample.split
+```
+
 ### ii. Fit a multiple logistic regression model using only the training observations.
 
 
@@ -518,43 +523,43 @@ summary(glm.pred2)
 
 
 ```r
-table(glm.pred1,obs=default.train$default)
+table(glm.pred1,obs=default.test$default)
 ```
 
 ```
 ##          obs
 ## glm.pred1   No  Yes
-##       No  4757  163
-##       Yes   77    3
+##       No  4805  115
+##       Yes   28   52
 ```
 
 ```r
-error=1-(mean(glm.pred1==default.train$default))
+error=1-(mean(glm.pred1==default.test$default))
 error
 ```
 
 ```
-## [1] 0.048
+## [1] 0.0286
 ```
 
 ```r
-table(glm.pred2,obs=default.train$default)
+table(glm.pred2,obs=default.test$default)
 ```
 
 ```
 ##          obs
 ## glm.pred2   No  Yes
-##       No  4754  163
-##       Yes   80    3
+##       No  4803  114
+##       Yes   30   53
 ```
 
 ```r
-error=1-(mean(glm.pred2==default.train$default))
+error=1-(mean(glm.pred2==default.test$default))
 error
 ```
 
 ```
-## [1] 0.0486
+## [1] 0.0288
 ```
 
 
@@ -644,23 +649,23 @@ summary(glm.pred1)
 ```
 
 ```r
-table(glm.pred1,obs=default.train$default)
+table(glm.pred1,obs=default.test$default)
 ```
 
 ```
 ##          obs
 ## glm.pred1   No  Yes
-##       No  4767  162
-##       Yes   69    2
+##       No  4811  118
+##       Yes   20   51
 ```
 
 ```r
-error=1-(mean(glm.pred1==default.train$default))
+error=1-(mean(glm.pred1==default.test$default))
 error
 ```
 
 ```
-## [1] 0.0462
+## [1] 0.0276
 ```
 
 ```r
@@ -752,23 +757,23 @@ summary(glm.pred1)
 ```
 
 ```r
-table(glm.pred1,obs=default.train$default)
+table(glm.pred1,obs=default.test$default)
 ```
 
 ```
 ##          obs
 ## glm.pred1   No  Yes
-##       No  4760  176
-##       Yes   63    1
+##       No  4828  108
+##       Yes   16   48
 ```
 
 ```r
-error=1-(mean(glm.pred1==default.train$default))
+error=1-(mean(glm.pred1==default.test$default))
 error
 ```
 
 ```
-## [1] 0.0478
+## [1] 0.0248
 ```
 
 ```r
@@ -864,23 +869,23 @@ summary(glm.pred1)
 ```
 
 ```r
-table(glm.pred1,obs=default.train$default)
+table(glm.pred1,obs=default.test$default)
 ```
 
 ```
 ##          obs
 ## glm.pred1   No  Yes
-##       No  4761  164
-##       Yes   74    1
+##       No  4813  112
+##       Yes   19   56
 ```
 
 ```r
-error=1-(mean(glm.pred1==default.train$default))
+error=1-(mean(glm.pred1==default.test$default))
 error
 ```
 
 ```
-## [1] 0.0476
+## [1] 0.0262
 ```
 
 
@@ -1043,23 +1048,23 @@ summary(glm.pred1)
 ```
 
 ```r
-table(glm.pred1,obs=default.train$default)
+table(glm.pred1,obs=default.test$default)
 ```
 
 ```
 ##          obs
 ## glm.pred1   No  Yes
-##       No  4754  163
-##       Yes   80    3
+##       No  4803  114
+##       Yes   30   53
 ```
 
 ```r
-error=1-(mean(glm.pred1==default.train$default))
+error=1-(mean(glm.pred1==default.test$default))
 error
 ```
 
 ```
-## [1] 0.0486
+## [1] 0.0288
 ```
 
 
@@ -1221,7 +1226,7 @@ attach(Weekly)
 for (i in 1:1089){
 glm.fits.Weeklyi=glm(Direction~Lag1+Lag2,data=Weekly[-i,],family=binomial)
 predi=predict(glm.fits.Weeklyi,Weekly[i,],type="response")
-predi=ifelse(predi==0,"Down","Up")
+predi=ifelse(predi>0.5,"Down","Up")
 error[i]=ifelse(predi!=Weekly[i,]$Direction,1,0)
 }
 ```
@@ -1236,7 +1241,7 @@ str(error)
 ```
 
 ```
-##  num [1:1089] 1 1 0 0 0 1 0 0 0 1 ...
+##  num [1:1089] 0 0 1 0 1 0 1 1 1 0 ...
 ```
 
 ```r
@@ -1244,7 +1249,7 @@ mean(error)
 ```
 
 ```
-## [1] 0.4444444
+## [1] 0.5500459
 ```
 
 > error rate is 44%

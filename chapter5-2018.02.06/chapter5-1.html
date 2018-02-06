@@ -368,6 +368,8 @@ dim(default.train)</code></pre>
 <pre class="r"><code>default.test &lt;- Default[-train,]
 dim(default.test)</code></pre>
 <pre><code>## [1] 5000    4</code></pre>
+<pre class="r"><code># nrow(Default)
+# sample.split</code></pre>
 </div>
 <div id="ii.-fit-a-multiple-logistic-regression-model-using-only-the-training-observations." class="section level3">
 <h3>ii. Fit a multiple logistic regression model using only the training observations.</h3>
@@ -448,22 +450,22 @@ summary(glm.pred2)</code></pre>
 </div>
 <div id="iv.-compute-the-validation-set-error-which-is-the-fraction-of-the-observations-in-the-validation-set-that-are-misclassied." class="section level3">
 <h3>iv. Compute the validation set error, which is the fraction of the observations in the validation set that are misclassiﬁed.</h3>
-<pre class="r"><code>table(glm.pred1,obs=default.train$default)</code></pre>
+<pre class="r"><code>table(glm.pred1,obs=default.test$default)</code></pre>
 <pre><code>##          obs
 ## glm.pred1   No  Yes
-##       No  4757  163
-##       Yes   77    3</code></pre>
-<pre class="r"><code>error=1-(mean(glm.pred1==default.train$default))
+##       No  4805  115
+##       Yes   28   52</code></pre>
+<pre class="r"><code>error=1-(mean(glm.pred1==default.test$default))
 error</code></pre>
-<pre><code>## [1] 0.048</code></pre>
-<pre class="r"><code>table(glm.pred2,obs=default.train$default)</code></pre>
+<pre><code>## [1] 0.0286</code></pre>
+<pre class="r"><code>table(glm.pred2,obs=default.test$default)</code></pre>
 <pre><code>##          obs
 ## glm.pred2   No  Yes
-##       No  4754  163
-##       Yes   80    3</code></pre>
-<pre class="r"><code>error=1-(mean(glm.pred2==default.train$default))
+##       No  4803  114
+##       Yes   30   53</code></pre>
+<pre class="r"><code>error=1-(mean(glm.pred2==default.test$default))
 error</code></pre>
-<pre><code>## [1] 0.0486</code></pre>
+<pre><code>## [1] 0.0288</code></pre>
 </div>
 </div>
 <div id="c-repeat-the-process-in-b-three-times-using-three-dierent-splits-of-the-observations-into-a-training-set-and-a-validation-set.-comment-on-the-results-obtained." class="section level2">
@@ -514,14 +516,14 @@ summary(glm.pred1)</code></pre>
 summary(glm.pred1)</code></pre>
 <pre><code>##    Length     Class      Mode 
 ##      5000 character character</code></pre>
-<pre class="r"><code>table(glm.pred1,obs=default.train$default)</code></pre>
+<pre class="r"><code>table(glm.pred1,obs=default.test$default)</code></pre>
 <pre><code>##          obs
 ## glm.pred1   No  Yes
-##       No  4767  162
-##       Yes   69    2</code></pre>
-<pre class="r"><code>error=1-(mean(glm.pred1==default.train$default))
+##       No  4811  118
+##       Yes   20   51</code></pre>
+<pre class="r"><code>error=1-(mean(glm.pred1==default.test$default))
 error</code></pre>
-<pre><code>## [1] 0.0462</code></pre>
+<pre><code>## [1] 0.0276</code></pre>
 <pre class="r"><code>set.seed(3)
 train=sample(10000,5000)
 default.train &lt;- Default[train,]
@@ -571,14 +573,14 @@ summary(glm.pred1)</code></pre>
 summary(glm.pred1)</code></pre>
 <pre><code>##    Length     Class      Mode 
 ##      5000 character character</code></pre>
-<pre class="r"><code>table(glm.pred1,obs=default.train$default)</code></pre>
+<pre class="r"><code>table(glm.pred1,obs=default.test$default)</code></pre>
 <pre><code>##          obs
 ## glm.pred1   No  Yes
-##       No  4760  176
-##       Yes   63    1</code></pre>
-<pre class="r"><code>error=1-(mean(glm.pred1==default.train$default))
+##       No  4828  108
+##       Yes   16   48</code></pre>
+<pre class="r"><code>error=1-(mean(glm.pred1==default.test$default))
 error</code></pre>
-<pre><code>## [1] 0.0478</code></pre>
+<pre><code>## [1] 0.0248</code></pre>
 <pre class="r"><code>set.seed(4)
 train=sample(10000,5000)
 default.train &lt;- Default[train,]
@@ -632,14 +634,14 @@ summary(glm.pred1)</code></pre>
 summary(glm.pred1)</code></pre>
 <pre><code>##    Length     Class      Mode 
 ##      5000 character character</code></pre>
-<pre class="r"><code>table(glm.pred1,obs=default.train$default)</code></pre>
+<pre class="r"><code>table(glm.pred1,obs=default.test$default)</code></pre>
 <pre><code>##          obs
 ## glm.pred1   No  Yes
-##       No  4761  164
-##       Yes   74    1</code></pre>
-<pre class="r"><code>error=1-(mean(glm.pred1==default.train$default))
+##       No  4813  112
+##       Yes   19   56</code></pre>
+<pre class="r"><code>error=1-(mean(glm.pred1==default.test$default))
 error</code></pre>
-<pre><code>## [1] 0.0476</code></pre>
+<pre><code>## [1] 0.0262</code></pre>
 </div>
 <div id="d-now-consider-a-logistic-regression-model-that-predicts-the-probability-of-default-using-income-balance-and-a-dummy-variable-for-student.-estimate-the-test-error-for-this-model-using-the-validation-set-approach.-comment-on-whether-or-not-including-a-dummy-variable-for-student-leads-to-a-reduction-in-the-test-error-rate." class="section level2">
 <h2>(d) Now consider a logistic regression model that predicts the probability of default using income, balance, and a dummy variable for student. Estimate the test error for this model using the validation set approach. Comment on whether or not including a dummy variable for student leads to a reduction in the test error rate.</h2>
@@ -726,14 +728,14 @@ summary(glm.pred1)</code></pre>
 summary(glm.pred1)</code></pre>
 <pre><code>##    Length     Class      Mode 
 ##      5000 character character</code></pre>
-<pre class="r"><code>table(glm.pred1,obs=default.train$default)</code></pre>
+<pre class="r"><code>table(glm.pred1,obs=default.test$default)</code></pre>
 <pre><code>##          obs
 ## glm.pred1   No  Yes
-##       No  4754  163
-##       Yes   80    3</code></pre>
-<pre class="r"><code>error=1-(mean(glm.pred1==default.train$default))
+##       No  4803  114
+##       Yes   30   53</code></pre>
+<pre class="r"><code>error=1-(mean(glm.pred1==default.test$default))
 error</code></pre>
-<pre><code>## [1] 0.0486</code></pre>
+<pre><code>## [1] 0.0288</code></pre>
 </div>
 </div>
 <div id="in-sections-5.3.2-and-5.3.3-we-saw-that-the-cv.glm-function-can-be-used-in-order-to-compute-the-loocv-test-error-estimate.-alternatively-one-could-compute-those-quantities-using-just-the-glm-and-predict.glm-functions-and-a-for-loop.-you-will-now-take-this-approach-in-order-to-compute-the-loocv-error-for-a-simple-logistic-regression-model-on-the-weekly-data-set.-recall-that-in-the-context-of-classication-problems-the-loocv-error-is-given-in-5.4." class="section level1">
@@ -858,7 +860,7 @@ summary(glm.fits.Weekly2)</code></pre>
 for (i in 1:1089){
 glm.fits.Weeklyi=glm(Direction~Lag1+Lag2,data=Weekly[-i,],family=binomial)
 predi=predict(glm.fits.Weeklyi,Weekly[i,],type=&quot;response&quot;)
-predi=ifelse(predi==0,&quot;Down&quot;,&quot;Up&quot;)
+predi=ifelse(predi&gt;0.5,&quot;Down&quot;,&quot;Up&quot;)
 error[i]=ifelse(predi!=Weekly[i,]$Direction,1,0)
 }</code></pre>
 </div>
@@ -866,9 +868,9 @@ error[i]=ifelse(predi!=Weekly[i,]$Direction,1,0)
 <div id="e-take-the-average-of-the-n-numbers-obtained-in-div-in-order-to-obtain-the-loocv-estimate-for-the-test-error.-comment-on-the-results." class="section level2">
 <h2>(e) Take the average of the n numbers obtained in (d)iv in order to obtain the LOOCV estimate for the test error. Comment on the results.</h2>
 <pre class="r"><code>str(error)</code></pre>
-<pre><code>##  num [1:1089] 1 1 0 0 0 1 0 0 0 1 ...</code></pre>
+<pre><code>##  num [1:1089] 0 0 1 0 1 0 1 1 1 0 ...</code></pre>
 <pre class="r"><code>mean(error)</code></pre>
-<pre><code>## [1] 0.4444444</code></pre>
+<pre><code>## [1] 0.5500459</code></pre>
 <blockquote>
 <p>error rate is 44%</p>
 </blockquote>

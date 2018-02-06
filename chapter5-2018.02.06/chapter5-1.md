@@ -1252,7 +1252,7 @@ mean(error)
 ## [1] 0.5500459
 ```
 
-> error rate is 44%
+> error rate is 55%
 
 # 8. We will now perform cross-validation on a simulated data set.
 

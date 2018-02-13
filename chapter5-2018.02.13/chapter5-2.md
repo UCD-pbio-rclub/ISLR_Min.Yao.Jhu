@@ -670,7 +670,19 @@ Hint: You can approximate a 95 % conﬁdence interval using the formula [ˆμ �
 
 
 ```r
-#?boot
+library(boot)
+?boot
+```
+
+```
+## starting httpd help server ...
+```
+
+```
+##  done
+```
+
+```r
 sd(boot.9c$t)
 ```
 
@@ -687,12 +699,12 @@ nrow(boot.9c$t)
 ```
 
 ```r
-SE<-sd(boot.9c$t)/sqrt(nrow(boot.9c$t))
+SE<-sd(boot.9c$t)
 SE
 ```
 
 ```
-## [1] 0.01302661
+## [1] 0.4119374
 ```
 
 ```r
@@ -709,7 +721,7 @@ lowinterval
 ```
 
 ```
-## [1] 22.50675
+## [1] 21.70893
 ```
 
 ```r
@@ -718,7 +730,7 @@ highinterval
 ```
 
 ```
-## [1] 22.55886
+## [1] 23.35668
 ```
 
 ```r

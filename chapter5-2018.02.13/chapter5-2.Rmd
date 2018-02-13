@@ -286,10 +286,11 @@ boot.9c
 Hint: You can approximate a 95 % conﬁdence interval using the formula [ˆμ − 2SE(ˆμ), ˆμ + 2SE(ˆμ)].
 
 ```{r}
-#?boot
+library(boot)
+?boot
 sd(boot.9c$t)
 nrow(boot.9c$t)
-SE<-sd(boot.9c$t)/sqrt(nrow(boot.9c$t))
+SE<-sd(boot.9c$t)
 SE
 mu.9a
 lowinterval=mu.9a-2*SE

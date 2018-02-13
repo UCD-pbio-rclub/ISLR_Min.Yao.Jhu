@@ -184,48 +184,158 @@ plot(1:100000, fn.2(1:100000))
 
 ## (h) We will now investigate numerically the probability that a bootstrap sample of size n = 100 contains the jth observation. Here j = 4. We repeatedly create bootstrap samples, and each time we record whether or not the fourth observation is contained in the bootstrap sample.
 
->
 
 ```{r}
-store =rep (NA , 10000)
+store=rep(NA,10000)
 for (i in 1:10000) {
-store [i]= sum ( sample (1:100 , rep =TRUE) ==4) >0
+store [i]= sum(sample(1:100, rep =TRUE)==4)>0
 }
-mean( store )
+mean(store)
 ```
 Comment on the results obtained.
 
+> about 63%, almost the same as previous results
+
 # 4. Suppose that we use some statistical learning method to make a prediction for the response Y for a particular value of the predictor X. Carefully describe how we might estimate the standard deviation of our prediction.
 
-> 
+> We can use bootstrap. To estimate the standard deviation of our prediction, we repeated the process of simulating 100 paired observations of X and Y, 1,000 times. The sampling is performed with replacement, which means that the replacement same observation can occur more than once in the bootstrap data set.
 
 # 6. We continue to consider the use of a logistic regression model to predict the probability of default using income and balance on the Default data set. In particular, we will now compute estimates for the standard errors of the income and balance logistic regression coeﬃcients in two diﬀerent ways: (1) using the bootstrap, and (2) using the standard formula for computing the standard errors in the glm() function. Do not forget to set a random seed before beginning your analysis.
 
 ## (a) Using the summary() and glm() functions, determine the estimated standard errors for the coeﬃcients associated with income and balance in a multiple logistic regression model that uses both predictors.
 
+```{r}
+library(ISLR)
+set.seed(1)
+summary(Default)
+dim(Default)
+
+glm.6a<-glm(default~income+balance,data=Default,family=binomial)
+summary(glm.6a)
+```
+
+
 ## (b) Write a function, boot.fn(), that takes as input the Default data set as well as an index of the observations, and that outputs the coeﬃcient estimates for income and balance in the multiple logistic regression model.
+
+```{r}
+boot.fn=function(data,index)
+ return(coef(glm(default~income+balance,data=data,family=binomial,subset=index)))
+set.seed(1)
+boot.fn(Default,1:10000)
+boot.fn(Default,sample(10000,10000,replace=T))
+
+```
+
 
 ## (c) Use the boot() function together with your boot.fn() function to estimate the standard errors of the logistic regression coeﬃcients for income and balance.
 
+```{r}
+library(boot)
+#?boot
+boot(Default,boot.fn,1000)
+summary(glm.6a)$coef
+```
+
 ## (d) Comment on the estimated standard errors obtained using the glm() function and using your bootstrap function.
+
+> Since this model provides a good ﬁt to the data, there is a good correspondence between the bootstrap estimates and the standard estimates.
+
+> The standard formulas rely on certain assumptions: (1) they
+depend on the unknown parameter σ^2 , the noise variance.(2) the xi are ﬁxed, and all the variability comes from the variation in the errors Ei.
+
+> The bootstrap approach does not rely on any of these assumptions, and so it is likely giving a more accurate estimate of the standard errors than is the summary() function.
+
 
 
 # 9. We will now consider the Boston housing data set, from the MASS library.
 
 ## (a) Based on this data set, provide an estimate for the population mean of medv. Call this estimate ˆμ.
 
+```{r}
+library(MASS)
+summary(Boston)
+mu.9a<-mean(Boston$medv)
+mu.9a
+```
+
+
 ## (b) Provide an estimate of the standard error of ˆμ. Interpret this result.
 Hint: We can compute the standard error of the sample mean by dividing the sample standard deviation by the square root of the number of observations.
 
+```{r}
+dim(Boston)
+nrow(Boston)
+standard.error<-sd(Boston$medv)/sqrt(nrow(Boston))
+standard.error
+```
+
+
 ## (c) Now estimate the standard error of ˆμ using the bootstrap. How does this compare to your answer from (b)?
+
+```{r}
+set.seed(1)
+boot.fn=function(data,index)
+ mean(data[index])
+boot.9c<-boot(Boston$medv,boot.fn,1000)
+boot.9c
+```
+
+>  these are somewhat diﬀerent from the estimates obtained using the bootstrap.
 
 ## (d) Based on your bootstrap estimate from (c), provide a 95 % conﬁdence interval for the mean of medv. Compare it to the results obtained using t.test(Boston$medv).
 Hint: You can approximate a 95 % conﬁdence interval using the formula [ˆμ − 2SE(ˆμ), ˆμ + 2SE(ˆμ)].
 
+```{r}
+#?boot
+sd(boot.9c$t)
+nrow(boot.9c$t)
+SE<-sd(boot.9c$t)/sqrt(nrow(boot.9c$t))
+SE
+mu.9a
+lowinterval=mu.9a-2*SE
+lowinterval
+highinterval=mu.9a+2*SE
+highinterval
+
+t.test(Boston$medv)
+```
+
+
 ## (e) Based on this data set, provide an estimate, ˆμ med , for the median value of medv in the population.
+
+```{r}
+mu.med=median(Boston$medv)
+mu.med
+```
+
 
 ## (f) We now would like to estimate the standard error of ˆμ med . Unfortunately, there is no simple formula for computing the standard error of the median. Instead, estimate the standard error of the median using the bootstrap. Comment on your ﬁndings.
 
+```{r}
+set.seed(1)
+boot.fn=function(data,index)
+ median(data[index])
+boot.9f<-boot(Boston$medv,boot.fn,1000)
+boot.9f
+```
+
+
 ## (g) Based on this data set, provide an estimate for the tenth percentile of medv in Boston suburbs. Call this quantity ˆμ 0.1 . (You can use the quantile() function.)
 
+```{r}
+#?quantile
+mu.0.1=quantile(Boston$medv,0.1)
+mu.0.1
+```
+
+
 ## (h) Use the bootstrap to estimate the standard error of ˆμ 0.1 . Comment on your ﬁndings.
+
+```{r}
+set.seed(1)
+boot.fn=function(data,index)
+ quantile(data[index],0.1)
+boot.9h<-boot(Boston$medv,boot.fn,1000)
+boot.9h
+```
+

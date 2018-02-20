@@ -365,3 +365,33 @@ coef(regfit.bwd,7)
 ##   -0.7163346 -116.1692169    0.3028847
 ```
 
+# 1. We perform best subset, forward stepwise, and backward stepwise selection on a single data set. For each approach, we obtain p + 1 models, containing 0, 1, 2, . . . , p predictors. Explain your answers:
+
+## (a) Which of the three models with k predictors has the smallest training RSS?
+
+## (b) Which of the three models with k predictors has the smallest test RSS?
+
+## (c) True or False:
+
+### i. The predictors in the k-variable model identiﬁed by forward stepwise are a subset of the predictors in the (k+1)-variable model identiﬁed by forward stepwise selection.
+
+### ii. The predictors in the k-variable model identiﬁed by backward stepwise are a subset of the predictors in the (k + 1)-variable model identiﬁed by backward stepwise selection.
+
+### iii. The predictors in the k-variable model identiﬁed by back-ward stepwise are a subset of the predictors in the (k + 1)-variable model identiﬁed by forward stepwise selection.
+
+### iv. The predictors in the k-variable model identiﬁed by forward stepwise are a subset of the predictors in the (k+1)-variable model identiﬁed by backward stepwise selection.
+
+### v. The predictors in the k-variable model identiﬁed by best subset are a subset of the predictors in the (k + 1)-variable model identiﬁed by best subset selection.
+
+# 8. In this exercise, we will generate simulated data, and will then use this data to perform best subset selection.
+## (a) Use the rnorm() function to generate a predictor X of length n = 100, as well as a noise vector E of length n = 100.
+
+## (b) Generate a response vector Y of length n = 100 according to the model Y = β 0 + β 1 X + β 2 X^2 + β 3 X^3 + E, where β 0 , β 1 , β 2 , and β 3 are constants of your choice.
+
+## (c) Use the regsubsets() function to perform best subset selection in order to choose the best model containing the predictors X, X^2, . . . , X^10. What is the best model obtained according to Cp , BIC, and adjusted R 2 ? Show some plots to provide evidence for your answer, and report the coeﬃcients of the best model obtained. Note you will need to use the data.frame() function to create a single data set containing both X and Y.
+
+## (d) Repeat (c), using forward stepwise selection and also using backwards stepwise selection. How does your answer compare to the results in (c)?
+
+## (e) Now ﬁt a lasso model to the simulated data, again using X, X^2 , . . . , X^10 as predictors. Use cross-validation to select the optimal value of λ. Create plots of the cross-validation error as a function of λ. Report the resulting coeﬃcient estimates, and discuss the results obtained.
+
+## (f) Now generate a response vector Y according to the model Y = β 0 + β 7 X^7 + E, and perform best subset selection and the lasso. Discuss the results obtained.

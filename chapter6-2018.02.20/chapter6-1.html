@@ -376,6 +376,54 @@ summary(regfit.bwd)</code></pre>
 ##       CWalks    DivisionW      PutOuts 
 ##   -0.7163346 -116.1692169    0.3028847</code></pre>
 </div>
+<div id="we-perform-best-subset-forward-stepwise-and-backward-stepwise-selection-on-a-single-data-set.-for-each-approach-we-obtain-p-1-models-containing-0-1-2-.-.-.-p-predictors.-explain-your-answers" class="section level1">
+<h1>1. We perform best subset, forward stepwise, and backward stepwise selection on a single data set. For each approach, we obtain p + 1 models, containing 0, 1, 2, . . . , p predictors. Explain your answers:</h1>
+<div id="a-which-of-the-three-models-with-k-predictors-has-the-smallest-training-rss" class="section level2">
+<h2>(a) Which of the three models with k predictors has the smallest training RSS?</h2>
+</div>
+<div id="b-which-of-the-three-models-with-k-predictors-has-the-smallest-test-rss" class="section level2">
+<h2>(b) Which of the three models with k predictors has the smallest test RSS?</h2>
+</div>
+<div id="c-true-or-false" class="section level2">
+<h2>(c) True or False:</h2>
+<div id="i.-the-predictors-in-the-k-variable-model-identied-by-forward-stepwise-are-a-subset-of-the-predictors-in-the-k1-variable-model-identied-by-forward-stepwise-selection." class="section level3">
+<h3>i. The predictors in the k-variable model identiﬁed by forward stepwise are a subset of the predictors in the (k+1)-variable model identiﬁed by forward stepwise selection.</h3>
+</div>
+<div id="ii.-the-predictors-in-the-k-variable-model-identied-by-backward-stepwise-are-a-subset-of-the-predictors-in-the-k-1-variable-model-identied-by-backward-stepwise-selection." class="section level3">
+<h3>ii. The predictors in the k-variable model identiﬁed by backward stepwise are a subset of the predictors in the (k + 1)-variable model identiﬁed by backward stepwise selection.</h3>
+</div>
+<div id="iii.-the-predictors-in-the-k-variable-model-identied-by-back-ward-stepwise-are-a-subset-of-the-predictors-in-the-k-1-variable-model-identied-by-forward-stepwise-selection." class="section level3">
+<h3>iii. The predictors in the k-variable model identiﬁed by back-ward stepwise are a subset of the predictors in the (k + 1)-variable model identiﬁed by forward stepwise selection.</h3>
+</div>
+<div id="iv.-the-predictors-in-the-k-variable-model-identied-by-forward-stepwise-are-a-subset-of-the-predictors-in-the-k1-variable-model-identied-by-backward-stepwise-selection." class="section level3">
+<h3>iv. The predictors in the k-variable model identiﬁed by forward stepwise are a subset of the predictors in the (k+1)-variable model identiﬁed by backward stepwise selection.</h3>
+</div>
+<div id="v.-the-predictors-in-the-k-variable-model-identied-by-best-subset-are-a-subset-of-the-predictors-in-the-k-1-variable-model-identied-by-best-subset-selection." class="section level3">
+<h3>v. The predictors in the k-variable model identiﬁed by best subset are a subset of the predictors in the (k + 1)-variable model identiﬁed by best subset selection.</h3>
+</div>
+</div>
+</div>
+<div id="in-this-exercise-we-will-generate-simulated-data-and-will-then-use-this-data-to-perform-best-subset-selection." class="section level1">
+<h1>8. In this exercise, we will generate simulated data, and will then use this data to perform best subset selection.</h1>
+<div id="a-use-the-rnorm-function-to-generate-a-predictor-x-of-length-n-100-as-well-as-a-noise-vector-e-of-length-n-100." class="section level2">
+<h2>(a) Use the rnorm() function to generate a predictor X of length n = 100, as well as a noise vector E of length n = 100.</h2>
+</div>
+<div id="b-generate-a-response-vector-y-of-length-n-100-according-to-the-model-y--0--1-x--2-x2--3-x3-e-where--0--1--2-and--3-are-constants-of-your-choice." class="section level2">
+<h2>(b) Generate a response vector Y of length n = 100 according to the model Y = β 0 + β 1 X + β 2 X^2 + β 3 X^3 + E, where β 0 , β 1 , β 2 , and β 3 are constants of your choice.</h2>
+</div>
+<div id="c-use-the-regsubsets-function-to-perform-best-subset-selection-in-order-to-choose-the-best-model-containing-the-predictors-x-x2-.-.-.-x10.-what-is-the-best-model-obtained-according-to-cp-bic-and-adjusted-r-2-show-some-plots-to-provide-evidence-for-your-answer-and-report-the-coecients-of-the-best-model-obtained.-note-you-will-need-to-use-the-data.frame-function-to-create-a-single-data-set-containing-both-x-and-y." class="section level2">
+<h2>(c) Use the regsubsets() function to perform best subset selection in order to choose the best model containing the predictors X, X^2, . . . , X^10. What is the best model obtained according to Cp , BIC, and adjusted R 2 ? Show some plots to provide evidence for your answer, and report the coeﬃcients of the best model obtained. Note you will need to use the data.frame() function to create a single data set containing both X and Y.</h2>
+</div>
+<div id="d-repeat-c-using-forward-stepwise-selection-and-also-using-backwards-stepwise-selection.-how-does-your-answer-compare-to-the-results-in-c" class="section level2">
+<h2>(d) Repeat (c), using forward stepwise selection and also using backwards stepwise selection. How does your answer compare to the results in (c)?</h2>
+</div>
+<div id="e-now-t-a-lasso-model-to-the-simulated-data-again-using-x-x2-.-.-.-x10-as-predictors.-use-cross-validation-to-select-the-optimal-value-of-.-create-plots-of-the-cross-validation-error-as-a-function-of-.-report-the-resulting-coecient-estimates-and-discuss-the-results-obtained." class="section level2">
+<h2>(e) Now ﬁt a lasso model to the simulated data, again using X, X^2 , . . . , X^10 as predictors. Use cross-validation to select the optimal value of λ. Create plots of the cross-validation error as a function of λ. Report the resulting coeﬃcient estimates, and discuss the results obtained.</h2>
+</div>
+<div id="f-now-generate-a-response-vector-y-according-to-the-model-y--0--7-x7-e-and-perform-best-subset-selection-and-the-lasso.-discuss-the-results-obtained." class="section level2">
+<h2>(f) Now generate a response vector Y according to the model Y = β 0 + β 7 X^7 + E, and perform best subset selection and the lasso. Discuss the results obtained.</h2>
+</div>
+</div>
 
 
 

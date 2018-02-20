@@ -129,7 +129,7 @@ $(document).ready(function () {
 <div id="best-subset-selection" class="section level1">
 <h1>Best Subset Selection</h1>
 <pre class="r"><code>library(ISLR)
-fix(Hitters)
+#fix(Hitters)
 names(Hitters)</code></pre>
 <pre><code>##  [1] &quot;AtBat&quot;     &quot;Hits&quot;      &quot;HmRun&quot;     &quot;Runs&quot;      &quot;RBI&quot;      
 ##  [6] &quot;Walks&quot;     &quot;Years&quot;     &quot;CAtBat&quot;    &quot;CHits&quot;     &quot;CHmRun&quot;   
@@ -204,6 +204,7 @@ plot(reg.summary$adjr2,xlab=&quot;Number of Variables&quot;,ylab=&quot;Adjusted 
 which.max(reg.summary$adjr2)</code></pre>
 <pre><code>## [1] 11</code></pre>
 <pre class="r"><code>points(11,reg.summary$adjr2[11], col=&quot;red&quot;,cex=2,pch=20)
+
 plot(reg.summary$cp,xlab=&quot;Number of Variables&quot;,ylab=&quot;Cp&quot;,type='l')
 which.min(reg.summary$cp)</code></pre>
 <pre><code>## [1] 10</code></pre>
@@ -213,7 +214,8 @@ which.min(reg.summary$bic)</code></pre>
 <pre class="r"><code>plot(reg.summary$bic,xlab=&quot;Number of Variables&quot;,ylab=&quot;BIC&quot;,type='l')
 points(6,reg.summary$bic[6],col=&quot;red&quot;,cex=2,pch=20)</code></pre>
 <p><img src="data:image/png;base64,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" /><!-- --></p>
-<pre class="r"><code>plot(regfit.full,scale=&quot;r2&quot;)
+<pre class="r"><code>#?plot.regsubsets
+plot(regfit.full,scale=&quot;r2&quot;)
 plot(regfit.full,scale=&quot;adjr2&quot;)
 plot(regfit.full,scale=&quot;Cp&quot;)
 plot(regfit.full,scale=&quot;bic&quot;)</code></pre>
@@ -380,26 +382,47 @@ summary(regfit.bwd)</code></pre>
 <h1>1. We perform best subset, forward stepwise, and backward stepwise selection on a single data set. For each approach, we obtain p + 1 models, containing 0, 1, 2, . . . , p predictors. Explain your answers:</h1>
 <div id="a-which-of-the-three-models-with-k-predictors-has-the-smallest-training-rss" class="section level2">
 <h2>(a) Which of the three models with k predictors has the smallest training RSS?</h2>
+<blockquote>
+<p>Best subset, because forward stepwise and backward stepwise selection are not guaranteed to ﬁnd the best possible model out of all 2^p models containing subsets of the p predictors.</p>
+</blockquote>
 </div>
 <div id="b-which-of-the-three-models-with-k-predictors-has-the-smallest-test-rss" class="section level2">
 <h2>(b) Which of the three models with k predictors has the smallest test RSS?</h2>
+<blockquote>
+<p>We don’t know. A number of techniques for adjusting the training error for the model size are available, like Cp, BIC, AIC and adjusted R^2. These approaches can be used to select among a set of models with diﬀerent numbers of variables. But, actually, we don’t know which model has the real smallest test RSS unless we have real test data.</p>
+</blockquote>
 </div>
 <div id="c-true-or-false" class="section level2">
 <h2>(c) True or False:</h2>
 <div id="i.-the-predictors-in-the-k-variable-model-identied-by-forward-stepwise-are-a-subset-of-the-predictors-in-the-k1-variable-model-identied-by-forward-stepwise-selection." class="section level3">
 <h3>i. The predictors in the k-variable model identiﬁed by forward stepwise are a subset of the predictors in the (k+1)-variable model identiﬁed by forward stepwise selection.</h3>
+<blockquote>
+<p>True.</p>
+</blockquote>
 </div>
 <div id="ii.-the-predictors-in-the-k-variable-model-identied-by-backward-stepwise-are-a-subset-of-the-predictors-in-the-k-1-variable-model-identied-by-backward-stepwise-selection." class="section level3">
 <h3>ii. The predictors in the k-variable model identiﬁed by backward stepwise are a subset of the predictors in the (k + 1)-variable model identiﬁed by backward stepwise selection.</h3>
+<blockquote>
+<p>True.</p>
+</blockquote>
 </div>
 <div id="iii.-the-predictors-in-the-k-variable-model-identied-by-back-ward-stepwise-are-a-subset-of-the-predictors-in-the-k-1-variable-model-identied-by-forward-stepwise-selection." class="section level3">
 <h3>iii. The predictors in the k-variable model identiﬁed by back-ward stepwise are a subset of the predictors in the (k + 1)-variable model identiﬁed by forward stepwise selection.</h3>
+<blockquote>
+<p>False. The best k-variable models and (k + 1)-variable models identiﬁed by forward stepwise selection and backward stepwise selection may be diﬀerent.</p>
+</blockquote>
 </div>
 <div id="iv.-the-predictors-in-the-k-variable-model-identied-by-forward-stepwise-are-a-subset-of-the-predictors-in-the-k1-variable-model-identied-by-backward-stepwise-selection." class="section level3">
 <h3>iv. The predictors in the k-variable model identiﬁed by forward stepwise are a subset of the predictors in the (k+1)-variable model identiﬁed by backward stepwise selection.</h3>
+<blockquote>
+<p>False. The best k-variable models and (k + 1)-variable models identiﬁed by forward stepwise selection and backward stepwise selection may be diﬀerent.</p>
+</blockquote>
 </div>
 <div id="v.-the-predictors-in-the-k-variable-model-identied-by-best-subset-are-a-subset-of-the-predictors-in-the-k-1-variable-model-identied-by-best-subset-selection." class="section level3">
 <h3>v. The predictors in the k-variable model identiﬁed by best subset are a subset of the predictors in the (k + 1)-variable model identiﬁed by best subset selection.</h3>
+<blockquote>
+<p>False. Because best subset may also remove any variables that no longer provide an improvement in the model ﬁt.</p>
+</blockquote>
 </div>
 </div>
 </div>

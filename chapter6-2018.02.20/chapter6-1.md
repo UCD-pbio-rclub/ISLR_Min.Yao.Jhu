@@ -9,7 +9,7 @@ Min-Yao
 
 ```r
 library(ISLR)
-fix(Hitters)
+#fix(Hitters)
 names(Hitters)
 ```
 
@@ -138,6 +138,7 @@ which.max(reg.summary$adjr2)
 
 ```r
 points(11,reg.summary$adjr2[11], col="red",cex=2,pch=20)
+
 plot(reg.summary$cp,xlab="Number of Variables",ylab="Cp",type='l')
 which.min(reg.summary$cp)
 ```
@@ -163,6 +164,7 @@ points(6,reg.summary$bic[6],col="red",cex=2,pch=20)
 ![](chapter6-1_files/figure-html/unnamed-chunk-1-1.png)<!-- -->
 
 ```r
+#?plot.regsubsets
 plot(regfit.full,scale="r2")
 plot(regfit.full,scale="adjr2")
 plot(regfit.full,scale="Cp")
@@ -369,19 +371,33 @@ coef(regfit.bwd,7)
 
 ## (a) Which of the three models with k predictors has the smallest training RSS?
 
+> Best subset, because forward stepwise and backward stepwise selection are not guaranteed to ﬁnd the best possible model out of all 2^p models containing subsets of the p predictors. 
+
 ## (b) Which of the three models with k predictors has the smallest test RSS?
+
+> We don't know. A number of techniques for adjusting the training error for the model size are available, like Cp, BIC, AIC and adjusted R^2. These approaches can be used to select among a set of models with diﬀerent numbers of variables. But, actually, we don't know which model has the real smallest test RSS unless we have real test data.
 
 ## (c) True or False:
 
 ### i. The predictors in the k-variable model identiﬁed by forward stepwise are a subset of the predictors in the (k+1)-variable model identiﬁed by forward stepwise selection.
 
+> True.
+
 ### ii. The predictors in the k-variable model identiﬁed by backward stepwise are a subset of the predictors in the (k + 1)-variable model identiﬁed by backward stepwise selection.
+
+> True.
 
 ### iii. The predictors in the k-variable model identiﬁed by back-ward stepwise are a subset of the predictors in the (k + 1)-variable model identiﬁed by forward stepwise selection.
 
+> False. The best k-variable models and (k + 1)-variable models identiﬁed by forward stepwise selection and backward stepwise selection may be diﬀerent.
+
 ### iv. The predictors in the k-variable model identiﬁed by forward stepwise are a subset of the predictors in the (k+1)-variable model identiﬁed by backward stepwise selection.
 
+> False. The best k-variable models and (k + 1)-variable models identiﬁed by forward stepwise selection and backward stepwise selection may be diﬀerent.
+
 ### v. The predictors in the k-variable model identiﬁed by best subset are a subset of the predictors in the (k + 1)-variable model identiﬁed by best subset selection.
+
+> False. Because best subset may also remove any variables that no longer provide an improvement in the model ﬁt.
 
 # 8. In this exercise, we will generate simulated data, and will then use this data to perform best subset selection.
 ## (a) Use the rnorm() function to generate a predictor X of length n = 100, as well as a noise vector E of length n = 100.

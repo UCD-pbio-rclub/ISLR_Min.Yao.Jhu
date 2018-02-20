@@ -102,11 +102,92 @@ coef(regfit.bwd,7)
 
 ## (a) Use the rnorm() function to generate a predictor X of length n = 100, as well as a noise vector E of length n = 100.
 
+```{r}
+set.seed(12)
+#?rnorm
+X=rnorm(100, 10, 1)
+E=rnorm(100, 5, 1)
+```
+
+
 ## (b) Generate a response vector Y of length n = 100 according to the model Y = β 0 + β 1 X + β 2 X^2 + β 3 X^3 + E, where β 0 , β 1 , β 2 , and β 3 are constants of your choice.
+
+```{r}
+B0=1
+B1=2
+B2=3
+B3=4
+Y=B0+B1*X+B2*(X^2)+B3*(X^3)+E
+```
+
 
 ## (c) Use the regsubsets() function to perform best subset selection in order to choose the best model containing the predictors X, X^2, . . . , X^10. What is the best model obtained according to Cp , BIC, and adjusted R 2 ? Show some plots to provide evidence for your answer, and report the coeﬃcients of the best model obtained. Note you will need to use the data.frame() function to create a single data set containing both X and Y.
 
+```{r}
+library(leaps)
+XYdata=data.frame(X,Y)
+summary(XYdata)
+plot(X,Y)
+
+XYregfit.full=regsubsets(Y~poly(X,10),XYdata,nvmax = 10)
+summary(XYregfit.full)
+
+plot(XYregfit.full,scale="r2")
+plot(XYregfit.full,scale="adjr2")
+plot(XYregfit.full,scale="Cp")
+plot(XYregfit.full,scale="bic")
+
+XYreg.summary=summary(XYregfit.full)
+plot(XYreg.summary$rss,xlab="Number of Variables",ylab="RSS",type="l")
+plot(XYreg.summary$cp,xlab="Number of Variables",ylab="Cp",type='l')
+which.min(XYreg.summary$cp)
+points(which.min(XYreg.summary$cp),XYreg.summary$cp[which.min(XYreg.summary$cp)],col="red",cex=2,pch=20)
+
+plot(XYreg.summary$bic,xlab="Number of Variables",ylab="bic",type='l')
+which.min(XYreg.summary$bic)
+points(which.min(XYreg.summary$bic),XYreg.summary$bic[which.min(XYreg.summary$bic)],col="red",cex=2,pch=20)
+
+plot(XYreg.summary$adjr2,xlab="Number of Variables",ylab="Adjusted RSq",type="l")
+which.max(XYreg.summary$adjr2)
+points(which.max(XYreg.summary$adjr2),XYreg.summary$adjr2[which.max(XYreg.summary$adjr2)], col="red",cex=2,pch=20)
+
+coef(XYregfit.full,3)
+coef(XYregfit.full,4)
+
+```
+
+> Cp and Adjusted RSq favor 4 variable model, but BIC favors 3 variable model.
+
 ## (d) Repeat (c), using forward stepwise selection and also using backwards stepwise selection. How does your answer compare to the results in (c)?
+
+```{r}
+XYregfit.fwd=regsubsets(Y~poly(X,10),XYdata,nvmax = 10,method="forward")
+summary(XYregfit.fwd)
+
+plot(XYregfit.fwd,scale="r2")
+plot(XYregfit.fwd,scale="adjr2")
+plot(XYregfit.fwd,scale="Cp")
+plot(XYregfit.fwd,scale="bic")
+
+XYreg.summary=summary(XYregfit.fwd)
+plot(XYreg.summary$rss,xlab="Number of Variables",ylab="RSS",type="l")
+plot(XYreg.summary$cp,xlab="Number of Variables",ylab="Cp",type='l')
+which.min(XYreg.summary$cp)
+points(which.min(XYreg.summary$cp),XYreg.summary$cp[which.min(XYreg.summary$cp)],col="red",cex=2,pch=20)
+
+plot(XYreg.summary$bic,xlab="Number of Variables",ylab="bic",type='l')
+which.min(XYreg.summary$bic)
+points(which.min(XYreg.summary$bic),XYreg.summary$bic[which.min(XYreg.summary$bic)],col="red",cex=2,pch=20)
+
+plot(XYreg.summary$adjr2,xlab="Number of Variables",ylab="Adjusted RSq",type="l")
+which.max(XYreg.summary$adjr2)
+points(which.max(XYreg.summary$adjr2),XYreg.summary$adjr2[which.max(XYreg.summary$adjr2)], col="red",cex=2,pch=20)
+
+```
+
+> the same results
+
+
 
 ## (e) Now ﬁt a lasso model to the simulated data, again using X, X^2 , . . . , X^10 as predictors. Use cross-validation to select the optimal value of λ. Create plots of the cross-validation error as a function of λ. Report the resulting coeﬃcient estimates, and discuss the results obtained.
 

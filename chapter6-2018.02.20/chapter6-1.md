@@ -400,13 +400,347 @@ coef(regfit.bwd,7)
 > False. Because best subset may also remove any variables that no longer provide an improvement in the model ﬁt.
 
 # 8. In this exercise, we will generate simulated data, and will then use this data to perform best subset selection.
+
 ## (a) Use the rnorm() function to generate a predictor X of length n = 100, as well as a noise vector E of length n = 100.
+
+
+```r
+set.seed(12)
+#?rnorm
+X=rnorm(100, 10, 1)
+E=rnorm(100, 5, 1)
+```
+
 
 ## (b) Generate a response vector Y of length n = 100 according to the model Y = β 0 + β 1 X + β 2 X^2 + β 3 X^3 + E, where β 0 , β 1 , β 2 , and β 3 are constants of your choice.
 
+
+```r
+B0=1
+B1=2
+B2=3
+B3=4
+Y=B0+B1*X+B2*(X^2)+B3*(X^3)+E
+```
+
+
 ## (c) Use the regsubsets() function to perform best subset selection in order to choose the best model containing the predictors X, X^2, . . . , X^10. What is the best model obtained according to Cp , BIC, and adjusted R 2 ? Show some plots to provide evidence for your answer, and report the coeﬃcients of the best model obtained. Note you will need to use the data.frame() function to create a single data set containing both X and Y.
 
+
+```r
+library(leaps)
+XYdata=data.frame(X,Y)
+summary(XYdata)
+```
+
+```
+##        X                Y       
+##  Min.   : 7.851   Min.   :2144  
+##  1st Qu.: 9.437   1st Qu.:3654  
+##  Median : 9.890   Median :4189  
+##  Mean   : 9.969   Mean   :4378  
+##  3rd Qu.:10.509   3rd Qu.:5002  
+##  Max.   :12.072   Max.   :7505
+```
+
+```r
+plot(X,Y)
+```
+
+![](chapter6-1_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+
+```r
+XYregfit.full=regsubsets(Y~poly(X,10),XYdata,nvmax = 10)
+summary(XYregfit.full)
+```
+
+```
+## Subset selection object
+## Call: regsubsets.formula(Y ~ poly(X, 10), XYdata, nvmax = 10)
+## 10 Variables  (and intercept)
+##               Forced in Forced out
+## poly(X, 10)1      FALSE      FALSE
+## poly(X, 10)2      FALSE      FALSE
+## poly(X, 10)3      FALSE      FALSE
+## poly(X, 10)4      FALSE      FALSE
+## poly(X, 10)5      FALSE      FALSE
+## poly(X, 10)6      FALSE      FALSE
+## poly(X, 10)7      FALSE      FALSE
+## poly(X, 10)8      FALSE      FALSE
+## poly(X, 10)9      FALSE      FALSE
+## poly(X, 10)10     FALSE      FALSE
+## 1 subsets of each size up to 10
+## Selection Algorithm: exhaustive
+##           poly(X, 10)1 poly(X, 10)2 poly(X, 10)3 poly(X, 10)4 poly(X, 10)5
+## 1  ( 1 )  "*"          " "          " "          " "          " "         
+## 2  ( 1 )  "*"          "*"          " "          " "          " "         
+## 3  ( 1 )  "*"          "*"          "*"          " "          " "         
+## 4  ( 1 )  "*"          "*"          "*"          " "          " "         
+## 5  ( 1 )  "*"          "*"          "*"          "*"          " "         
+## 6  ( 1 )  "*"          "*"          "*"          "*"          " "         
+## 7  ( 1 )  "*"          "*"          "*"          "*"          "*"         
+## 8  ( 1 )  "*"          "*"          "*"          "*"          "*"         
+## 9  ( 1 )  "*"          "*"          "*"          "*"          "*"         
+## 10  ( 1 ) "*"          "*"          "*"          "*"          "*"         
+##           poly(X, 10)6 poly(X, 10)7 poly(X, 10)8 poly(X, 10)9
+## 1  ( 1 )  " "          " "          " "          " "         
+## 2  ( 1 )  " "          " "          " "          " "         
+## 3  ( 1 )  " "          " "          " "          " "         
+## 4  ( 1 )  " "          " "          " "          " "         
+## 5  ( 1 )  " "          " "          " "          " "         
+## 6  ( 1 )  " "          "*"          " "          " "         
+## 7  ( 1 )  " "          "*"          " "          " "         
+## 8  ( 1 )  " "          "*"          "*"          " "         
+## 9  ( 1 )  "*"          "*"          "*"          " "         
+## 10  ( 1 ) "*"          "*"          "*"          "*"         
+##           poly(X, 10)10
+## 1  ( 1 )  " "          
+## 2  ( 1 )  " "          
+## 3  ( 1 )  " "          
+## 4  ( 1 )  "*"          
+## 5  ( 1 )  "*"          
+## 6  ( 1 )  "*"          
+## 7  ( 1 )  "*"          
+## 8  ( 1 )  "*"          
+## 9  ( 1 )  "*"          
+## 10  ( 1 ) "*"
+```
+
+```r
+plot(XYregfit.full,scale="r2")
+```
+
+![](chapter6-1_files/figure-html/unnamed-chunk-5-2.png)<!-- -->
+
+```r
+plot(XYregfit.full,scale="adjr2")
+```
+
+![](chapter6-1_files/figure-html/unnamed-chunk-5-3.png)<!-- -->
+
+```r
+plot(XYregfit.full,scale="Cp")
+```
+
+![](chapter6-1_files/figure-html/unnamed-chunk-5-4.png)<!-- -->
+
+```r
+plot(XYregfit.full,scale="bic")
+```
+
+![](chapter6-1_files/figure-html/unnamed-chunk-5-5.png)<!-- -->
+
+```r
+XYreg.summary=summary(XYregfit.full)
+plot(XYreg.summary$rss,xlab="Number of Variables",ylab="RSS",type="l")
+```
+
+![](chapter6-1_files/figure-html/unnamed-chunk-5-6.png)<!-- -->
+
+```r
+plot(XYreg.summary$cp,xlab="Number of Variables",ylab="Cp",type='l')
+which.min(XYreg.summary$cp)
+```
+
+```
+## [1] 4
+```
+
+```r
+points(which.min(XYreg.summary$cp),XYreg.summary$cp[which.min(XYreg.summary$cp)],col="red",cex=2,pch=20)
+```
+
+![](chapter6-1_files/figure-html/unnamed-chunk-5-7.png)<!-- -->
+
+```r
+plot(XYreg.summary$bic,xlab="Number of Variables",ylab="bic",type='l')
+which.min(XYreg.summary$bic)
+```
+
+```
+## [1] 3
+```
+
+```r
+points(which.min(XYreg.summary$bic),XYreg.summary$bic[which.min(XYreg.summary$bic)],col="red",cex=2,pch=20)
+```
+
+![](chapter6-1_files/figure-html/unnamed-chunk-5-8.png)<!-- -->
+
+```r
+plot(XYreg.summary$adjr2,xlab="Number of Variables",ylab="Adjusted RSq",type="l")
+which.max(XYreg.summary$adjr2)
+```
+
+```
+## [1] 4
+```
+
+```r
+points(which.max(XYreg.summary$adjr2),XYreg.summary$adjr2[which.max(XYreg.summary$adjr2)], col="red",cex=2,pch=20)
+```
+
+![](chapter6-1_files/figure-html/unnamed-chunk-5-9.png)<!-- -->
+
+```r
+coef(XYregfit.full,3)
+```
+
+```
+##  (Intercept) poly(X, 10)1 poly(X, 10)2 poly(X, 10)3 
+##   4378.10082  11032.72208   1271.98179     49.78343
+```
+
+```r
+coef(XYregfit.full,4)
+```
+
+```
+##   (Intercept)  poly(X, 10)1  poly(X, 10)2  poly(X, 10)3 poly(X, 10)10 
+##   4378.100817  11032.722081   1271.981792     49.783432      1.898334
+```
+
+> Cp and Adjusted RSq favor 4 variable model, but BIC favors 3 variable model.
+
 ## (d) Repeat (c), using forward stepwise selection and also using backwards stepwise selection. How does your answer compare to the results in (c)?
+
+
+```r
+XYregfit.fwd=regsubsets(Y~poly(X,10),XYdata,nvmax = 10,method="forward")
+summary(XYregfit.fwd)
+```
+
+```
+## Subset selection object
+## Call: regsubsets.formula(Y ~ poly(X, 10), XYdata, nvmax = 10, method = "forward")
+## 10 Variables  (and intercept)
+##               Forced in Forced out
+## poly(X, 10)1      FALSE      FALSE
+## poly(X, 10)2      FALSE      FALSE
+## poly(X, 10)3      FALSE      FALSE
+## poly(X, 10)4      FALSE      FALSE
+## poly(X, 10)5      FALSE      FALSE
+## poly(X, 10)6      FALSE      FALSE
+## poly(X, 10)7      FALSE      FALSE
+## poly(X, 10)8      FALSE      FALSE
+## poly(X, 10)9      FALSE      FALSE
+## poly(X, 10)10     FALSE      FALSE
+## 1 subsets of each size up to 10
+## Selection Algorithm: forward
+##           poly(X, 10)1 poly(X, 10)2 poly(X, 10)3 poly(X, 10)4 poly(X, 10)5
+## 1  ( 1 )  "*"          " "          " "          " "          " "         
+## 2  ( 1 )  "*"          "*"          " "          " "          " "         
+## 3  ( 1 )  "*"          "*"          "*"          " "          " "         
+## 4  ( 1 )  "*"          "*"          "*"          " "          " "         
+## 5  ( 1 )  "*"          "*"          "*"          "*"          " "         
+## 6  ( 1 )  "*"          "*"          "*"          "*"          " "         
+## 7  ( 1 )  "*"          "*"          "*"          "*"          "*"         
+## 8  ( 1 )  "*"          "*"          "*"          "*"          "*"         
+## 9  ( 1 )  "*"          "*"          "*"          "*"          "*"         
+## 10  ( 1 ) "*"          "*"          "*"          "*"          "*"         
+##           poly(X, 10)6 poly(X, 10)7 poly(X, 10)8 poly(X, 10)9
+## 1  ( 1 )  " "          " "          " "          " "         
+## 2  ( 1 )  " "          " "          " "          " "         
+## 3  ( 1 )  " "          " "          " "          " "         
+## 4  ( 1 )  " "          " "          " "          " "         
+## 5  ( 1 )  " "          " "          " "          " "         
+## 6  ( 1 )  " "          "*"          " "          " "         
+## 7  ( 1 )  " "          "*"          " "          " "         
+## 8  ( 1 )  " "          "*"          "*"          " "         
+## 9  ( 1 )  "*"          "*"          "*"          " "         
+## 10  ( 1 ) "*"          "*"          "*"          "*"         
+##           poly(X, 10)10
+## 1  ( 1 )  " "          
+## 2  ( 1 )  " "          
+## 3  ( 1 )  " "          
+## 4  ( 1 )  "*"          
+## 5  ( 1 )  "*"          
+## 6  ( 1 )  "*"          
+## 7  ( 1 )  "*"          
+## 8  ( 1 )  "*"          
+## 9  ( 1 )  "*"          
+## 10  ( 1 ) "*"
+```
+
+```r
+plot(XYregfit.fwd,scale="r2")
+```
+
+![](chapter6-1_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+
+```r
+plot(XYregfit.fwd,scale="adjr2")
+```
+
+![](chapter6-1_files/figure-html/unnamed-chunk-6-2.png)<!-- -->
+
+```r
+plot(XYregfit.fwd,scale="Cp")
+```
+
+![](chapter6-1_files/figure-html/unnamed-chunk-6-3.png)<!-- -->
+
+```r
+plot(XYregfit.fwd,scale="bic")
+```
+
+![](chapter6-1_files/figure-html/unnamed-chunk-6-4.png)<!-- -->
+
+```r
+XYreg.summary=summary(XYregfit.fwd)
+plot(XYreg.summary$rss,xlab="Number of Variables",ylab="RSS",type="l")
+```
+
+![](chapter6-1_files/figure-html/unnamed-chunk-6-5.png)<!-- -->
+
+```r
+plot(XYreg.summary$cp,xlab="Number of Variables",ylab="Cp",type='l')
+which.min(XYreg.summary$cp)
+```
+
+```
+## [1] 4
+```
+
+```r
+points(which.min(XYreg.summary$cp),XYreg.summary$cp[which.min(XYreg.summary$cp)],col="red",cex=2,pch=20)
+```
+
+![](chapter6-1_files/figure-html/unnamed-chunk-6-6.png)<!-- -->
+
+```r
+plot(XYreg.summary$bic,xlab="Number of Variables",ylab="bic",type='l')
+which.min(XYreg.summary$bic)
+```
+
+```
+## [1] 3
+```
+
+```r
+points(which.min(XYreg.summary$bic),XYreg.summary$bic[which.min(XYreg.summary$bic)],col="red",cex=2,pch=20)
+```
+
+![](chapter6-1_files/figure-html/unnamed-chunk-6-7.png)<!-- -->
+
+```r
+plot(XYreg.summary$adjr2,xlab="Number of Variables",ylab="Adjusted RSq",type="l")
+which.max(XYreg.summary$adjr2)
+```
+
+```
+## [1] 4
+```
+
+```r
+points(which.max(XYreg.summary$adjr2),XYreg.summary$adjr2[which.max(XYreg.summary$adjr2)], col="red",cex=2,pch=20)
+```
+
+![](chapter6-1_files/figure-html/unnamed-chunk-6-8.png)<!-- -->
+
+> the same results
+
+
 
 ## (e) Now ﬁt a lasso model to the simulated data, again using X, X^2 , . . . , X^10 as predictors. Use cross-validation to select the optimal value of λ. Create plots of the cross-validation error as a function of λ. Report the resulting coeﬃcient estimates, and discuss the results obtained.
 

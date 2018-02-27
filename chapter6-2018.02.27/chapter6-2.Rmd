@@ -224,7 +224,7 @@ of i. through v. is correct. Justify your answer.
 
 ## (b) Repeat (a) for test RSS.
 
->  i. Increase initially, and then eventually start decreasing in an inverted U shape.
+> ii. Decrease initially, and then eventually start increasing in a U shape.
 
 >  as λ → ∞ , the impact of the shrinkage penalty grows, and the ridge regression coeﬃcient estimates will approach zero. 
 

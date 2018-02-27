@@ -576,33 +576,43 @@ predict(out,type=&quot;coefficients&quot;,s=bestlam)[1:20,]</code></pre>
 <p>for a particular value of s. For parts (a) through (e), indicate which of i. through v. is correct. Justify your answer.</p>
 <div id="a-as-we-increase-s-from-0-the-training-rss-will" class="section level2">
 <h2>(a) As we increase s from 0, the training RSS will:</h2>
-<div id="i.-increase-initially-and-then-eventually-start-decreasing-in-an-inverted-u-shape." class="section level3">
-<h3>i. Increase initially, and then eventually start decreasing in an inverted U shape.</h3>
-</div>
-<div id="ii.-decrease-initially-and-then-eventually-start-increasing-in-a-u-shape." class="section level3">
-<h3>ii. Decrease initially, and then eventually start increasing in a U shape.</h3>
-</div>
-<div id="iii.-steadily-increase." class="section level3">
-<h3>iii. Steadily increase.</h3>
-</div>
-<div id="iv.-steadily-decrease." class="section level3">
-<h3>iv. Steadily decrease.</h3>
-</div>
-<div id="v.-remain-constant." class="section level3">
-<h3>v. Remain constant.</h3>
-</div>
+<blockquote>
+<ol start="4" style="list-style-type: lower-roman">
+<li>Steadily decrease.</li>
+</ol>
+</blockquote>
 </div>
 <div id="b-repeat-a-for-test-rss." class="section level2">
 <h2>(b) Repeat (a) for test RSS.</h2>
+<blockquote>
+<ol start="2" style="list-style-type: lower-roman">
+<li>Decrease initially, and then eventually start increasing in a U shape.</li>
+</ol>
+</blockquote>
 </div>
 <div id="c-repeat-a-for-variance." class="section level2">
 <h2>(c) Repeat (a) for variance.</h2>
+<blockquote>
+<ol start="3" style="list-style-type: lower-roman">
+<li>Steadily increase.</li>
+</ol>
+</blockquote>
 </div>
 <div id="d-repeat-a-for-squared-bias." class="section level2">
 <h2>(d) Repeat (a) for (squared) bias.</h2>
+<blockquote>
+<ol start="4" style="list-style-type: lower-roman">
+<li>Steadily decrease.</li>
+</ol>
+</blockquote>
 </div>
 <div id="e-repeat-a-for-the-irreducible-error." class="section level2">
 <h2>(e) Repeat (a) for the irreducible error.</h2>
+<blockquote>
+<ol start="22" style="list-style-type: lower-alpha">
+<li>Remain constant.</li>
+</ol>
+</blockquote>
 </div>
 </div>
 <div id="suppose-we-estimate-the-regression-coecients-in-a-linear-regression-model-by-minimizing-1" class="section level1">
@@ -610,33 +620,49 @@ predict(out,type=&quot;coefficients&quot;,s=bestlam)[1:20,]</code></pre>
 <p>for a particular value of λ. For parts (a) through (e), indicate which of i. through v. is correct. Justify your answer.</p>
 <div id="a-as-we-increase--from-0-the-training-rss-will" class="section level2">
 <h2>(a) As we increase λ from 0, the training RSS will:</h2>
-<div id="i.-increase-initially-and-then-eventually-start-decreasing-in-an-inverted-u-shape.-1" class="section level3">
-<h3>i. Increase initially, and then eventually start decreasing in an inverted U shape.</h3>
-</div>
-<div id="ii.-decrease-initially-and-then-eventually-start-increasing-in-a-u-shape.-1" class="section level3">
-<h3>ii. Decrease initially, and then eventually start increasing in a U shape.</h3>
-</div>
-<div id="iii.-steadily-increase.-1" class="section level3">
-<h3>iii. Steadily increase.</h3>
-</div>
-<div id="iv.-steadily-decrease.-1" class="section level3">
-<h3>iv. Steadily decrease.</h3>
-</div>
-<div id="v.-remain-constant.-1" class="section level3">
-<h3>v. Remain constant.</h3>
-</div>
+<blockquote>
+<ol start="3" style="list-style-type: lower-roman">
+<li>Steadily increase.</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>as λ → ∞ , the impact of the shrinkage penalty grows, and the ridge regression coeﬃcient estimates will approach zero.</p>
+</blockquote>
 </div>
 <div id="b-repeat-a-for-test-rss.-1" class="section level2">
 <h2>(b) Repeat (a) for test RSS.</h2>
+<blockquote>
+<ol style="list-style-type: lower-roman">
+<li>Increase initially, and then eventually start decreasing in an inverted U shape.</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>as λ → ∞ , the impact of the shrinkage penalty grows, and the ridge regression coeﬃcient estimates will approach zero.</p>
+</blockquote>
 </div>
 <div id="c-repeat-a-for-variance.-1" class="section level2">
 <h2>(c) Repeat (a) for variance.</h2>
+<blockquote>
+<ol start="4" style="list-style-type: lower-roman">
+<li>Steadily decrease.</li>
+</ol>
+</blockquote>
 </div>
 <div id="d-repeat-a-for-squared-bias.-1" class="section level2">
 <h2>(d) Repeat (a) for (squared) bias.</h2>
+<blockquote>
+<ol start="3" style="list-style-type: lower-roman">
+<li>Steadily increase.</li>
+</ol>
+</blockquote>
 </div>
 <div id="e-repeat-a-for-the-irreducible-error.-1" class="section level2">
 <h2>(e) Repeat (a) for the irreducible error.</h2>
+<blockquote>
+<ol start="22" style="list-style-type: lower-alpha">
+<li>Remain constant.</li>
+</ol>
+</blockquote>
 </div>
 </div>
 <div id="it-is-well-known-that-ridge-regression-tends-to-give-similar-coecient-values-to-correlated-variables-whereas-the-lasso-may-give-quite-different-coecient-values-to-correlated-variables.-we-will-now-explore-this-property-in-a-very-simple-setting.-suppose-that-n-2-p-2-x-11-x-12-x-21-x-22-.-furthermore-suppose-that-y-1-y-2-0-and-x-11-x-21-0-and-x-12-x-22-0-so-that-the-estimate-for-the-intercept-in-a-least-squares-ridge-regression-or-lasso-model-is-zero--0-0." class="section level1">
@@ -652,12 +678,89 @@ predict(out,type=&quot;coefficients&quot;,s=bestlam)[1:20,]</code></pre>
 <h1>9. In this exercise, we will predict the number of applications received using the other variables in the College data set.</h1>
 <div id="a-split-the-data-set-into-a-training-set-and-a-test-set." class="section level2">
 <h2>(a) Split the data set into a training set and a test set.</h2>
+<pre class="r"><code>summary(College)</code></pre>
+<pre><code>##  Private        Apps           Accept          Enroll       Top10perc    
+##  No :212   Min.   :   81   Min.   :   72   Min.   :  35   Min.   : 1.00  
+##  Yes:565   1st Qu.:  776   1st Qu.:  604   1st Qu.: 242   1st Qu.:15.00  
+##            Median : 1558   Median : 1110   Median : 434   Median :23.00  
+##            Mean   : 3002   Mean   : 2019   Mean   : 780   Mean   :27.56  
+##            3rd Qu.: 3624   3rd Qu.: 2424   3rd Qu.: 902   3rd Qu.:35.00  
+##            Max.   :48094   Max.   :26330   Max.   :6392   Max.   :96.00  
+##    Top25perc      F.Undergrad     P.Undergrad         Outstate    
+##  Min.   :  9.0   Min.   :  139   Min.   :    1.0   Min.   : 2340  
+##  1st Qu.: 41.0   1st Qu.:  992   1st Qu.:   95.0   1st Qu.: 7320  
+##  Median : 54.0   Median : 1707   Median :  353.0   Median : 9990  
+##  Mean   : 55.8   Mean   : 3700   Mean   :  855.3   Mean   :10441  
+##  3rd Qu.: 69.0   3rd Qu.: 4005   3rd Qu.:  967.0   3rd Qu.:12925  
+##  Max.   :100.0   Max.   :31643   Max.   :21836.0   Max.   :21700  
+##    Room.Board       Books           Personal         PhD        
+##  Min.   :1780   Min.   :  96.0   Min.   : 250   Min.   :  8.00  
+##  1st Qu.:3597   1st Qu.: 470.0   1st Qu.: 850   1st Qu.: 62.00  
+##  Median :4200   Median : 500.0   Median :1200   Median : 75.00  
+##  Mean   :4358   Mean   : 549.4   Mean   :1341   Mean   : 72.66  
+##  3rd Qu.:5050   3rd Qu.: 600.0   3rd Qu.:1700   3rd Qu.: 85.00  
+##  Max.   :8124   Max.   :2340.0   Max.   :6800   Max.   :103.00  
+##     Terminal       S.F.Ratio      perc.alumni        Expend     
+##  Min.   : 24.0   Min.   : 2.50   Min.   : 0.00   Min.   : 3186  
+##  1st Qu.: 71.0   1st Qu.:11.50   1st Qu.:13.00   1st Qu.: 6751  
+##  Median : 82.0   Median :13.60   Median :21.00   Median : 8377  
+##  Mean   : 79.7   Mean   :14.09   Mean   :22.74   Mean   : 9660  
+##  3rd Qu.: 92.0   3rd Qu.:16.50   3rd Qu.:31.00   3rd Qu.:10830  
+##  Max.   :100.0   Max.   :39.80   Max.   :64.00   Max.   :56233  
+##    Grad.Rate     
+##  Min.   : 10.00  
+##  1st Qu.: 53.00  
+##  Median : 65.00  
+##  Mean   : 65.46  
+##  3rd Qu.: 78.00  
+##  Max.   :118.00</code></pre>
+<pre class="r"><code>?College</code></pre>
+<pre><code>## starting httpd help server ...</code></pre>
+<pre><code>##  done</code></pre>
+<pre class="r"><code>x=model.matrix(Apps~.,College)[,-1]
+y=College$Apps
+set.seed(1)
+train=sample(1:nrow(x), nrow(x)/2)
+test=(-train)
+y.test=y[test]
+
+#set.seed(1)
+#train=sample(1:nrow(College), nrow(College)/2)
+#test=(-train)
+#College.test=College[test]</code></pre>
 </div>
 <div id="b-fit-a-linear-model-using-least-squares-on-the-training-set-and-report-the-test-error-obtained." class="section level2">
 <h2>(b) Fit a linear model using least squares on the training set, and report the test error obtained.</h2>
+<pre class="r"><code>lm.fit=lm(y~x, subset=train)
+mean((College$Apps-predict(lm.fit,College))[-train]^2)</code></pre>
+<pre><code>## [1] 1108531</code></pre>
+<blockquote>
+<p>test MSE = 1108531</p>
+</blockquote>
 </div>
 <div id="c-fit-a-ridge-regression-model-on-the-training-set-with--chosen-by-cross-validation.-report-the-test-error-obtained." class="section level2">
 <h2>(c) Fit a ridge regression model on the training set, with λ chosen by cross-validation. Report the test error obtained.</h2>
+<pre class="r"><code>library(glmnet)
+grid=10^seq(10,-2,length=100)
+ridge.mod=glmnet(x,y,alpha=0,lambda=grid)
+
+dim(coef(ridge.mod))</code></pre>
+<pre><code>## [1]  18 100</code></pre>
+<pre class="r"><code>ridge.mod=glmnet(x[train,],y[train],alpha=0,lambda=grid, thresh=1e-12)
+
+set.seed(1)
+cv.out=cv.glmnet(x[train,],y[train],alpha=0)
+plot(cv.out)</code></pre>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<pre class="r"><code>bestlam=cv.out$lambda.min
+bestlam</code></pre>
+<pre><code>## [1] 450.7435</code></pre>
+<pre class="r"><code>ridge.pred=predict(ridge.mod,s=bestlam,newx=x[test,])
+mean((ridge.pred-y.test)^2)</code></pre>
+<pre><code>## [1] 1037308</code></pre>
+<blockquote>
+<p>test MSE = 1037308</p>
+</blockquote>
 </div>
 </div>
 

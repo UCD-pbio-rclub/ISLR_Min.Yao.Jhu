@@ -755,15 +755,24 @@ for a particular value of s. For parts (a) through (e), indicate which
 of i. through v. is correct. Justify your answer.
 
 ## (a) As we increase s from 0, the training RSS will:
-###i. Increase initially, and then eventually start decreasing in an inverted U shape.
-###ii. Decrease initially, and then eventually start increasing in a U shape.
-###iii. Steadily increase.
-###iv. Steadily decrease.
-###v. Remain constant.
-##(b) Repeat (a) for test RSS.
-##(c) Repeat (a) for variance.
-##(d) Repeat (a) for (squared) bias.
-##(e) Repeat (a) for the irreducible error.
+
+> iv. Steadily decrease.
+
+## (b) Repeat (a) for test RSS.
+
+> ii. Decrease initially, and then eventually start increasing in a U shape.
+
+## (c) Repeat (a) for variance.
+
+> iii. Steadily increase.
+
+## (d) Repeat (a) for (squared) bias.
+
+> iv. Steadily decrease.
+
+## (e) Repeat (a) for the irreducible error.
+
+> v. Remain constant.
 
 # 4. Suppose we estimate the regression coeﬃcients in a linear regression model by minimizing
 
@@ -771,15 +780,28 @@ for a particular value of λ. For parts (a) through (e), indicate which
 of i. through v. is correct. Justify your answer.
 
 ## (a) As we increase λ from 0, the training RSS will:
-### i. Increase initially, and then eventually start decreasing in an inverted U shape.
-### ii. Decrease initially, and then eventually start increasing in a U shape.
-### iii. Steadily increase.
-### iv. Steadily decrease.
-### v. Remain constant.
+
+> iii. Steadily increase.
+
+>  as λ → ∞ , the impact of the shrinkage penalty grows, and the ridge regression coeﬃcient estimates will approach zero. 
+
 ## (b) Repeat (a) for test RSS.
+
+>  i. Increase initially, and then eventually start decreasing in an inverted U shape.
+
+>  as λ → ∞ , the impact of the shrinkage penalty grows, and the ridge regression coeﬃcient estimates will approach zero. 
+
 ## (c) Repeat (a) for variance.
+
+>  iv. Steadily decrease.
+
 ## (d) Repeat (a) for (squared) bias.
+
+> iii. Steadily increase.
+
 ## (e) Repeat (a) for the irreducible error.
+
+> v. Remain constant.
 
 # 5. It is well-known that ridge regression tends to give similar coeﬃcient values to correlated variables, whereas the lasso may give quite different coeﬃcient values to correlated variables. We will now explore this property in a very simple setting. Suppose that n = 2, p = 2, x 11 = x 12 , x 21 = x 22 . Furthermore, suppose that y 1 +y 2 = 0 and x 11 +x 21 = 0 and x 12 +x 22 = 0, so that the estimate for the intercept in a least squares, ridge regression, or lasso model is zero: ˆβ 0 = 0.
 
@@ -788,6 +810,134 @@ of i. through v. is correct. Justify your answer.
 ## (b) Argue that in this setting, the ridge coeﬃcient estimates satisfy ˆβ 1 =ˆβ 2 .
 
 # 9. In this exercise, we will predict the number of applications received using the other variables in the College data set.
+
 ## (a) Split the data set into a training set and a test set.
+
+
+```r
+summary(College)
+```
+
+```
+##  Private        Apps           Accept          Enroll       Top10perc    
+##  No :212   Min.   :   81   Min.   :   72   Min.   :  35   Min.   : 1.00  
+##  Yes:565   1st Qu.:  776   1st Qu.:  604   1st Qu.: 242   1st Qu.:15.00  
+##            Median : 1558   Median : 1110   Median : 434   Median :23.00  
+##            Mean   : 3002   Mean   : 2019   Mean   : 780   Mean   :27.56  
+##            3rd Qu.: 3624   3rd Qu.: 2424   3rd Qu.: 902   3rd Qu.:35.00  
+##            Max.   :48094   Max.   :26330   Max.   :6392   Max.   :96.00  
+##    Top25perc      F.Undergrad     P.Undergrad         Outstate    
+##  Min.   :  9.0   Min.   :  139   Min.   :    1.0   Min.   : 2340  
+##  1st Qu.: 41.0   1st Qu.:  992   1st Qu.:   95.0   1st Qu.: 7320  
+##  Median : 54.0   Median : 1707   Median :  353.0   Median : 9990  
+##  Mean   : 55.8   Mean   : 3700   Mean   :  855.3   Mean   :10441  
+##  3rd Qu.: 69.0   3rd Qu.: 4005   3rd Qu.:  967.0   3rd Qu.:12925  
+##  Max.   :100.0   Max.   :31643   Max.   :21836.0   Max.   :21700  
+##    Room.Board       Books           Personal         PhD        
+##  Min.   :1780   Min.   :  96.0   Min.   : 250   Min.   :  8.00  
+##  1st Qu.:3597   1st Qu.: 470.0   1st Qu.: 850   1st Qu.: 62.00  
+##  Median :4200   Median : 500.0   Median :1200   Median : 75.00  
+##  Mean   :4358   Mean   : 549.4   Mean   :1341   Mean   : 72.66  
+##  3rd Qu.:5050   3rd Qu.: 600.0   3rd Qu.:1700   3rd Qu.: 85.00  
+##  Max.   :8124   Max.   :2340.0   Max.   :6800   Max.   :103.00  
+##     Terminal       S.F.Ratio      perc.alumni        Expend     
+##  Min.   : 24.0   Min.   : 2.50   Min.   : 0.00   Min.   : 3186  
+##  1st Qu.: 71.0   1st Qu.:11.50   1st Qu.:13.00   1st Qu.: 6751  
+##  Median : 82.0   Median :13.60   Median :21.00   Median : 8377  
+##  Mean   : 79.7   Mean   :14.09   Mean   :22.74   Mean   : 9660  
+##  3rd Qu.: 92.0   3rd Qu.:16.50   3rd Qu.:31.00   3rd Qu.:10830  
+##  Max.   :100.0   Max.   :39.80   Max.   :64.00   Max.   :56233  
+##    Grad.Rate     
+##  Min.   : 10.00  
+##  1st Qu.: 53.00  
+##  Median : 65.00  
+##  Mean   : 65.46  
+##  3rd Qu.: 78.00  
+##  Max.   :118.00
+```
+
+```r
+?College
+```
+
+```
+## starting httpd help server ...
+```
+
+```
+##  done
+```
+
+```r
+x=model.matrix(Apps~.,College)[,-1]
+y=College$Apps
+set.seed(1)
+train=sample(1:nrow(x), nrow(x)/2)
+test=(-train)
+y.test=y[test]
+
+#set.seed(1)
+#train=sample(1:nrow(College), nrow(College)/2)
+#test=(-train)
+#College.test=College[test]
+```
+
+
 ## (b) Fit a linear model using least squares on the training set, and report the test error obtained.
+
+
+```r
+lm.fit=lm(y~x, subset=train)
+mean((College$Apps-predict(lm.fit,College))[-train]^2)
+```
+
+```
+## [1] 1108531
+```
+
+> test MSE = 1108531
+
 ## (c) Fit a ridge regression model on the training set, with λ chosen by cross-validation. Report the test error obtained.
+
+
+```r
+library(glmnet)
+grid=10^seq(10,-2,length=100)
+ridge.mod=glmnet(x,y,alpha=0,lambda=grid)
+
+dim(coef(ridge.mod))
+```
+
+```
+## [1]  18 100
+```
+
+```r
+ridge.mod=glmnet(x[train,],y[train],alpha=0,lambda=grid, thresh=1e-12)
+
+set.seed(1)
+cv.out=cv.glmnet(x[train,],y[train],alpha=0)
+plot(cv.out)
+```
+
+![](chapter6-2_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
+
+```r
+bestlam=cv.out$lambda.min
+bestlam
+```
+
+```
+## [1] 450.7435
+```
+
+```r
+ridge.pred=predict(ridge.mod,s=bestlam,newx=x[test,])
+mean((ridge.pred-y.test)^2)
+```
+
+```
+## [1] 1037308
+```
+
+> test MSE = 1037308

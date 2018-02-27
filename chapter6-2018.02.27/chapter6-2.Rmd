@@ -192,15 +192,24 @@ for a particular value of s. For parts (a) through (e), indicate which
 of i. through v. is correct. Justify your answer.
 
 ## (a) As we increase s from 0, the training RSS will:
-###i. Increase initially, and then eventually start decreasing in an inverted U shape.
-###ii. Decrease initially, and then eventually start increasing in a U shape.
-###iii. Steadily increase.
-###iv. Steadily decrease.
-###v. Remain constant.
-##(b) Repeat (a) for test RSS.
-##(c) Repeat (a) for variance.
-##(d) Repeat (a) for (squared) bias.
-##(e) Repeat (a) for the irreducible error.
+
+> iv. Steadily decrease.
+
+## (b) Repeat (a) for test RSS.
+
+> ii. Decrease initially, and then eventually start increasing in a U shape.
+
+## (c) Repeat (a) for variance.
+
+> iii. Steadily increase.
+
+## (d) Repeat (a) for (squared) bias.
+
+> iv. Steadily decrease.
+
+## (e) Repeat (a) for the irreducible error.
+
+> v. Remain constant.
 
 # 4. Suppose we estimate the regression coeﬃcients in a linear regression model by minimizing
 
@@ -208,15 +217,28 @@ for a particular value of λ. For parts (a) through (e), indicate which
 of i. through v. is correct. Justify your answer.
 
 ## (a) As we increase λ from 0, the training RSS will:
-### i. Increase initially, and then eventually start decreasing in an inverted U shape.
-### ii. Decrease initially, and then eventually start increasing in a U shape.
-### iii. Steadily increase.
-### iv. Steadily decrease.
-### v. Remain constant.
+
+> iii. Steadily increase.
+
+>  as λ → ∞ , the impact of the shrinkage penalty grows, and the ridge regression coeﬃcient estimates will approach zero. 
+
 ## (b) Repeat (a) for test RSS.
+
+>  i. Increase initially, and then eventually start decreasing in an inverted U shape.
+
+>  as λ → ∞ , the impact of the shrinkage penalty grows, and the ridge regression coeﬃcient estimates will approach zero. 
+
 ## (c) Repeat (a) for variance.
+
+>  iv. Steadily decrease.
+
 ## (d) Repeat (a) for (squared) bias.
+
+> iii. Steadily increase.
+
 ## (e) Repeat (a) for the irreducible error.
+
+> v. Remain constant.
 
 # 5. It is well-known that ridge regression tends to give similar coeﬃcient values to correlated variables, whereas the lasso may give quite different coeﬃcient values to correlated variables. We will now explore this property in a very simple setting. Suppose that n = 2, p = 2, x 11 = x 12 , x 21 = x 22 . Furthermore, suppose that y 1 +y 2 = 0 and x 11 +x 21 = 0 and x 12 +x 22 = 0, so that the estimate for the intercept in a least squares, ridge regression, or lasso model is zero: ˆβ 0 = 0.
 
@@ -225,6 +247,58 @@ of i. through v. is correct. Justify your answer.
 ## (b) Argue that in this setting, the ridge coeﬃcient estimates satisfy ˆβ 1 =ˆβ 2 .
 
 # 9. In this exercise, we will predict the number of applications received using the other variables in the College data set.
+
 ## (a) Split the data set into a training set and a test set.
+
+```{r}
+summary(College)
+?College
+
+x=model.matrix(Apps~.,College)[,-1]
+y=College$Apps
+set.seed(1)
+train=sample(1:nrow(x), nrow(x)/2)
+test=(-train)
+y.test=y[test]
+
+#set.seed(1)
+#train=sample(1:nrow(College), nrow(College)/2)
+#test=(-train)
+#College.test=College[test]
+
+```
+
+
 ## (b) Fit a linear model using least squares on the training set, and report the test error obtained.
+
+```{r}
+lm.fit=lm(y~x, subset=train)
+mean((College$Apps-predict(lm.fit,College))[-train]^2)
+
+```
+
+> test MSE = 1108531
+
 ## (c) Fit a ridge regression model on the training set, with λ chosen by cross-validation. Report the test error obtained.
+
+```{r}
+library(glmnet)
+grid=10^seq(10,-2,length=100)
+ridge.mod=glmnet(x,y,alpha=0,lambda=grid)
+
+dim(coef(ridge.mod))
+
+ridge.mod=glmnet(x[train,],y[train],alpha=0,lambda=grid, thresh=1e-12)
+
+set.seed(1)
+cv.out=cv.glmnet(x[train,],y[train],alpha=0)
+plot(cv.out)
+bestlam=cv.out$lambda.min
+bestlam
+
+ridge.pred=predict(ridge.mod,s=bestlam,newx=x[test,])
+mean((ridge.pred-y.test)^2)
+
+```
+
+> test MSE = 1037308

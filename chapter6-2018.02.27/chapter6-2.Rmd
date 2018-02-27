@@ -110,14 +110,16 @@ cv.errors=matrix(NA,k,19, dimnames=list(NULL, paste(1:19)))
 for(j in 1:k){
   best.fit=regsubsets(Salary~.,data=Hitters[folds!=j,],nvmax=19)
   for(i in 1:19){
-    pred=predict(best.fit,Hitters[folds==j,],id=i)
-    cv.errors[j,i]=mean( (Hitters$Salary[folds==j]-pred)^2)
+    pred=predict.regsubsets(best.fit,Hitters[folds==j,],id=i)
+    cv.errors[j,i]=mean((Hitters$Salary[folds==j]-pred)^2)
     }
-  }
+}
+
 mean.cv.errors=apply(cv.errors,2,mean)
 mean.cv.errors
 par(mfrow=c(1,1))
 plot(mean.cv.errors,type='b')
+
 reg.best=regsubsets(Salary~.,data=Hitters, nvmax=19)
 coef(reg.best,11)
 ```
@@ -135,126 +137,94 @@ y=Hitters$Salary
 library(glmnet)
 grid=10^seq(10,-2,length=100)
 ridge.mod=glmnet(x,y,alpha=0,lambda=grid)
+
 dim(coef(ridge.mod))
+
 ridge.mod$lambda[50]
 coef(ridge.mod)[,50]
 sqrt(sum(coef(ridge.mod)[-1,50]^2))
+
 ridge.mod$lambda[60]
 coef(ridge.mod)[,60]
 sqrt(sum(coef(ridge.mod)[-1,60]^2))
+
 predict(ridge.mod,s=50,type="coefficients")[1:20,]
+```
+
+```{r}
 set.seed(1)
 train=sample(1:nrow(x), nrow(x)/2)
 test=(-train)
 y.test=y[test]
+
 ridge.mod=glmnet(x[train,],y[train],alpha=0,lambda=grid, thresh=1e-12)
 ridge.pred=predict(ridge.mod,s=4,newx=x[test,])
 mean((ridge.pred-y.test)^2)
+
 mean((mean(y[train])-y.test)^2)
+
 ridge.pred=predict(ridge.mod,s=1e10,newx=x[test,])
 mean((ridge.pred-y.test)^2)
-ridge.pred=predict(ridge.mod,s=0,newx=x[test,],exact=T)
+
+ridge.pred=predict(ridge.mod,s=0,newx=x[test,])
 mean((ridge.pred-y.test)^2)
 lm(y~x, subset=train)
-predict(ridge.mod,s=0,exact=T,type="coefficients")[1:20,]
+predict(ridge.mod,s=0,type="coefficients")[1:20,]
+```
+
+```{r}
 set.seed(1)
 cv.out=cv.glmnet(x[train,],y[train],alpha=0)
 plot(cv.out)
 bestlam=cv.out$lambda.min
 bestlam
+
 ridge.pred=predict(ridge.mod,s=bestlam,newx=x[test,])
 mean((ridge.pred-y.test)^2)
+
 out=glmnet(x,y,alpha=0)
 predict(out,type="coefficients",s=bestlam)[1:20,]
 ```
 
-# 3. Suppose we estimate the regression coeﬃcients in a linear regression
-model by minimizing
-n 
-i=1
-⎛
-⎝ y i − β 0 −
-p 
-j=1
-β j x ij
-⎞
-⎠
-2
-subject to
-p 
-j=1
-| β j | ≤ s
+# 3. Suppose we estimate the regression coeﬃcients in a linear regression model by minimizing
+
 for a particular value of s. For parts (a) through (e), indicate which
 of i. through v. is correct. Justify your answer.
-(a) As we increase s from 0, the training RSS will:
-i. Increase initially, and then eventually start decreasing in an
-inverted U shape.
-ii. Decrease initially, and then eventually start increasing in a
-U shape.
-iii. Steadily increase.
-iv. Steadily decrease.
-v. Remain constant.
-(b) Repeat (a) for test RSS.
-(c) Repeat (a) for variance.
-(d) Repeat (a) for (squared) bias.
-(e) Repeat (a) for the irreducible error.
 
-# 4. Suppose we estimate the regression coeﬃcients in a linear regression
-model by minimizing
-n 
-i=1
-⎛
-⎝ y i − β 0 −
-p 
-j=1
-β j x ij
-⎞
-⎠
-2
-+ λ
-p 
-j=1
-β
-2
-j
+## (a) As we increase s from 0, the training RSS will:
+###i. Increase initially, and then eventually start decreasing in an inverted U shape.
+###ii. Decrease initially, and then eventually start increasing in a U shape.
+###iii. Steadily increase.
+###iv. Steadily decrease.
+###v. Remain constant.
+##(b) Repeat (a) for test RSS.
+##(c) Repeat (a) for variance.
+##(d) Repeat (a) for (squared) bias.
+##(e) Repeat (a) for the irreducible error.
+
+# 4. Suppose we estimate the regression coeﬃcients in a linear regression model by minimizing
+
 for a particular value of λ. For parts (a) through (e), indicate which
 of i. through v. is correct. Justify your answer.
 
-(a) As we increase λ from 0, the training RSS will:
-i. Increase initially, and then eventually start decreasing in an
-inverted U shape.
-ii. Decrease initially, and then eventually start increasing in a
-U shape.
-iii. Steadily increase.
-iv. Steadily decrease.
-v. Remain constant.
-(b) Repeat (a) for test RSS.
-(c) Repeat (a) for variance.
-(d) Repeat (a) for (squared) bias.
-(e) Repeat (a) for the irreducible error.
+## (a) As we increase λ from 0, the training RSS will:
+### i. Increase initially, and then eventually start decreasing in an inverted U shape.
+### ii. Decrease initially, and then eventually start increasing in a U shape.
+### iii. Steadily increase.
+### iv. Steadily decrease.
+### v. Remain constant.
+## (b) Repeat (a) for test RSS.
+## (c) Repeat (a) for variance.
+## (d) Repeat (a) for (squared) bias.
+## (e) Repeat (a) for the irreducible error.
 
-# 5. It is well-known that ridge regression tends to give similar coeﬃcient
-values to correlated variables, whereas the lasso may give quite dif-
-ferent coeﬃcient values to correlated variables. We will now explore
-this property in a very simple setting.
-Suppose that n = 2, p = 2, x 11 = x 12 , x 21 = x 22 . Furthermore,
-suppose that y 1 +y 2 = 0 and x 11 +x 21 = 0 and x 12 +x 22 = 0, so that
-the estimate for the intercept in a least squares, ridge regression, or
-lasso model is zero:
-ˆ
-β 0 = 0.
-(a) Write out the ridge regression optimization problem in this set-
-ting.
-(b) Argue that in this setting, the ridge coeﬃcient estimates satisfy
-ˆ
-β 1 =
-ˆ
-β 2 .
+# 5. It is well-known that ridge regression tends to give similar coeﬃcient values to correlated variables, whereas the lasso may give quite different coeﬃcient values to correlated variables. We will now explore this property in a very simple setting. Suppose that n = 2, p = 2, x 11 = x 12 , x 21 = x 22 . Furthermore, suppose that y 1 +y 2 = 0 and x 11 +x 21 = 0 and x 12 +x 22 = 0, so that the estimate for the intercept in a least squares, ridge regression, or lasso model is zero: ˆβ 0 = 0.
 
-# 9. In this exercise, we will predict the number of applications received
-using the other variables in the College data set.
-(a) Split the data set into a training set and a test set.
-(b) Fit a linear model using least squares on the training set, and
-report the test error obtained.
-(c) Fit a ridge regression model on the training set, with λ chosen
-by cross-validation. Report the test error obtained.
+## (a) Write out the ridge regression optimization problem in this setting.
+
+## (b) Argue that in this setting, the ridge coeﬃcient estimates satisfy ˆβ 1 =ˆβ 2 .
+
+# 9. In this exercise, we will predict the number of applications received using the other variables in the College data set.
+## (a) Split the data set into a training set and a test set.
+## (b) Fit a linear model using least squares on the training set, and report the test error obtained.
+## (c) Fit a ridge regression model on the training set, with λ chosen by cross-validation. Report the test error obtained.

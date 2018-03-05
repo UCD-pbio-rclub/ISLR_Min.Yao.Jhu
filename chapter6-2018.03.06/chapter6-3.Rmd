@@ -205,4 +205,190 @@ lasso.coef
 lasso.coef[lasso.coef!=0]
 ```
 
+# 2. For parts (a) through (c), indicate which of i. through iv. is correct. Justify your answer.
 
+## (a) The lasso, relative to least squares, is:
+i. More ﬂexible and hence will give improved prediction ac-
+curacy when its increase in bias is less than its decrease in
+variance.
+ii. More ﬂexible and hence will give improved prediction accu-
+racy when its increase in variance is less than its decrease
+in bias.
+iii. Less ﬂexible and hence will give improved prediction accu-
+racy when its increase in bias is less than its decrease in
+variance.
+iv. Less ﬂexible and hence will give improved prediction accu-
+racy when its increase in variance is less than its decrease
+in bias.
+
+## (b) Repeat (a) for ridge regression relative to least squares.
+## (c) Repeat (a) for non-linear methods relative to least squares.
+
+# 5. It is well-known that ridge regression tends to give similar coeﬃcient values to correlated variables, whereas the lasso may give quite different coeﬃcient values to correlated variables. We will now explore this property in a very simple setting. Suppose that n = 2, p = 2, x 11 = x 12 , x 21 = x 22 . Furthermore, suppose that y 1 +y 2 = 0 and x 11 +x 21 = 0 and x 12 +x 22 = 0, so that the estimate for the intercept in a least squares, ridge regression, or lasso model is zero: ˆβ 0 = 0.
+
+## (a) Write out the ridge regression optimization problem in this setting.
+
+## (b) Argue that in this setting, the ridge coeﬃcient estimates satisfy ˆβ 1 =ˆβ 2 .
+
+## (c) Write out the lasso optimization problem in this setting.
+
+## (d) Argue that in this setting, the lasso coeﬃcientsˆβ 1 and ˆβ 2 are not unique—in other words, there are many possible solutions to the optimization problem in (c). Describe these solutions.
+
+# 8. In this exercise, we will generate simulated data, and will then use this data to perform best subset selection.
+
+## (a) Use the rnorm() function to generate a predictor X of length n = 100, as well as a noise vector E of length n = 100.
+
+```{r}
+set.seed(12)
+#?rnorm
+X=rnorm(100, 10, 1)
+E=rnorm(100, 5, 1)
+```
+
+
+## (b) Generate a response vector Y of length n = 100 according to the model Y = β 0 + β 1 X + β 2 X^2 + β 3 X^3 + E, where β 0 , β 1 , β 2 , and β 3 are constants of your choice.
+
+```{r}
+B0=1
+B1=2
+B2=3
+B3=4
+Y=B0+B1*X+B2*(X^2)+B3*(X^3)+E
+```
+
+
+## (c) Use the regsubsets() function to perform best subset selection in order to choose the best model containing the predictors X, X^2, . . . , X^10. What is the best model obtained according to Cp , BIC, and adjusted R 2 ? Show some plots to provide evidence for your answer, and report the coeﬃcients of the best model obtained. Note you will need to use the data.frame() function to create a single data set containing both X and Y.
+
+```{r}
+library(leaps)
+XYdata=data.frame(X,Y)
+summary(XYdata)
+plot(X,Y)
+
+XYregfit.full=regsubsets(Y~poly(X,10),XYdata,nvmax = 10)
+summary(XYregfit.full)
+
+plot(XYregfit.full,scale="r2")
+plot(XYregfit.full,scale="adjr2")
+plot(XYregfit.full,scale="Cp")
+plot(XYregfit.full,scale="bic")
+
+XYreg.summary=summary(XYregfit.full)
+plot(XYreg.summary$rss,xlab="Number of Variables",ylab="RSS",type="l")
+plot(XYreg.summary$cp,xlab="Number of Variables",ylab="Cp",type='l')
+which.min(XYreg.summary$cp)
+points(which.min(XYreg.summary$cp),XYreg.summary$cp[which.min(XYreg.summary$cp)],col="red",cex=2,pch=20)
+
+plot(XYreg.summary$bic,xlab="Number of Variables",ylab="bic",type='l')
+which.min(XYreg.summary$bic)
+points(which.min(XYreg.summary$bic),XYreg.summary$bic[which.min(XYreg.summary$bic)],col="red",cex=2,pch=20)
+
+plot(XYreg.summary$adjr2,xlab="Number of Variables",ylab="Adjusted RSq",type="l")
+which.max(XYreg.summary$adjr2)
+points(which.max(XYreg.summary$adjr2),XYreg.summary$adjr2[which.max(XYreg.summary$adjr2)], col="red",cex=2,pch=20)
+
+coef(XYregfit.full,3)
+coef(XYregfit.full,4)
+
+```
+
+> Cp and Adjusted RSq favor 4 variable model, but BIC favors 3 variable model.
+
+## (d) Repeat (c), using forward stepwise selection and also using backwards stepwise selection. How does your answer compare to the results in (c)?
+
+```{r}
+XYregfit.fwd=regsubsets(Y~poly(X,10),XYdata,nvmax = 10,method="forward")
+summary(XYregfit.fwd)
+
+plot(XYregfit.fwd,scale="r2")
+plot(XYregfit.fwd,scale="adjr2")
+plot(XYregfit.fwd,scale="Cp")
+plot(XYregfit.fwd,scale="bic")
+
+XYreg.summary=summary(XYregfit.fwd)
+plot(XYreg.summary$rss,xlab="Number of Variables",ylab="RSS",type="l")
+plot(XYreg.summary$cp,xlab="Number of Variables",ylab="Cp",type='l')
+which.min(XYreg.summary$cp)
+points(which.min(XYreg.summary$cp),XYreg.summary$cp[which.min(XYreg.summary$cp)],col="red",cex=2,pch=20)
+
+plot(XYreg.summary$bic,xlab="Number of Variables",ylab="bic",type='l')
+which.min(XYreg.summary$bic)
+points(which.min(XYreg.summary$bic),XYreg.summary$bic[which.min(XYreg.summary$bic)],col="red",cex=2,pch=20)
+
+plot(XYreg.summary$adjr2,xlab="Number of Variables",ylab="Adjusted RSq",type="l")
+which.max(XYreg.summary$adjr2)
+points(which.max(XYreg.summary$adjr2),XYreg.summary$adjr2[which.max(XYreg.summary$adjr2)], col="red",cex=2,pch=20)
+
+```
+
+> the same results
+
+
+
+## (e) Now ﬁt a lasso model to the simulated data, again using X, X^2 , . . . , X^10 as predictors. Use cross-validation to select the optimal value of λ. Create plots of the cross-validation error as a function of λ. Report the resulting coeﬃcient estimates, and discuss the results obtained.
+
+## (f) Now generate a response vector Y according to the model Y = β 0 + β 7 X^7 + E, and perform best subset selection and the lasso. Discuss the results obtained.
+
+# 9. In this exercise, we will predict the number of applications received using the other variables in the College data set.
+
+## (a) Split the data set into a training set and a test set.
+
+```{r}
+summary(College)
+#?College
+
+x=model.matrix(Apps~.,College)[,-1]
+y=College$Apps
+set.seed(1)
+train=sample(1:nrow(x), nrow(x)/2)
+test=(-train)
+y.test=y[test]
+
+#set.seed(1)
+#train=sample(1:nrow(College), nrow(College)/2)
+#test=(-train)
+#College.test=College[test]
+
+```
+
+## (b) Fit a linear model using least squares on the training set, and report the test error obtained.
+
+```{r}
+lm.fit=lm(y~x, subset=train)
+mean((College$Apps-predict(lm.fit,College))[-train]^2)
+
+```
+
+> test MSE = 1108531
+
+## (c) Fit a ridge regression model on the training set, with λ chosen by cross-validation. Report the test error obtained.
+
+```{r}
+library(glmnet)
+grid=10^seq(10,-2,length=100)
+ridge.mod=glmnet(x,y,alpha=0,lambda=grid)
+
+dim(coef(ridge.mod))
+
+ridge.mod=glmnet(x[train,],y[train],alpha=0,lambda=grid, thresh=1e-12)
+
+set.seed(1)
+cv.out=cv.glmnet(x[train,],y[train],alpha=0)
+plot(cv.out)
+bestlam=cv.out$lambda.min
+bestlam
+
+ridge.pred=predict(ridge.mod,s=bestlam,newx=x[test,])
+mean((ridge.pred-y.test)^2)
+
+```
+
+> test MSE = 1037308
+
+## (d) Fit a lasso model on the training set, with λ chosen by cross-validation. Report the test error obtained, along with the number of non-zero coeﬃcient estimates.
+
+# 11. We will now try to predict per capita crime rate in the Boston data set.
+
+## (a) Try out some of the regression methods explored in this chapter, such as best subset selection, the lasso, ridge regression, and PCR. Present and discuss results for the approaches that you consider.
+## (b) Propose a model (or set of models) that seem to perform well on this data set, and justify your answer. Make sure that you are evaluating model performance using validation set error, cross-validation, or some other reasonable alternative, as opposed to using training error.
+## (c) Does your chosen model involve all of the features in the data set? Why or why not?

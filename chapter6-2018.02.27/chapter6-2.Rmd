@@ -129,6 +129,7 @@ coef(reg.best,11)
 ```{r}
 x=model.matrix(Salary~.,Hitters)[,-1]
 y=Hitters$Salary
+
 ```
 
 # Ridge Regression

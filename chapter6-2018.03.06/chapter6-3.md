@@ -1593,6 +1593,14 @@ summary(College)
 ```
 
 ```r
+dim(College)
+```
+
+```
+## [1] 777  18
+```
+
+```r
 #?College
 
 x=model.matrix(Apps~.,College)[,-1]
@@ -1628,6 +1636,7 @@ mean((College$Apps-predict(lm.fit,College))[-train]^2)
 ```r
 library(glmnet)
 grid=10^seq(10,-2,length=100)
+
 ridge.mod=glmnet(x,y,alpha=0,lambda=grid)
 
 dim(coef(ridge.mod))
@@ -1669,8 +1678,603 @@ mean((ridge.pred-y.test)^2)
 
 ## (d) Fit a lasso model on the training set, with λ chosen by cross-validation. Report the test error obtained, along with the number of non-zero coeﬃcient estimates.
 
+
+```r
+# lasso
+library(glmnet)
+
+lasso.mod=glmnet(x[train,],y[train],alpha=1,lambda=grid)
+plot(lasso.mod)
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
+
+```r
+set.seed(1)
+cv.out=cv.glmnet(x[train,],y[train],alpha=1)
+plot(cv.out)
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-20-2.png)<!-- -->
+
+```r
+bestlam=cv.out$lambda.min
+lasso.pred=predict(lasso.mod,s=bestlam,newx=x[test,])
+mean((lasso.pred-y.test)^2)
+```
+
+```
+## [1] 1032128
+```
+
+```r
+out=glmnet(x,y,alpha=1,lambda=grid)
+lasso.coef=predict(out,type="coefficients",s=bestlam)[1:18,]
+lasso.coef
+```
+
+```
+##   (Intercept)    PrivateYes        Accept        Enroll     Top10perc 
+## -6.321166e+02 -4.088980e+02  1.437087e+00 -1.418240e-01  3.146071e+01 
+##     Top25perc   F.Undergrad   P.Undergrad      Outstate    Room.Board 
+## -8.818529e-01  0.000000e+00  1.488050e-02 -5.348474e-02  1.206366e-01 
+##         Books      Personal           PhD      Terminal     S.F.Ratio 
+##  0.000000e+00  6.054932e-05 -5.127428e+00 -3.370371e+00  2.739664e+00 
+##   perc.alumni        Expend     Grad.Rate 
+## -1.038499e+00  6.839807e-02  4.706478e+00
+```
+
+```r
+lasso.coef[lasso.coef!=0]
+```
+
+```
+##   (Intercept)    PrivateYes        Accept        Enroll     Top10perc 
+## -6.321166e+02 -4.088980e+02  1.437087e+00 -1.418240e-01  3.146071e+01 
+##     Top25perc   P.Undergrad      Outstate    Room.Board      Personal 
+## -8.818529e-01  1.488050e-02 -5.348474e-02  1.206366e-01  6.054932e-05 
+##           PhD      Terminal     S.F.Ratio   perc.alumni        Expend 
+## -5.127428e+00 -3.370371e+00  2.739664e+00 -1.038499e+00  6.839807e-02 
+##     Grad.Rate 
+##  4.706478e+00
+```
+
+> test MSE = 1032128
+
+
+
 # 11. We will now try to predict per capita crime rate in the Boston data set.
 
 ## (a) Try out some of the regression methods explored in this chapter, such as best subset selection, the lasso, ridge regression, and PCR. Present and discuss results for the approaches that you consider.
+
+
+```r
+library(MASS)
+summary(Boston)
+```
+
+```
+##       crim                zn             indus            chas        
+##  Min.   : 0.00632   Min.   :  0.00   Min.   : 0.46   Min.   :0.00000  
+##  1st Qu.: 0.08204   1st Qu.:  0.00   1st Qu.: 5.19   1st Qu.:0.00000  
+##  Median : 0.25651   Median :  0.00   Median : 9.69   Median :0.00000  
+##  Mean   : 3.61352   Mean   : 11.36   Mean   :11.14   Mean   :0.06917  
+##  3rd Qu.: 3.67708   3rd Qu.: 12.50   3rd Qu.:18.10   3rd Qu.:0.00000  
+##  Max.   :88.97620   Max.   :100.00   Max.   :27.74   Max.   :1.00000  
+##       nox               rm             age              dis        
+##  Min.   :0.3850   Min.   :3.561   Min.   :  2.90   Min.   : 1.130  
+##  1st Qu.:0.4490   1st Qu.:5.886   1st Qu.: 45.02   1st Qu.: 2.100  
+##  Median :0.5380   Median :6.208   Median : 77.50   Median : 3.207  
+##  Mean   :0.5547   Mean   :6.285   Mean   : 68.57   Mean   : 3.795  
+##  3rd Qu.:0.6240   3rd Qu.:6.623   3rd Qu.: 94.08   3rd Qu.: 5.188  
+##  Max.   :0.8710   Max.   :8.780   Max.   :100.00   Max.   :12.127  
+##       rad              tax           ptratio          black       
+##  Min.   : 1.000   Min.   :187.0   Min.   :12.60   Min.   :  0.32  
+##  1st Qu.: 4.000   1st Qu.:279.0   1st Qu.:17.40   1st Qu.:375.38  
+##  Median : 5.000   Median :330.0   Median :19.05   Median :391.44  
+##  Mean   : 9.549   Mean   :408.2   Mean   :18.46   Mean   :356.67  
+##  3rd Qu.:24.000   3rd Qu.:666.0   3rd Qu.:20.20   3rd Qu.:396.23  
+##  Max.   :24.000   Max.   :711.0   Max.   :22.00   Max.   :396.90  
+##      lstat            medv      
+##  Min.   : 1.73   Min.   : 5.00  
+##  1st Qu.: 6.95   1st Qu.:17.02  
+##  Median :11.36   Median :21.20  
+##  Mean   :12.65   Mean   :22.53  
+##  3rd Qu.:16.95   3rd Qu.:25.00  
+##  Max.   :37.97   Max.   :50.00
+```
+
+```r
+# best subset selection
+
+library(leaps)
+
+regfit.full=regsubsets(crim~.,Boston,nvmax = 13)
+summary(regfit.full)
+```
+
+```
+## Subset selection object
+## Call: regsubsets.formula(crim ~ ., Boston, nvmax = 13)
+## 13 Variables  (and intercept)
+##         Forced in Forced out
+## zn          FALSE      FALSE
+## indus       FALSE      FALSE
+## chas        FALSE      FALSE
+## nox         FALSE      FALSE
+## rm          FALSE      FALSE
+## age         FALSE      FALSE
+## dis         FALSE      FALSE
+## rad         FALSE      FALSE
+## tax         FALSE      FALSE
+## ptratio     FALSE      FALSE
+## black       FALSE      FALSE
+## lstat       FALSE      FALSE
+## medv        FALSE      FALSE
+## 1 subsets of each size up to 13
+## Selection Algorithm: exhaustive
+##           zn  indus chas nox rm  age dis rad tax ptratio black lstat medv
+## 1  ( 1 )  " " " "   " "  " " " " " " " " "*" " " " "     " "   " "   " " 
+## 2  ( 1 )  " " " "   " "  " " " " " " " " "*" " " " "     " "   "*"   " " 
+## 3  ( 1 )  " " " "   " "  " " " " " " " " "*" " " " "     "*"   "*"   " " 
+## 4  ( 1 )  "*" " "   " "  " " " " " " "*" "*" " " " "     " "   " "   "*" 
+## 5  ( 1 )  "*" " "   " "  " " " " " " "*" "*" " " " "     "*"   " "   "*" 
+## 6  ( 1 )  "*" " "   " "  "*" " " " " "*" "*" " " " "     "*"   " "   "*" 
+## 7  ( 1 )  "*" " "   " "  "*" " " " " "*" "*" " " "*"     "*"   " "   "*" 
+## 8  ( 1 )  "*" " "   " "  "*" " " " " "*" "*" " " "*"     "*"   "*"   "*" 
+## 9  ( 1 )  "*" "*"   " "  "*" " " " " "*" "*" " " "*"     "*"   "*"   "*" 
+## 10  ( 1 ) "*" "*"   " "  "*" "*" " " "*" "*" " " "*"     "*"   "*"   "*" 
+## 11  ( 1 ) "*" "*"   " "  "*" "*" " " "*" "*" "*" "*"     "*"   "*"   "*" 
+## 12  ( 1 ) "*" "*"   "*"  "*" "*" " " "*" "*" "*" "*"     "*"   "*"   "*" 
+## 13  ( 1 ) "*" "*"   "*"  "*" "*" "*" "*" "*" "*" "*"     "*"   "*"   "*"
+```
+
+```r
+plot(regfit.full,scale="r2")
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
+
+```r
+plot(regfit.full,scale="adjr2")
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-21-2.png)<!-- -->
+
+```r
+plot(regfit.full,scale="Cp")
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-21-3.png)<!-- -->
+
+```r
+plot(regfit.full,scale="bic")
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-21-4.png)<!-- -->
+
+```r
+reg.summary=summary(regfit.full)
+plot(reg.summary$rss,xlab="Number of Variables",ylab="RSS",type="l")
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-21-5.png)<!-- -->
+
+```r
+plot(reg.summary$cp,xlab="Number of Variables",ylab="Cp",type='l')
+which.min(reg.summary$cp)
+```
+
+```
+## [1] 8
+```
+
+```r
+points(which.min(reg.summary$cp),reg.summary$cp[which.min(reg.summary$cp)],col="red",cex=2,pch=20)
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-21-6.png)<!-- -->
+
+```r
+plot(reg.summary$bic,xlab="Number of Variables",ylab="bic",type='l')
+which.min(reg.summary$bic)
+```
+
+```
+## [1] 3
+```
+
+```r
+points(which.min(reg.summary$bic),reg.summary$bic[which.min(reg.summary$bic)],col="red",cex=2,pch=20)
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-21-7.png)<!-- -->
+
+```r
+plot(reg.summary$adjr2,xlab="Number of Variables",ylab="Adjusted RSq",type="l")
+which.max(reg.summary$adjr2)
+```
+
+```
+## [1] 9
+```
+
+```r
+points(which.max(reg.summary$adjr2),reg.summary$adjr2[which.max(reg.summary$adjr2)], col="red",cex=2,pch=20)
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-21-8.png)<!-- -->
+
+```r
+coef(regfit.full,9)
+```
+
+```
+##   (Intercept)            zn         indus           nox           dis 
+##  19.124636156   0.042788127  -0.099385948 -10.466490364  -1.002597606 
+##           rad       ptratio         black         lstat          medv 
+##   0.539503547  -0.270835584  -0.008003761   0.117805932  -0.180593877
+```
+
+```r
+coef(regfit.full,8)
+```
+
+```
+##   (Intercept)            zn           nox           dis           rad 
+##  19.683127801   0.043293393 -12.753707757  -0.918318253   0.532616533 
+##       ptratio         black         lstat          medv 
+##  -0.310540942  -0.007922426   0.110173124  -0.174207166
+```
+
+```r
+coef(regfit.full,3)
+```
+
+```
+##  (Intercept)          rad        black        lstat 
+## -0.372585457  0.488172386 -0.009471639  0.213595700
+```
+
+```r
+# the lasso
+library(glmnet)
+
+grid=10^seq(10,-2,length=100)
+
+x=model.matrix(crim~.,Boston)[,-1]
+y=Boston$crim
+
+set.seed(1)
+train=sample(1:nrow(x), nrow(x)/2)
+test=(-train)
+y.test=y[test]
+
+lasso.mod=glmnet(x[train,],y[train],alpha=1,lambda=grid)
+plot(lasso.mod)
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-21-9.png)<!-- -->
+
+```r
+set.seed(1)
+cv.out=cv.glmnet(x[train,],y[train],alpha=1)
+plot(cv.out)
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-21-10.png)<!-- -->
+
+```r
+bestlam=cv.out$lambda.min
+bestlam
+```
+
+```
+## [1] 0.09979553
+```
+
+```r
+lasso.pred=predict(lasso.mod,s=bestlam,newx=x[test,])
+mean((lasso.pred-y.test)^2)
+```
+
+```
+## [1] 38.3096
+```
+
+```r
+out=glmnet(x,y,alpha=1,lambda=grid)
+lasso.coef=predict(out,type="coefficients",s=bestlam)[1:11,]
+lasso.coef
+```
+
+```
+## (Intercept)          zn       indus        chas         nox          rm 
+##  9.26270091  0.03135641 -0.05102314 -0.51264890 -3.75545166  0.04132004 
+##         age         dis         rad         tax     ptratio 
+##  0.00000000 -0.60070039  0.49479389  0.00000000 -0.10750998
+```
+
+```r
+lasso.coef[lasso.coef!=0]
+```
+
+```
+## (Intercept)          zn       indus        chas         nox          rm 
+##  9.26270091  0.03135641 -0.05102314 -0.51264890 -3.75545166  0.04132004 
+##         dis         rad     ptratio 
+## -0.60070039  0.49479389 -0.10750998
+```
+
+```r
+# ridge regression
+library(glmnet)
+
+ridge.mod=glmnet(x[train,],y[train],alpha=0,lambda=grid, thresh=1e-12)
+
+set.seed(1)
+cv.out=cv.glmnet(x[train,],y[train],alpha=0)
+plot(cv.out)
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-21-11.png)<!-- -->
+
+```r
+bestlam=cv.out$lambda.min
+bestlam
+```
+
+```
+## [1] 0.7908625
+```
+
+```r
+ridge.pred=predict(ridge.mod,s=bestlam,newx=x[test,])
+mean((ridge.pred-y.test)^2)
+```
+
+```
+## [1] 38.36587
+```
+
+```r
+out=glmnet(x,y,alpha=0,lambda=grid)
+ridge.coef=predict(out,type="coefficients",s=bestlam)[1:11,]
+ridge.coef
+```
+
+```
+##  (Intercept)           zn        indus         chas          nox 
+##  7.210622046  0.030124939 -0.076009134 -0.747210720 -4.150965154 
+##           rm          age          dis          rad          tax 
+##  0.304997445  0.002373218 -0.623135506  0.387204976  0.004545079 
+##      ptratio 
+## -0.101347676
+```
+
+> best subset selection,
+Cp: 8; bic: 3; Adjusted RSq: 9
+
+  (Intercept)            zn         indus           nox           dis 
+ 19.124636156   0.042788127  -0.099385948 -10.466490364  -1.002597606 
+          rad       ptratio         black         lstat          medv 
+  0.539503547  -0.270835584  -0.008003761   0.117805932  -0.180593877 
+  (Intercept)            zn           nox           dis           rad 
+ 19.683127801   0.043293393 -12.753707757  -0.918318253   0.532616533 
+      ptratio         black         lstat          medv 
+ -0.310540942  -0.007922426   0.110173124  -0.174207166 
+ (Intercept)          rad        black        lstat 
+-0.372585457  0.488172386 -0.009471639  0.213595700 
+
+> lasso: 8
+
+(Intercept)          zn       indus        chas         nox          rm 
+ 9.26270091  0.03135641 -0.05102314 -0.51264890 -3.75545166  0.04132004 
+        dis         rad     ptratio 
+-0.60070039  0.49479389 -0.10750998 
+
+> MSE = 38.3096
+
+> ridge regression
+
+ (Intercept)           zn        indus         chas          nox           rm 
+14.776826098  0.041373639 -0.074977442 -0.733273998 -9.003406341  0.413309117 
+         age          dis          rad          tax      ptratio 
+ 0.001260395 -0.915381715  0.537911180 -0.001370858 -0.234996727 
+
+> MSE = 38.86819
+
+
+
 ## (b) Propose a model (or set of models) that seem to perform well on this data set, and justify your answer. Make sure that you are evaluating model performance using validation set error, cross-validation, or some other reasonable alternative, as opposed to using training error.
+
+
+```r
+# Choosing Among Models
+# validation set approach
+
+set.seed(1)
+train=sample(c(TRUE,FALSE), nrow(Boston),rep=TRUE)
+test=(!train)
+
+regfit.best=regsubsets(crim~.,Boston[train,],nvmax = 13)
+summary(regfit.best)
+```
+
+```
+## Subset selection object
+## Call: regsubsets.formula(crim ~ ., Boston[train, ], nvmax = 13)
+## 13 Variables  (and intercept)
+##         Forced in Forced out
+## zn          FALSE      FALSE
+## indus       FALSE      FALSE
+## chas        FALSE      FALSE
+## nox         FALSE      FALSE
+## rm          FALSE      FALSE
+## age         FALSE      FALSE
+## dis         FALSE      FALSE
+## rad         FALSE      FALSE
+## tax         FALSE      FALSE
+## ptratio     FALSE      FALSE
+## black       FALSE      FALSE
+## lstat       FALSE      FALSE
+## medv        FALSE      FALSE
+## 1 subsets of each size up to 13
+## Selection Algorithm: exhaustive
+##           zn  indus chas nox rm  age dis rad tax ptratio black lstat medv
+## 1  ( 1 )  " " " "   " "  " " " " " " " " "*" " " " "     " "   " "   " " 
+## 2  ( 1 )  " " " "   " "  " " " " " " " " "*" " " " "     " "   "*"   " " 
+## 3  ( 1 )  " " " "   " "  " " "*" " " " " "*" " " " "     " "   " "   "*" 
+## 4  ( 1 )  " " " "   " "  " " "*" " " " " "*" " " " "     " "   "*"   "*" 
+## 5  ( 1 )  "*" " "   " "  " " "*" " " "*" "*" " " " "     " "   " "   "*" 
+## 6  ( 1 )  "*" " "   " "  " " "*" " " "*" "*" " " " "     " "   "*"   "*" 
+## 7  ( 1 )  "*" " "   " "  " " "*" " " "*" "*" " " " "     "*"   "*"   "*" 
+## 8  ( 1 )  "*" " "   " "  " " "*" "*" "*" "*" " " " "     "*"   "*"   "*" 
+## 9  ( 1 )  "*" " "   " "  " " "*" "*" "*" "*" " " "*"     "*"   "*"   "*" 
+## 10  ( 1 ) "*" " "   " "  "*" "*" "*" "*" "*" " " "*"     "*"   "*"   "*" 
+## 11  ( 1 ) "*" " "   " "  "*" "*" "*" "*" "*" "*" "*"     "*"   "*"   "*" 
+## 12  ( 1 ) "*" " "   "*"  "*" "*" "*" "*" "*" "*" "*"     "*"   "*"   "*" 
+## 13  ( 1 ) "*" "*"   "*"  "*" "*" "*" "*" "*" "*" "*"     "*"   "*"   "*"
+```
+
+```r
+test.mat=model.matrix(crim~.,Boston[test,])
+
+val.errors=rep(NA,13)
+for(i in 1:13){
+   coefi=coef(regfit.best,id=i)
+   pred=test.mat[,names(coefi)]%*%coefi
+   val.errors[i]=mean((Boston$crim[test]-pred)^2)
+}
+
+val.errors
+```
+
+```
+##  [1] 58.50445 55.89099 57.93484 57.69696 56.87287 56.80141 59.49510
+##  [8] 60.34830 60.42652 59.60702 59.38341 59.30440 59.36511
+```
+
+```r
+which.min(val.errors)
+```
+
+```
+## [1] 2
+```
+
+```r
+coef(regfit.best,2)
+```
+
+```
+## (Intercept)         rad       lstat 
+##  -3.7604819   0.4750033   0.2041807
+```
+
+```r
+# best model has 2 variables
+
+# make a predict function
+predict.regsubsets=function(object,newdata,id,...){
+  form=as.formula(object$call[[2]])
+  mat=model.matrix(form,newdata)
+  coefi=coef(object,id=id)
+  xvars=names(coefi)
+  mat[,xvars]%*%coefi
+  }
+
+regfit.best=regsubsets(crim~.,Boston,nvmax=13)
+coef(regfit.best,2)
+```
+
+```
+## (Intercept)         rad       lstat 
+##  -4.3814053   0.5228128   0.2372846
+```
+
+```r
+# Cross validation
+
+k=10
+set.seed(1)
+folds=sample(1:k,nrow(Boston),replace=TRUE)
+cv.errors=matrix(NA,k,13, dimnames=list(NULL, paste(1:13)))
+
+for(j in 1:k){
+  best.fit=regsubsets(crim~.,data=Boston[folds!=j,],nvmax=13)
+  for(i in 1:13){
+    pred=predict.regsubsets(best.fit,Boston[folds==j,],id=i)
+    cv.errors[j,i]=mean((Boston$crim[folds==j]-pred)^2)
+    }
+}
+
+mean.cv.errors=apply(cv.errors,2,mean)
+mean.cv.errors
+```
+
+```
+##        1        2        3        4        5        6        7        8 
+## 43.79995 42.64344 42.98910 42.53276 42.45726 42.39477 41.76549 41.82720 
+##        9       10       11       12       13 
+## 41.15964 41.21315 41.27749 41.03457 41.06013
+```
+
+```r
+par(mfrow=c(1,1))
+plot(mean.cv.errors,type='b')
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-22-1.png)<!-- -->
+
+```r
+reg.best=regsubsets(crim~.,data=Boston, nvmax=13)
+coef(reg.best,12)
+```
+
+```
+##   (Intercept)            zn         indus          chas           nox 
+##  16.985713928   0.044673247  -0.063848469  -0.744367726 -10.202169211 
+##            rm           dis           rad           tax       ptratio 
+##   0.439588002  -0.993556631   0.587660185  -0.003767546  -0.269948860 
+##         black         lstat          medv 
+##  -0.007518904   0.128120290  -0.198877768
+```
+
+```r
+coef(reg.best,9)
+```
+
+```
+##   (Intercept)            zn         indus           nox           dis 
+##  19.124636156   0.042788127  -0.099385948 -10.466490364  -1.002597606 
+##           rad       ptratio         black         lstat          medv 
+##   0.539503547  -0.270835584  -0.008003761   0.117805932  -0.180593877
+```
+
+> best model by validation set approach
+
+(Intercept)         rad       lstat 
+ -4.3814053   0.5228128   0.2372846 
+ 
+> best model by Cross validation
+
+> 12 v
+
+  (Intercept)            zn         indus          chas           nox 
+ 16.985713928   0.044673247  -0.063848469  -0.744367726 -10.202169211 
+           rm           dis           rad           tax       ptratio 
+  0.439588002  -0.993556631   0.587660185  -0.003767546  -0.269948860 
+        black         lstat          medv 
+ -0.007518904   0.128120290  -0.198877768 
+ 
+> 9 v
+
+   (Intercept)            zn         indus           nox           dis 
+ 19.124636156   0.042788127  -0.099385948 -10.466490364  -1.002597606 
+          rad       ptratio         black         lstat          medv 
+  0.539503547  -0.270835584  -0.008003761   0.117805932  -0.180593877 
+
 ## (c) Does your chosen model involve all of the features in the data set? Why or why not?
+
+> No

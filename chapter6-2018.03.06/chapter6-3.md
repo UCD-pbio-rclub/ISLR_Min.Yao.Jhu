@@ -806,23 +806,22 @@ lasso.coef[lasso.coef!=0]
 ```
 
 # 2. For parts (a) through (c), indicate which of i. through iv. is correct. Justify your answer.
+i. More ﬂexible and hence will give improved prediction accuracy when its increase in bias is less than its decrease in variance.
+ii. More ﬂexible and hence will give improved prediction accuracy when its increase in variance is less than its decrease in bias.
+iii. Less ﬂexible and hence will give improved prediction accuracy when its increase in bias is less than its decrease in variance.
+iv. Less ﬂexible and hence will give improved prediction accuracy when its increase in variance is less than its decrease in bias.
 
 ## (a) The lasso, relative to least squares, is:
-i. More ﬂexible and hence will give improved prediction ac-
-curacy when its increase in bias is less than its decrease in
-variance.
-ii. More ﬂexible and hence will give improved prediction accu-
-racy when its increase in variance is less than its decrease
-in bias.
-iii. Less ﬂexible and hence will give improved prediction accu-
-racy when its increase in bias is less than its decrease in
-variance.
-iv. Less ﬂexible and hence will give improved prediction accu-
-racy when its increase in variance is less than its decrease
-in bias.
+
+> iii. Less ﬂexible and hence will give improved prediction accuracy when its increase in bias is less than its decrease in variance.
 
 ## (b) Repeat (a) for ridge regression relative to least squares.
+
+> iii. Less ﬂexible and hence will give improved prediction accuracy when its increase in bias is less than its decrease in variance. 
+
 ## (c) Repeat (a) for non-linear methods relative to least squares.
+
+> ii. More ﬂexible and hence will give improved prediction accuracy when its increase in variance is less than its decrease in bias.
 
 # 5. It is well-known that ridge regression tends to give similar coeﬃcient values to correlated variables, whereas the lasso may give quite different coeﬃcient values to correlated variables. We will now explore this property in a very simple setting. Suppose that n = 2, p = 2, x 11 = x 12 , x 21 = x 22 . Furthermore, suppose that y 1 +y 2 = 0 and x 11 +x 21 = 0 and x 12 +x 22 = 0, so that the estimate for the intercept in a least squares, ridge regression, or lasso model is zero: ˆβ 0 = 0.
 
@@ -1175,11 +1174,376 @@ points(which.max(XYreg.summary$adjr2),XYreg.summary$adjr2[which.max(XYreg.summar
 
 > the same results
 
-
-
 ## (e) Now ﬁt a lasso model to the simulated data, again using X, X^2 , . . . , X^10 as predictors. Use cross-validation to select the optimal value of λ. Create plots of the cross-validation error as a function of λ. Report the resulting coeﬃcient estimates, and discuss the results obtained.
 
+
+```r
+library(glmnet)
+summary(XYdata)
+```
+
+```
+##        X                Y       
+##  Min.   : 7.851   Min.   :2144  
+##  1st Qu.: 9.437   1st Qu.:3654  
+##  Median : 9.890   Median :4189  
+##  Mean   : 9.969   Mean   :4378  
+##  3rd Qu.:10.509   3rd Qu.:5002  
+##  Max.   :12.072   Max.   :7505
+```
+
+```r
+dim(XYdata)
+```
+
+```
+## [1] 100   2
+```
+
+```r
+plot(X,Y)
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
+
+```r
+grid=10^seq(10,-2,length=100)
+
+x=model.matrix(Y~poly(X,10),XYdata)[,-1]
+y=XYdata$Y
+
+set.seed(1)
+train=sample(1:nrow(x), nrow(x)/2)
+test=(-train)
+y.test=y[test]
+
+lasso.mod=glmnet(x[train,],y[train],alpha=1,lambda=grid)
+plot(lasso.mod)
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-15-2.png)<!-- -->
+
+```r
+set.seed(1)
+cv.out=cv.glmnet(x[train,],y[train],alpha=1)
+plot(cv.out)
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-15-3.png)<!-- -->
+
+```r
+bestlam=cv.out$lambda.min
+lasso.pred=predict(lasso.mod,s=bestlam,newx=x[test,])
+mean((lasso.pred-y.test)^2)
+```
+
+```
+## [1] 1314.309
+```
+
+```r
+out=glmnet(x,y,alpha=1,lambda=grid)
+lasso.coef=predict(out,type="coefficients",s=bestlam)[1:11,]
+lasso.coef
+```
+
+```
+##   (Intercept)  poly(X, 10)1  poly(X, 10)2  poly(X, 10)3  poly(X, 10)4 
+##     4378.1008    10735.4124      974.6721        0.0000        0.0000 
+##  poly(X, 10)5  poly(X, 10)6  poly(X, 10)7  poly(X, 10)8  poly(X, 10)9 
+##        0.0000        0.0000        0.0000        0.0000        0.0000 
+## poly(X, 10)10 
+##        0.0000
+```
+
+```r
+lasso.coef[lasso.coef!=0]
+```
+
+```
+##  (Intercept) poly(X, 10)1 poly(X, 10)2 
+##    4378.1008   10735.4124     974.6721
+```
+
+> best subset selection
+
+ (Intercept) poly(X, 10)1 poly(X, 10)2 poly(X, 10)3 
+  4378.10082  11032.72208   1271.98179     49.78343 
+  
+  (Intercept)  poly(X, 10)1  poly(X, 10)2  poly(X, 10)3 poly(X, 10)10 
+  4378.100817  11032.722081   1271.981792     49.783432      1.898334
+
+> lasso
+
+ (Intercept) poly(X, 10)1 poly(X, 10)2 
+   4378.1008   10735.4124     974.6721
+
+
+
 ## (f) Now generate a response vector Y according to the model Y = β 0 + β 7 X^7 + E, and perform best subset selection and the lasso. Discuss the results obtained.
+
+
+```r
+B7=8
+Y2=B0+B7*(X^7)+E
+XY2data=data.frame(X,Y2)
+summary(XY2data)
+```
+
+```
+##        X                Y2           
+##  Min.   : 7.851   Min.   : 14704978  
+##  1st Qu.: 9.437   1st Qu.: 53323063  
+##  Median : 9.890   Median : 74062435  
+##  Mean   : 9.969   Mean   : 91299650  
+##  3rd Qu.:10.509   3rd Qu.:113276889  
+##  Max.   :12.072   Max.   :298919048
+```
+
+```r
+plot(X,Y2)
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
+
+```r
+# best subset selection
+
+library(leaps)
+
+XY2regfit.full=regsubsets(Y2~poly(X,10),XY2data,nvmax = 10)
+summary(XY2regfit.full)
+```
+
+```
+## Subset selection object
+## Call: regsubsets.formula(Y2 ~ poly(X, 10), XY2data, nvmax = 10)
+## 10 Variables  (and intercept)
+##               Forced in Forced out
+## poly(X, 10)1      FALSE      FALSE
+## poly(X, 10)2      FALSE      FALSE
+## poly(X, 10)3      FALSE      FALSE
+## poly(X, 10)4      FALSE      FALSE
+## poly(X, 10)5      FALSE      FALSE
+## poly(X, 10)6      FALSE      FALSE
+## poly(X, 10)7      FALSE      FALSE
+## poly(X, 10)8      FALSE      FALSE
+## poly(X, 10)9      FALSE      FALSE
+## poly(X, 10)10     FALSE      FALSE
+## 1 subsets of each size up to 10
+## Selection Algorithm: exhaustive
+##           poly(X, 10)1 poly(X, 10)2 poly(X, 10)3 poly(X, 10)4 poly(X, 10)5
+## 1  ( 1 )  "*"          " "          " "          " "          " "         
+## 2  ( 1 )  "*"          "*"          " "          " "          " "         
+## 3  ( 1 )  "*"          "*"          "*"          " "          " "         
+## 4  ( 1 )  "*"          "*"          "*"          "*"          " "         
+## 5  ( 1 )  "*"          "*"          "*"          "*"          "*"         
+## 6  ( 1 )  "*"          "*"          "*"          "*"          "*"         
+## 7  ( 1 )  "*"          "*"          "*"          "*"          "*"         
+## 8  ( 1 )  "*"          "*"          "*"          "*"          "*"         
+## 9  ( 1 )  "*"          "*"          "*"          "*"          "*"         
+## 10  ( 1 ) "*"          "*"          "*"          "*"          "*"         
+##           poly(X, 10)6 poly(X, 10)7 poly(X, 10)8 poly(X, 10)9
+## 1  ( 1 )  " "          " "          " "          " "         
+## 2  ( 1 )  " "          " "          " "          " "         
+## 3  ( 1 )  " "          " "          " "          " "         
+## 4  ( 1 )  " "          " "          " "          " "         
+## 5  ( 1 )  " "          " "          " "          " "         
+## 6  ( 1 )  "*"          " "          " "          " "         
+## 7  ( 1 )  "*"          "*"          " "          " "         
+## 8  ( 1 )  "*"          "*"          " "          " "         
+## 9  ( 1 )  "*"          "*"          "*"          " "         
+## 10  ( 1 ) "*"          "*"          "*"          "*"         
+##           poly(X, 10)10
+## 1  ( 1 )  " "          
+## 2  ( 1 )  " "          
+## 3  ( 1 )  " "          
+## 4  ( 1 )  " "          
+## 5  ( 1 )  " "          
+## 6  ( 1 )  " "          
+## 7  ( 1 )  " "          
+## 8  ( 1 )  "*"          
+## 9  ( 1 )  "*"          
+## 10  ( 1 ) "*"
+```
+
+```r
+plot(XY2regfit.full,scale="r2")
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-16-2.png)<!-- -->
+
+```r
+plot(XY2regfit.full,scale="adjr2")
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-16-3.png)<!-- -->
+
+```r
+plot(XY2regfit.full,scale="Cp")
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-16-4.png)<!-- -->
+
+```r
+plot(XY2regfit.full,scale="bic")
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-16-5.png)<!-- -->
+
+```r
+XY2reg.summary=summary(XY2regfit.full)
+plot(XY2reg.summary$rss,xlab="Number of Variables",ylab="RSS",type="l")
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-16-6.png)<!-- -->
+
+```r
+plot(XY2reg.summary$cp,xlab="Number of Variables",ylab="Cp",type='l')
+which.min(XY2reg.summary$cp)
+```
+
+```
+## [1] 8
+```
+
+```r
+points(which.min(XY2reg.summary$cp),XY2reg.summary$cp[which.min(XY2reg.summary$cp)],col="red",cex=2,pch=20)
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-16-7.png)<!-- -->
+
+```r
+plot(XY2reg.summary$bic,xlab="Number of Variables",ylab="bic",type='l')
+which.min(XY2reg.summary$bic)
+```
+
+```
+## [1] 7
+```
+
+```r
+points(which.min(XY2reg.summary$bic),XY2reg.summary$bic[which.min(XY2reg.summary$bic)],col="red",cex=2,pch=20)
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-16-8.png)<!-- -->
+
+```r
+plot(XY2reg.summary$adjr2,xlab="Number of Variables",ylab="Adjusted RSq",type="l")
+which.max(XY2reg.summary$adjr2)
+```
+
+```
+## [1] 7
+```
+
+```r
+points(which.max(XY2reg.summary$adjr2),XY2reg.summary$adjr2[which.max(XY2reg.summary$adjr2)], col="red",cex=2,pch=20)
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-16-9.png)<!-- -->
+
+```r
+coef(XY2regfit.full,8)
+```
+
+```
+##   (Intercept)  poly(X, 10)1  poly(X, 10)2  poly(X, 10)3  poly(X, 10)4 
+##  9.129965e+07  5.498227e+08  1.887044e+08  3.715973e+07  3.839524e+06 
+##  poly(X, 10)5  poly(X, 10)6  poly(X, 10)7 poly(X, 10)10 
+##  2.013016e+05  6.641229e+03  1.090581e+02  1.898334e+00
+```
+
+```r
+coef(XY2regfit.full,7)
+```
+
+```
+##  (Intercept) poly(X, 10)1 poly(X, 10)2 poly(X, 10)3 poly(X, 10)4 
+## 9.129965e+07 5.498227e+08 1.887044e+08 3.715973e+07 3.839524e+06 
+## poly(X, 10)5 poly(X, 10)6 poly(X, 10)7 
+## 2.013016e+05 6.641229e+03 1.090581e+02
+```
+
+```r
+# lasso
+library(glmnet)
+
+grid=10^seq(10,-2,length=100)
+
+x=model.matrix(Y2~poly(X,10),XY2data)[,-1]
+y=XY2data$Y2
+
+set.seed(1)
+train=sample(1:nrow(x), nrow(x)/2)
+test=(-train)
+y.test=y[test]
+
+lasso.mod=glmnet(x[train,],y[train],alpha=1,lambda=grid)
+plot(lasso.mod)
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-16-10.png)<!-- -->
+
+```r
+set.seed(1)
+cv.out=cv.glmnet(x[train,],y[train],alpha=1)
+plot(cv.out)
+```
+
+![](chapter6-3_files/figure-html/unnamed-chunk-16-11.png)<!-- -->
+
+```r
+bestlam=cv.out$lambda.min
+lasso.pred=predict(lasso.mod,s=bestlam,newx=x[test,])
+mean((lasso.pred-y.test)^2)
+```
+
+```
+## [1] 4.618321e+12
+```
+
+```r
+out=glmnet(x,y,alpha=1,lambda=grid)
+lasso.coef=predict(out,type="coefficients",s=bestlam)[1:11,]
+lasso.coef
+```
+
+```
+##   (Intercept)  poly(X, 10)1  poly(X, 10)2  poly(X, 10)3  poly(X, 10)4 
+##      91299650     537211391     176093109      24548447             0 
+##  poly(X, 10)5  poly(X, 10)6  poly(X, 10)7  poly(X, 10)8  poly(X, 10)9 
+##             0             0             0             0             0 
+## poly(X, 10)10 
+##             0
+```
+
+```r
+lasso.coef[lasso.coef!=0]
+```
+
+```
+##  (Intercept) poly(X, 10)1 poly(X, 10)2 poly(X, 10)3 
+##     91299650    537211391    176093109     24548447
+```
+
+> best subset selection
+
+  (Intercept)  poly(X, 10)1  poly(X, 10)2  poly(X, 10)3  poly(X, 10)4 
+ 9.129965e+07  5.498227e+08  1.887044e+08  3.715973e+07  3.839524e+06 
+ poly(X, 10)5  poly(X, 10)6  poly(X, 10)7 poly(X, 10)10 
+ 2.013016e+05  6.641229e+03  1.090581e+02  1.898334e+00 
+ 
+ (Intercept) poly(X, 10)1 poly(X, 10)2 poly(X, 10)3 poly(X, 10)4 poly(X, 10)5 
+9.129965e+07 5.498227e+08 1.887044e+08 3.715973e+07 3.839524e+06 2.013016e+05 
+poly(X, 10)6 poly(X, 10)7 
+6.641229e+03 1.090581e+02 
+
+> lasso
+
+ (Intercept) poly(X, 10)1 poly(X, 10)2 poly(X, 10)3 
+    91299650    537211391    176093109     24548447 
+
 
 # 9. In this exercise, we will predict the number of applications received using the other variables in the College data set.
 
@@ -1229,18 +1593,8 @@ summary(College)
 ```
 
 ```r
-?College
-```
+#?College
 
-```
-## starting httpd help server ...
-```
-
-```
-##  done
-```
-
-```r
 x=model.matrix(Apps~.,College)[,-1]
 y=College$Apps
 set.seed(1)
@@ -1291,7 +1645,7 @@ cv.out=cv.glmnet(x[train,],y[train],alpha=0)
 plot(cv.out)
 ```
 
-![](chapter6-3_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
+![](chapter6-3_files/figure-html/unnamed-chunk-19-1.png)<!-- -->
 
 ```r
 bestlam=cv.out$lambda.min

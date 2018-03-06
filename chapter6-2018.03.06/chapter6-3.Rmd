@@ -206,23 +206,22 @@ lasso.coef[lasso.coef!=0]
 ```
 
 # 2. For parts (a) through (c), indicate which of i. through iv. is correct. Justify your answer.
+i. More ﬂexible and hence will give improved prediction accuracy when its increase in bias is less than its decrease in variance.
+ii. More ﬂexible and hence will give improved prediction accuracy when its increase in variance is less than its decrease in bias.
+iii. Less ﬂexible and hence will give improved prediction accuracy when its increase in bias is less than its decrease in variance.
+iv. Less ﬂexible and hence will give improved prediction accuracy when its increase in variance is less than its decrease in bias.
 
 ## (a) The lasso, relative to least squares, is:
-i. More ﬂexible and hence will give improved prediction ac-
-curacy when its increase in bias is less than its decrease in
-variance.
-ii. More ﬂexible and hence will give improved prediction accu-
-racy when its increase in variance is less than its decrease
-in bias.
-iii. Less ﬂexible and hence will give improved prediction accu-
-racy when its increase in bias is less than its decrease in
-variance.
-iv. Less ﬂexible and hence will give improved prediction accu-
-racy when its increase in variance is less than its decrease
-in bias.
+
+> iii. Less ﬂexible and hence will give improved prediction accuracy when its increase in bias is less than its decrease in variance.
 
 ## (b) Repeat (a) for ridge regression relative to least squares.
+
+> iii. Less ﬂexible and hence will give improved prediction accuracy when its increase in bias is less than its decrease in variance. 
+
 ## (c) Repeat (a) for non-linear methods relative to least squares.
+
+> ii. More ﬂexible and hence will give improved prediction accuracy when its increase in variance is less than its decrease in bias.
 
 # 5. It is well-known that ridge regression tends to give similar coeﬃcient values to correlated variables, whereas the lasso may give quite different coeﬃcient values to correlated variables. We will now explore this property in a very simple setting. Suppose that n = 2, p = 2, x 11 = x 12 , x 21 = x 22 . Furthermore, suppose that y 1 +y 2 = 0 and x 11 +x 21 = 0 and x 12 +x 22 = 0, so that the estimate for the intercept in a least squares, ridge regression, or lasso model is zero: ˆβ 0 = 0.
 
@@ -323,11 +322,140 @@ points(which.max(XYreg.summary$adjr2),XYreg.summary$adjr2[which.max(XYreg.summar
 
 > the same results
 
-
-
 ## (e) Now ﬁt a lasso model to the simulated data, again using X, X^2 , . . . , X^10 as predictors. Use cross-validation to select the optimal value of λ. Create plots of the cross-validation error as a function of λ. Report the resulting coeﬃcient estimates, and discuss the results obtained.
 
+```{r}
+library(glmnet)
+summary(XYdata)
+dim(XYdata)
+plot(X,Y)
+
+grid=10^seq(10,-2,length=100)
+
+x=model.matrix(Y~poly(X,10),XYdata)[,-1]
+y=XYdata$Y
+
+set.seed(1)
+train=sample(1:nrow(x), nrow(x)/2)
+test=(-train)
+y.test=y[test]
+
+lasso.mod=glmnet(x[train,],y[train],alpha=1,lambda=grid)
+plot(lasso.mod)
+
+set.seed(1)
+cv.out=cv.glmnet(x[train,],y[train],alpha=1)
+plot(cv.out)
+bestlam=cv.out$lambda.min
+lasso.pred=predict(lasso.mod,s=bestlam,newx=x[test,])
+mean((lasso.pred-y.test)^2)
+
+out=glmnet(x,y,alpha=1,lambda=grid)
+lasso.coef=predict(out,type="coefficients",s=bestlam)[1:11,]
+lasso.coef
+lasso.coef[lasso.coef!=0]
+```
+
+> best subset selection
+
+ (Intercept) poly(X, 10)1 poly(X, 10)2 poly(X, 10)3 
+  4378.10082  11032.72208   1271.98179     49.78343 
+  
+  (Intercept)  poly(X, 10)1  poly(X, 10)2  poly(X, 10)3 poly(X, 10)10 
+  4378.100817  11032.722081   1271.981792     49.783432      1.898334
+
+> lasso
+
+ (Intercept) poly(X, 10)1 poly(X, 10)2 
+   4378.1008   10735.4124     974.6721
+
+
+
 ## (f) Now generate a response vector Y according to the model Y = β 0 + β 7 X^7 + E, and perform best subset selection and the lasso. Discuss the results obtained.
+
+```{r}
+B7=8
+Y2=B0+B7*(X^7)+E
+XY2data=data.frame(X,Y2)
+summary(XY2data)
+plot(X,Y2)
+
+# best subset selection
+
+library(leaps)
+
+XY2regfit.full=regsubsets(Y2~poly(X,10),XY2data,nvmax = 10)
+summary(XY2regfit.full)
+
+plot(XY2regfit.full,scale="r2")
+plot(XY2regfit.full,scale="adjr2")
+plot(XY2regfit.full,scale="Cp")
+plot(XY2regfit.full,scale="bic")
+
+XY2reg.summary=summary(XY2regfit.full)
+plot(XY2reg.summary$rss,xlab="Number of Variables",ylab="RSS",type="l")
+plot(XY2reg.summary$cp,xlab="Number of Variables",ylab="Cp",type='l')
+which.min(XY2reg.summary$cp)
+points(which.min(XY2reg.summary$cp),XY2reg.summary$cp[which.min(XY2reg.summary$cp)],col="red",cex=2,pch=20)
+
+plot(XY2reg.summary$bic,xlab="Number of Variables",ylab="bic",type='l')
+which.min(XY2reg.summary$bic)
+points(which.min(XY2reg.summary$bic),XY2reg.summary$bic[which.min(XY2reg.summary$bic)],col="red",cex=2,pch=20)
+
+plot(XY2reg.summary$adjr2,xlab="Number of Variables",ylab="Adjusted RSq",type="l")
+which.max(XY2reg.summary$adjr2)
+points(which.max(XY2reg.summary$adjr2),XY2reg.summary$adjr2[which.max(XY2reg.summary$adjr2)], col="red",cex=2,pch=20)
+
+coef(XY2regfit.full,8)
+coef(XY2regfit.full,7)
+
+
+# lasso
+library(glmnet)
+
+grid=10^seq(10,-2,length=100)
+
+x=model.matrix(Y2~poly(X,10),XY2data)[,-1]
+y=XY2data$Y2
+
+set.seed(1)
+train=sample(1:nrow(x), nrow(x)/2)
+test=(-train)
+y.test=y[test]
+
+lasso.mod=glmnet(x[train,],y[train],alpha=1,lambda=grid)
+plot(lasso.mod)
+
+set.seed(1)
+cv.out=cv.glmnet(x[train,],y[train],alpha=1)
+plot(cv.out)
+bestlam=cv.out$lambda.min
+lasso.pred=predict(lasso.mod,s=bestlam,newx=x[test,])
+mean((lasso.pred-y.test)^2)
+
+out=glmnet(x,y,alpha=1,lambda=grid)
+lasso.coef=predict(out,type="coefficients",s=bestlam)[1:11,]
+lasso.coef
+lasso.coef[lasso.coef!=0]
+```
+
+> best subset selection
+
+  (Intercept)  poly(X, 10)1  poly(X, 10)2  poly(X, 10)3  poly(X, 10)4 
+ 9.129965e+07  5.498227e+08  1.887044e+08  3.715973e+07  3.839524e+06 
+ poly(X, 10)5  poly(X, 10)6  poly(X, 10)7 poly(X, 10)10 
+ 2.013016e+05  6.641229e+03  1.090581e+02  1.898334e+00 
+ 
+ (Intercept) poly(X, 10)1 poly(X, 10)2 poly(X, 10)3 poly(X, 10)4 poly(X, 10)5 
+9.129965e+07 5.498227e+08 1.887044e+08 3.715973e+07 3.839524e+06 2.013016e+05 
+poly(X, 10)6 poly(X, 10)7 
+6.641229e+03 1.090581e+02 
+
+> lasso
+
+ (Intercept) poly(X, 10)1 poly(X, 10)2 poly(X, 10)3 
+    91299650    537211391    176093109     24548447 
+
 
 # 9. In this exercise, we will predict the number of applications received using the other variables in the College data set.
 

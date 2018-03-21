@@ -546,6 +546,48 @@ matlines(age.grid,se.bands,lwd=1,col="blue",lty=3)
 
 ![](chapter7-1_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
 
+```r
+fit=lm(wage~poly(age,3),data=Wage)
+summary(fit)
+```
+
+```
+## 
+## Call:
+## lm(formula = wage ~ poly(age, 3), data = Wage)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -99.693 -24.562  -5.222  15.096 206.119 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)    111.7036     0.7291 153.211  < 2e-16 ***
+## poly(age, 3)1  447.0679    39.9335  11.195  < 2e-16 ***
+## poly(age, 3)2 -478.3158    39.9335 -11.978  < 2e-16 ***
+## poly(age, 3)3  125.5217    39.9335   3.143  0.00169 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 39.93 on 2996 degrees of freedom
+## Multiple R-squared:  0.0851,	Adjusted R-squared:  0.08419 
+## F-statistic: 92.89 on 3 and 2996 DF,  p-value: < 2.2e-16
+```
+
+```r
+agelims=range(age)
+age.grid=seq(from=agelims[1],to=agelims[2]) #min to  max (add 1 each time)
+preds=predict(fit,newdata=list(age=age.grid),se=TRUE)# add SE
+se.bands=cbind(preds$fit+2*preds$se.fit,preds$fit-2*preds$se.fit)
+
+plot(age,wage,xlim=agelims,cex=.5,col="darkgrey")
+title("Degree-3 Polynomial",outer=T)
+lines(age.grid,preds$fit,lwd=2,col="red")
+matlines(age.grid,se.bands,lwd=1,col="red",lty=3)
+```
+
+![](chapter7-1_files/figure-html/unnamed-chunk-11-2.png)<!-- -->
+
 
 
 

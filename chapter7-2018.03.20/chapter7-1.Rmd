@@ -193,6 +193,20 @@ plot(age,wage,xlim=agelims,cex=.5,col="darkgrey")
 title("Degree-4 Polynomial",outer=T)
 lines(age.grid,preds$fit,lwd=2,col="blue")
 matlines(age.grid,se.bands,lwd=1,col="blue",lty=3)
+
+
+fit=lm(wage~poly(age,3),data=Wage)
+summary(fit)
+
+agelims=range(age)
+age.grid=seq(from=agelims[1],to=agelims[2]) #min to  max (add 1 each time)
+preds=predict(fit,newdata=list(age=age.grid),se=TRUE)# add SE
+se.bands=cbind(preds$fit+2*preds$se.fit,preds$fit-2*preds$se.fit)
+
+plot(age,wage,xlim=agelims,cex=.5,col="darkgrey")
+title("Degree-3 Polynomial",outer=T)
+lines(age.grid,preds$fit,lwd=2,col="red")
+matlines(age.grid,se.bands,lwd=1,col="red",lty=3)
 ```
 
 

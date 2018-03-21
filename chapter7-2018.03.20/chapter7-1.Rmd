@@ -32,8 +32,11 @@ coef(fit2a)
 
 plot(fitted(fit2),fitted(fit2a))
 
-#fit2b=lm(wage~cbind(age,age^2,age^3,age^4),data=Wage)
+fit2b=lm(wage~cbind(age,age^2,age^3,age^4),data=Wage)
+summary(fit2b)
+```
 
+```{r}
 agelims=range(age)
 age.grid=seq(from=agelims[1],to=agelims[2]) #min to  max (add 1 each time)
 preds=predict(fit,newdata=list(age=age.grid),se=TRUE)# add SE
@@ -47,12 +50,16 @@ matlines(age.grid,se.bands,lwd=1,col="blue",lty=3)
 
 preds2=predict(fit2,newdata=list(age=age.grid),se=TRUE)
 max(abs(preds$fit-preds2$fit))
+```
+
+```{r}
 fit.1=lm(wage~age,data=Wage)
 fit.2=lm(wage~poly(age,2),data=Wage)
 fit.3=lm(wage~poly(age,3),data=Wage)
 fit.4=lm(wage~poly(age,4),data=Wage)
 fit.5=lm(wage~poly(age,5),data=Wage)
 anova(fit.1,fit.2,fit.3,fit.4,fit.5)
+
 coef(summary(fit.5))
 (-11.983)^2
 
@@ -73,6 +80,7 @@ se.bands[1:5,]
 
 $$p=\frac{e^eta}{1+e^eta}.$$
 ```{r}
+#lab from video
 prob.bands=exp(se.bands)/(1+exp(se.bands))
 matplot(age.grid, prob.bands, col = "blue", lwd = c(2,1,1),lty = c(1,2,2),type = "l",ylim = c(0,.1))
 points(jitter(age),I(wage>250)/10,pch="|",cex=.5)
@@ -84,14 +92,18 @@ points(jitter(age),I(wage>250)/10,pch="|",cex=.5)
 ```{r}
 fit=glm(I(wage>250)~poly(age,4),data=Wage,family=binomial)
 preds=predict(fit,newdata=list(age=age.grid),se=T)
+
 pfit=exp(preds$fit)/(1+exp(preds$fit))
 se.bands.logit = cbind(preds$fit+2*preds$se.fit, preds$fit-2*preds$se.fit)
 se.bands = exp(se.bands.logit)/(1+exp(se.bands.logit))
+
 preds=predict(fit,newdata=list(age=age.grid),type="response",se=T)
+
 plot(age,I(wage>250),xlim=agelims,type="n",ylim=c(0,.2))
 points(jitter(age), I((wage>250)/5),cex=.5,pch="|",col="darkgrey")
 lines(age.grid,pfit,lwd=2, col="blue")
 matlines(age.grid,se.bands,lwd=1,col="blue",lty=3)
+
 table(cut(age,4))
 fit=lm(wage~cut(age,4),data=Wage)
 coef(summary(fit))
@@ -117,6 +129,7 @@ lines(age.grid,pred$fit-2*pred$se,lty="dashed")
 dim(bs(age,knots=c(25,40,60)))
 dim(bs(age,df=6))
 attr(bs(age,df=6),"knots")
+
 fit2=lm(wage~ns(age,df=4),data=Wage)
 pred2=predict(fit2,newdata=list(age=age.grid),se=T)
 lines(age.grid, pred2$fit,col="red",lwd=2)

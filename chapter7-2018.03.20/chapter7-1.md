@@ -115,8 +115,42 @@ plot(fitted(fit2),fitted(fit2a))
 ![](chapter7-1_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
 ```r
-#fit2b=lm(wage~cbind(age,age^2,age^3,age^4),data=Wage)
+fit2b=lm(wage~cbind(age,age^2,age^3,age^4),data=Wage)
+summary(fit2b)
+```
 
+```
+## 
+## Call:
+## lm(formula = wage ~ cbind(age, age^2, age^3, age^4), data = Wage)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -98.707 -24.626  -4.993  15.217 203.693 
+## 
+## Coefficients:
+##                                      Estimate Std. Error t value Pr(>|t|)
+## (Intercept)                        -1.842e+02  6.004e+01  -3.067 0.002180
+## cbind(age, age^2, age^3, age^4)age  2.125e+01  5.887e+00   3.609 0.000312
+## cbind(age, age^2, age^3, age^4)    -5.639e-01  2.061e-01  -2.736 0.006261
+## cbind(age, age^2, age^3, age^4)     6.811e-03  3.066e-03   2.221 0.026398
+## cbind(age, age^2, age^3, age^4)    -3.204e-05  1.641e-05  -1.952 0.051039
+##                                       
+## (Intercept)                        ** 
+## cbind(age, age^2, age^3, age^4)age ***
+## cbind(age, age^2, age^3, age^4)    ** 
+## cbind(age, age^2, age^3, age^4)    *  
+## cbind(age, age^2, age^3, age^4)    .  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 39.91 on 2995 degrees of freedom
+## Multiple R-squared:  0.08626,	Adjusted R-squared:  0.08504 
+## F-statistic: 70.69 on 4 and 2995 DF,  p-value: < 2.2e-16
+```
+
+
+```r
 agelims=range(age)
 age.grid=seq(from=agelims[1],to=agelims[2]) #min to  max (add 1 each time)
 preds=predict(fit,newdata=list(age=age.grid),se=TRUE)# add SE
@@ -135,6 +169,9 @@ max(abs(preds$fit-preds2$fit))
 ```
 ## [1] 7.81597e-11
 ```
+
+![](chapter7-1_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
 
 ```r
 fit.1=lm(wage~age,data=Wage)
@@ -206,8 +243,6 @@ anova(fit.1,fit.2,fit.3)
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-![](chapter7-1_files/figure-html/unnamed-chunk-3-2.png)<!-- -->
-
 
 ```r
 #lab from video
@@ -261,12 +296,13 @@ se.bands[1:5,]
 $$p=\frac{e^eta}{1+e^eta}.$$
 
 ```r
+#lab from video
 prob.bands=exp(se.bands)/(1+exp(se.bands))
 matplot(age.grid, prob.bands, col = "blue", lwd = c(2,1,1),lty = c(1,2,2),type = "l",ylim = c(0,.1))
 points(jitter(age),I(wage>250)/10,pch="|",cex=.5)
 ```
 
-![](chapter7-1_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+![](chapter7-1_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
 
 
@@ -274,17 +310,20 @@ points(jitter(age),I(wage>250)/10,pch="|",cex=.5)
 ```r
 fit=glm(I(wage>250)~poly(age,4),data=Wage,family=binomial)
 preds=predict(fit,newdata=list(age=age.grid),se=T)
+
 pfit=exp(preds$fit)/(1+exp(preds$fit))
 se.bands.logit = cbind(preds$fit+2*preds$se.fit, preds$fit-2*preds$se.fit)
 se.bands = exp(se.bands.logit)/(1+exp(se.bands.logit))
+
 preds=predict(fit,newdata=list(age=age.grid),type="response",se=T)
+
 plot(age,I(wage>250),xlim=agelims,type="n",ylim=c(0,.2))
 points(jitter(age), I((wage>250)/5),cex=.5,pch="|",col="darkgrey")
 lines(age.grid,pfit,lwd=2, col="blue")
 matlines(age.grid,se.bands,lwd=1,col="blue",lty=3)
 ```
 
-![](chapter7-1_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+![](chapter7-1_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 
 ```r
 table(cut(age,4))
@@ -384,7 +423,7 @@ pred2=predict(fit2,newdata=list(age=age.grid),se=T)
 lines(age.grid, pred2$fit,col="red",lwd=2)
 ```
 
-![](chapter7-1_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+![](chapter7-1_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 
 # 6. In this exercise, you will further analyze the Wage data set considered throughout this chapter. 
 

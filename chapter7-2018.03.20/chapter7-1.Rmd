@@ -42,7 +42,7 @@ age.grid=seq(from=agelims[1],to=agelims[2]) #min to  max (add 1 each time)
 preds=predict(fit,newdata=list(age=age.grid),se=TRUE)# add SE
 se.bands=cbind(preds$fit+2*preds$se.fit,preds$fit-2*preds$se.fit)
 
-par(mfrow=c(1,2),mar=c(4.5,4.5,1,1),oma=c(0,0,4,0))
+#par(mfrow=c(1,2),mar=c(4.5,4.5,1,1),oma=c(0,0,4,0))
 plot(age,wage,xlim=agelims,cex=.5,col="darkgrey")
 title("Degree-4 Polynomial",outer=T)
 lines(age.grid,preds$fit,lwd=2,col="blue")
@@ -139,9 +139,102 @@ lines(age.grid, pred2$fit,col="red",lwd=2)
 
 ## (a) Perform polynomial regression to predict wage using age. Use cross-validation to select the optimal degree d for the polynomial. What degree was chosen, and how does this compare to the results of hypothesis testing using ANOVA? Make a plot of the resulting polynomial ﬁt to the data.
 
+```{r}
+# ANOVA
+fit.1=lm(wage~age,data=Wage)
+fit.2=lm(wage~poly(age,2),data=Wage)
+fit.3=lm(wage~poly(age,3),data=Wage)
+fit.4=lm(wage~poly(age,4),data=Wage)
+fit.5=lm(wage~poly(age,5),data=Wage)
+anova(fit.1,fit.2,fit.3,fit.4,fit.5)
+
+# cross-validation
+
+library(boot)
+set.seed(1)
+cv.error=rep(0,10)
+degree=1:10
+for(d in degree){
+  glm.fit=glm(wage~poly(age,d),data=Wage)
+  cv.error[d]=loocv(glm.fit)
+}
+plot(degree,cv.error,type = "b")
+
+cv.error10=rep(0,10)
+for (i in 1:10){
+ glm.fit=glm(wage~poly(age,i),data=Wage)
+ cv.error10[i]=cv.glm(Wage,glm.fit,K=10)$delta[1]
+ }
+cv.error10
+plot(degree,cv.error,type = "b")
+lines(degree,cv.error10,type = "b", col="red")
+
+```
+
+> ANOVA: degree=3; cross-validation: degree=4 lowest
+
+```{r}
+fit=lm(wage~poly(age,4),data=Wage)
+summary(fit)
+
+agelims=range(age)
+age.grid=seq(from=agelims[1],to=agelims[2]) #min to  max (add 1 each time)
+preds=predict(fit,newdata=list(age=age.grid),se=TRUE)# add SE
+se.bands=cbind(preds$fit+2*preds$se.fit,preds$fit-2*preds$se.fit)
+
+plot(age,wage,xlim=agelims,cex=.5,col="darkgrey")
+title("Degree-4 Polynomial",outer=T)
+lines(age.grid,preds$fit,lwd=2,col="blue")
+matlines(age.grid,se.bands,lwd=1,col="blue",lty=3)
+```
+
+
+
+
 ## (b) Fit a step function to predict wage using age, and perform cross-validation to choose the optimal number of cuts. Make a plot of the ﬁt obtained.
 
+```{r}
+set.seed(1)
+cut.cv.error10=rep(0,10)
+for (i in 2:10){
+ Wage$age.cut <- cut(Wage$age, i) 
+ glm.fit=glm(wage~age.cut,data=Wage)
+ cut.cv.error10[i]=cv.glm(Wage,glm.fit,K=10)$delta[1]
+ }
+cut.cv.error10
+plot(degree[-1],cut.cv.error10[-1],type = "b")
+
+```
+
+```{r}
+plot(wage ~ age, data = Wage, col = "darkgrey")
+fit <- lm(wage ~ cut(age, 8), data = Wage)
+coef(summary(fit))
+preds <- predict(fit, data.frame(age = age.grid))
+lines(age.grid, preds, col = "blue", lwd = 2)
+```
+
+
 # 7. The Wage data set contains a number of other features not explored in this chapter, such as marital status (maritl), job class (jobclass), and others. Explore the relationships between some of these other predictors and wage, and use non-linear ﬁtting techniques in order to ﬁt ﬂexible models to the data. Create plots of the results obtained, and write a summary of your ﬁndings.
+
+```{r}
+summary(Wage)
+library(ggplot2)
+library(GGally)
+ggpairs(Wage)
+```
+
+```{r}
+fit.a=lm(wage~maritl,data=Wage)
+fit.b=lm(wage~maritl+race,data=Wage)
+fit.c=lm(wage~maritl+race+education,data=Wage)
+fit.d=lm(wage~maritl+race+education+poly(age, 4),data=Wage)
+anova(fit.a,fit.b,fit.c,fit.d)
+summary(fit.d)
+
+
+```
+
 
 # 8. Fit some of the non-linear models investigated in this chapter to the Auto data set. Is there evidence for non-linear relationships in this data set? Create some informative plots to justify your answer.
 

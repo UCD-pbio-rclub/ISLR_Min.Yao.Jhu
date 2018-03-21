@@ -151,6 +151,13 @@ anova(fit.1,fit.2,fit.3,fit.4,fit.5)
 # cross-validation
 
 library(boot)
+
+##formula 5.2
+loocv=function(fit){
+  h=lm.influence(fit)$h
+  mean((residuals(fit)/(1-h))^2)
+}
+
 set.seed(1)
 cv.error=rep(0,10)
 degree=1:10
@@ -238,16 +245,179 @@ summary(fit.d)
 
 # 8. Fit some of the non-linear models investigated in this chapter to the Auto data set. Is there evidence for non-linear relationships in this data set? Create some informative plots to justify your answer.
 
+```{r}
+summary(Auto)
+library(ggplot2)
+library(GGally)
+ggpairs(Auto[-9])
+
+
+```
+
+```{r}
+fit.1=lm(mpg~poly(displacement,4),data=Auto)
+summary(fit.1)
+fit.1=lm(mpg~poly(displacement,2),data=Auto)
+summary(fit.1)
+displacementlims=range(Auto$displacement)
+displacement.grid=seq(from=displacementlims[1],to=displacementlims[2])
+preds=predict(fit.1,newdata=list(displacement=displacement.grid),se=TRUE)
+se.bands=cbind(preds$fit+2*preds$se.fit,preds$fit-2*preds$se.fit)
+plot(Auto$displacement,Auto$mpg,xlim=displacementlims,cex=.5,col="darkgrey")
+title("Degree-2 Polynomial",outer=T)
+lines(displacement.grid,preds$fit,lwd=2,col="blue")
+matlines(displacement.grid,se.bands,lwd=1,col="blue",lty=3)
+
+
+fit.2=lm(mpg~poly(horsepower,4),data=Auto)
+summary(fit.2)
+fit.2=lm(mpg~poly(horsepower,2),data=Auto)
+summary(fit.2)
+horsepowerlims=range(Auto$horsepower)
+horsepower.grid=seq(from=horsepowerlims[1],to=horsepowerlims[2])
+preds=predict(fit.2,newdata=list(horsepower=horsepower.grid),se=TRUE)
+se.bands=cbind(preds$fit+2*preds$se.fit,preds$fit-2*preds$se.fit)
+plot(Auto$horsepower,Auto$mpg,xlim=horsepowerlims,cex=.5,col="darkgrey")
+title("Degree-2 Polynomial",outer=T)
+lines(horsepower.grid,preds$fit,lwd=2,col="blue")
+matlines(horsepower.grid,se.bands,lwd=1,col="blue",lty=3)
+
+fit.3=lm(mpg~poly(weight,4),data=Auto)
+summary(fit.3)
+fit.3=lm(mpg~poly(weight,2),data=Auto)
+summary(fit.3)
+weightlims=range(Auto$weight)
+weight.grid=seq(from=weightlims[1],to=weightlims[2])
+preds=predict(fit.3,newdata=list(weight=weight.grid),se=TRUE)
+se.bands=cbind(preds$fit+2*preds$se.fit,preds$fit-2*preds$se.fit)
+plot(Auto$weight,Auto$mpg,xlim=weightlims,cex=.5,col="darkgrey")
+title("Degree-2 Polynomial",outer=T)
+lines(weight.grid,preds$fit,lwd=2,col="blue")
+matlines(weight.grid,se.bands,lwd=1,col="blue",lty=3)
+
+fit.4=lm(mpg~poly(displacement,2)+poly(horsepower,2)+poly(weight,2),data=Auto)
+summary(fit.4)
+
+
+
+
+```
+
+
 # 9. This question uses the variables dis (the weighted mean of distances to ﬁve Boston employment centers) and nox (nitrogen oxides concentration in parts per 10 million) from the Boston data. We will treat dis as the predictor and nox as the response.
 
 ## (a) Use the poly() function to ﬁt a cubic polynomial regression to predict nox using dis. Report the regression output, and plot the resulting data and polynomial ﬁts.
 
+```{r}
+library(MASS)
+summary(Boston)
+
+fit.1=lm(nox~poly(dis,3),data=Boston)
+summary(fit.1)
+dislims=range(Boston$dis)
+dis.grid=seq(from=dislims[1],to=dislims[2])
+preds=predict(fit.1,newdata=list(dis=dis.grid),se=TRUE)
+se.bands=cbind(preds$fit+2*preds$se.fit,preds$fit-2*preds$se.fit)
+plot(Boston$dis,Boston$nox,xlim=dislims,cex=.5,col="darkgrey")
+title("Degree-3 Polynomial",outer=T)
+lines(dis.grid,preds$fit,lwd=2,col="blue")
+matlines(dis.grid,se.bands,lwd=1,col="blue",lty=3)
+
+
+```
+
+
 ## (b) Plot the polynomial ﬁts for a range of diﬀerent polynomial degrees (say, from 1 to 10), and report the associated residual sum of squares.
+
+```{r}
+plot(Boston$dis,Boston$nox,xlim=dislims,cex=.5,col="darkgrey")
+title("Polynomial",outer=T)
+for (i in 1:10){
+  fit.1=lm(nox~poly(dis,i),data=Boston)
+  preds=predict(fit.1,newdata=list(dis=dis.grid),se=TRUE)
+  lines(dis.grid,preds$fit,lwd=2,col=26+i)
+  print(summary(fit.1))
+ }
+```
+
 
 ## (c) Perform cross-validation or another approach to select the optimal degree for the polynomial, and explain your results.
 
+```{r}
+# cross-validation
+
+library(boot)
+set.seed(1)
+cv.error=rep(0,10)
+degree=1:10
+for(d in degree){
+  glm.fit=glm(nox~poly(dis,d),data=Boston)
+  cv.error[d]=loocv(glm.fit)
+}
+cv.error
+plot(degree,cv.error,type = "b")
+
+cv.error10=rep(0,10)
+for (i in 1:10){
+ glm.fit=glm(nox~poly(dis,i),data=Boston)
+ cv.error10[i]=cv.glm(Boston,glm.fit,K=10)$delta[1]
+ }
+cv.error10
+plot(degree,cv.error,type = "b")
+lines(degree,cv.error10,type = "b", col="red")
+```
+
+> optimal degree = 4
+
 ## (d) Use the bs() function to ﬁt a regression spline to predict nox using dis. Report the output for the ﬁt using four degrees of freedom. How did you choose the knots? Plot the resulting ﬁt.
+
+```{r}
+library(splines)
+fit=lm(nox~bs(dis,knots=c(3,5,7)),data=Boston)
+pred=predict(fit,newdata=list(dis=dis.grid),se=T)
+summary(fit)
+plot(Boston$dis,Boston$nox,col="gray")
+lines(dis.grid,pred$fit,lwd=2)
+lines(dis.grid,pred$fit+2*pred$se,lty="dashed")
+lines(dis.grid,pred$fit-2*pred$se,lty="dashed")
+
+dim(bs(Boston$dis,knots=c(3,5,7)))
+dim(bs(Boston$dis,df=6))
+attr(bs(Boston$dis,df=6),"knots")
+
+fit2=lm(nox~ns(dis,df=4),data=Boston)
+pred2=predict(fit2,newdata=list(dis=dis.grid),se=T)
+lines(dis.grid, pred2$fit,col="red",lwd=2)
+```
+
 
 ## (e) Now ﬁt a regression spline for a range of degrees of freedom, and plot the resulting ﬁts and report the resulting RSS. Describe the results obtained.
 
+```{r}
+plot(Boston$dis,Boston$nox,col="gray")
+for (i in 1:10){
+  fit2=lm(nox~ns(dis,df=i),data=Boston)
+  pred2=predict(fit2,newdata=list(dis=dis.grid),se=T)
+  lines(dis.grid, pred2$fit,col=1+i,lwd=2)
+  print(summary(fit2))
+ }
+```
+
+
 ## (f) Perform cross-validation or another approach in order to select the best degrees of freedom for a regression spline on this data. Describe your results.
+
+```{r}
+# cross-validation
+
+library(boot)
+cv.error10=rep(0,10)
+for (i in 1:10){
+ glm.fit=glm(nox~ns(dis,df=i),data=Boston)
+ cv.error10[i]=cv.glm(Boston,glm.fit,K=10)$delta[1]
+ }
+cv.error10
+plot(degree,cv.error10,type = "b", col="red")
+
+```
+
+> the best degrees of freedom for a regression spline on this data = 8

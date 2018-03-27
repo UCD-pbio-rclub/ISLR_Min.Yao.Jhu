@@ -2,7 +2,9 @@
 title: "chapter7-2"
 author: "Min-Yao"
 date: "2018年3月26日"
-output: html_document
+output: 
+  html_document: 
+    keep_md: yes
 ---
 
 # Chapter 7 Lab: Non-linear Modeling
@@ -130,7 +132,72 @@ attr(bs(age,df=6),"knots")
 fit2=lm(wage~ns(age,df=4),data=Wage)
 pred2=predict(fit2,newdata=list(age=age.grid),se=T)
 lines(age.grid, pred2$fit,col="red",lwd=2)
+
+# Smooth Splines
+
+plot(age,wage,xlim=agelims,cex=.5,col="darkgrey")
+title("Smoothing Spline")
+fit=smooth.spline(age,wage,df=16)
+fit2=smooth.spline(age,wage,cv=TRUE)
+fit2$df
+lines(fit,col="red",lwd=2)
+lines(fit2,col="blue",lwd=2)
+legend("topright",legend=c("16 DF","6.8 DF"),col=c("red","blue"),lty=1,lwd=2,cex=.8)
+
+plot(age,wage,xlim=agelims,cex=.5,col="darkgrey")
+title("Local Regression")
+fit=loess(wage~age,span=.2,data=Wage)
+fit2=loess(wage~age,span=.5,data=Wage)
+lines(age.grid,predict(fit,data.frame(age=age.grid)),col="red",lwd=2)
+lines(age.grid,predict(fit2,data.frame(age=age.grid)),col="blue",lwd=2)
+legend("topright",legend=c("Span=0.2","Span=0.5"),col=c("red","blue"),lty=1,lwd=2,cex=.8)
 ```
+
+# GAMs
+
+```{r}
+library(mgcv)
+library(gam)
+summary(Wage)
+
+gam1<-lm(wage~ns(year,4)+ns(age,5)+education,data=Wage)
+gam.m3<-gam(wage~s(year,4)+s(age,5)+education,data=Wage)
+
+#?s
+par(mfrow=c(1,3))
+plot(gam.m3,se=TRUE,col="blue")
+plot.Gam(gam1, se=TRUE, col="red")
+
+gam.m1=gam(wage~s(age,5)+education,data=Wage)
+gam.m2=gam(wage~year+s(age,5)+education,data=Wage)
+anova(gam.m1,gam.m2,gam.m3,test="F")
+
+summary(gam.m3)
+
+preds=predict(gam.m2,newdata=Wage)
+
+#local 
+
+gam.lo=gam(wage~s(year,df=4)+lo(age,span=0.7)+education,data=Wage)
+plot.Gam(gam.lo, se=TRUE, col="green")
+gam.lo.i=gam(wage~lo(year,age,span=0.5)+education,data=Wage)
+
+library(akima)
+par(mfrow=c(1,1))
+plot(gam.lo.i)
+
+gam.lr=gam(I(wage>250)~year+s(age,df=5)+education,family=binomial,data=Wage)
+par(mfrow=c(1,3))
+plot(gam.lr,se=T,col="green")
+
+table(education,I(wage>250))
+gam.lr.s=gam(I(wage>250)~year+s(age,df=5)+education,family=binomial,data=Wage,subset=(education!="1. < HS Grad"))
+plot(gam.lr.s,se=T,col="green")
+
+```
+
+
+----------------------------------------------------------------------------------
 
 # 7. The Wage data set contains a number of other features not explored in this chapter, such as marital status (maritl), job class (jobclass), and others. Explore the relationships between some of these other predictors and wage, and use non-linear ﬁtting techniques in order to ﬁt ﬂexible models to the data. Create plots of the results obtained, and write a summary of your ﬁndings.
 
@@ -148,9 +215,9 @@ fit.c=lm(wage~maritl+race+education,data=Wage)
 fit.d=lm(wage~maritl+race+education+poly(age, 4),data=Wage)
 anova(fit.a,fit.b,fit.c,fit.d)
 summary(fit.d)
-
-
 ```
+
+
 
 # 8. Fit some of the non-linear models investigated in this chapter to the Auto data set. Is there evidence for non-linear relationships in this data set? Create some informative plots to justify your answer.
 

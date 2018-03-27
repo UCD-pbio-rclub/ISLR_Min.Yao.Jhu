@@ -1,0 +1,223 @@
+---
+title: "chapter7-2"
+author: "Min-Yao"
+date: "2018年3月26日"
+output: html_document
+---
+
+# Chapter 7 Lab: Non-linear Modeling
+
+```{r}
+library(ISLR)
+attach(Wage)
+```
+
+# Polynomial Regression and Step Functions
+
+```{r}
+fit=lm(wage~poly(age,4),data=Wage)
+summary(fit)
+coef(summary(fit))
+```
+
+```{r}
+fit2=lm(wage~poly(age,4,raw=T),data=Wage)
+coef(summary(fit2))
+
+fit2a=lm(wage~age+I(age^2)+I(age^3)+I(age^4),data=Wage)
+summary(fit2a)
+coef(fit2a)
+
+plot(fitted(fit2),fitted(fit2a))
+
+fit2b=lm(wage~cbind(age,age^2,age^3,age^4),data=Wage)
+summary(fit2b)
+```
+
+```{r}
+agelims=range(age)
+age.grid=seq(from=agelims[1],to=agelims[2]) #min to  max (add 1 each time)
+preds=predict(fit,newdata=list(age=age.grid),se=TRUE)# add SE
+se.bands=cbind(preds$fit+2*preds$se.fit,preds$fit-2*preds$se.fit)
+
+#par(mfrow=c(1,2),mar=c(4.5,4.5,1,1),oma=c(0,0,4,0))
+plot(age,wage,xlim=agelims,cex=.5,col="darkgrey")
+title("Degree-4 Polynomial",outer=T)
+lines(age.grid,preds$fit,lwd=2,col="blue")
+matlines(age.grid,se.bands,lwd=1,col="blue",lty=3)
+
+preds2=predict(fit2,newdata=list(age=age.grid),se=TRUE)
+max(abs(preds$fit-preds2$fit))
+```
+
+```{r}
+fit.1=lm(wage~age,data=Wage)
+fit.2=lm(wage~poly(age,2),data=Wage)
+fit.3=lm(wage~poly(age,3),data=Wage)
+fit.4=lm(wage~poly(age,4),data=Wage)
+fit.5=lm(wage~poly(age,5),data=Wage)
+anova(fit.1,fit.2,fit.3,fit.4,fit.5)
+
+coef(summary(fit.5))
+(-11.983)^2
+
+fit.1=lm(wage~education+age,data=Wage)
+fit.2=lm(wage~education+poly(age,2),data=Wage)
+fit.3=lm(wage~education+poly(age,3),data=Wage)
+anova(fit.1,fit.2,fit.3)
+```
+
+```{r}
+#lab from video
+fit=glm(I(wage>250)~poly(age,3),data=Wage,family=binomial)
+summary(fit)
+preds=predict(fit,newdata=list(age=age.grid),se=T)
+se.bands = preds$fit + cbind(fit=0, lower=-2*preds$se, upper=2*preds$se)
+se.bands[1:5,]
+```
+
+$$p=\frac{e^eta}{1+e^eta}.$$
+
+```{r}
+#lab from video
+prob.bands=exp(se.bands)/(1+exp(se.bands))
+matplot(age.grid, prob.bands, col = "blue", lwd = c(2,1,1),lty = c(1,2,2),type = "l",ylim = c(0,.1))
+points(jitter(age),I(wage>250)/10,pch="|",cex=.5)
+
+```
+
+```{r}
+fit=glm(I(wage>250)~poly(age,4),data=Wage,family=binomial)
+preds=predict(fit,newdata=list(age=age.grid),se=T)
+
+pfit=exp(preds$fit)/(1+exp(preds$fit))
+se.bands.logit = cbind(preds$fit+2*preds$se.fit, preds$fit-2*preds$se.fit)
+se.bands = exp(se.bands.logit)/(1+exp(se.bands.logit))
+
+preds=predict(fit,newdata=list(age=age.grid),type="response",se=T)
+
+plot(age,I(wage>250),xlim=agelims,type="n",ylim=c(0,.2))
+points(jitter(age), I((wage>250)/5),cex=.5,pch="|",col="darkgrey")
+lines(age.grid,pfit,lwd=2, col="blue")
+matlines(age.grid,se.bands,lwd=1,col="blue",lty=3)
+
+table(cut(age,4))
+fit=lm(wage~cut(age,4),data=Wage)
+coef(summary(fit))
+
+```
+
+# Splines
+
+```{r}
+library(splines)
+fit=lm(wage~bs(age,knots=c(25,40,60)),data=Wage)
+pred=predict(fit,newdata=list(age=age.grid),se=T)
+summary(fit)
+
+plot(age,wage,col="gray")
+
+lines(age.grid,pred$fit,lwd=2)
+#abline(v=c(25,40,60),lty=2,col="darkgreen")
+lines(age.grid,pred$fit+2*pred$se,lty="dashed")
+lines(age.grid,pred$fit-2*pred$se,lty="dashed")
+
+
+dim(bs(age,knots=c(25,40,60)))
+dim(bs(age,df=6))
+attr(bs(age,df=6),"knots")
+
+fit2=lm(wage~ns(age,df=4),data=Wage)
+pred2=predict(fit2,newdata=list(age=age.grid),se=T)
+lines(age.grid, pred2$fit,col="red",lwd=2)
+```
+
+# 7. The Wage data set contains a number of other features not explored in this chapter, such as marital status (maritl), job class (jobclass), and others. Explore the relationships between some of these other predictors and wage, and use non-linear ﬁtting techniques in order to ﬁt ﬂexible models to the data. Create plots of the results obtained, and write a summary of your ﬁndings.
+
+```{r}
+summary(Wage)
+library(ggplot2)
+library(GGally)
+ggpairs(Wage)
+```
+
+```{r}
+fit.a=lm(wage~maritl,data=Wage)
+fit.b=lm(wage~maritl+race,data=Wage)
+fit.c=lm(wage~maritl+race+education,data=Wage)
+fit.d=lm(wage~maritl+race+education+poly(age, 4),data=Wage)
+anova(fit.a,fit.b,fit.c,fit.d)
+summary(fit.d)
+
+
+```
+
+# 8. Fit some of the non-linear models investigated in this chapter to the Auto data set. Is there evidence for non-linear relationships in this data set? Create some informative plots to justify your answer.
+
+```{r}
+summary(Auto)
+library(ggplot2)
+library(GGally)
+ggpairs(Auto[-9])
+
+
+```
+
+```{r}
+fit.1=lm(mpg~poly(displacement,4),data=Auto)
+summary(fit.1)
+fit.1=lm(mpg~poly(displacement,2),data=Auto)
+summary(fit.1)
+displacementlims=range(Auto$displacement)
+displacement.grid=seq(from=displacementlims[1],to=displacementlims[2])
+preds=predict(fit.1,newdata=list(displacement=displacement.grid),se=TRUE)
+se.bands=cbind(preds$fit+2*preds$se.fit,preds$fit-2*preds$se.fit)
+plot(Auto$displacement,Auto$mpg,xlim=displacementlims,cex=.5,col="darkgrey")
+title("Degree-2 Polynomial",outer=T)
+lines(displacement.grid,preds$fit,lwd=2,col="blue")
+matlines(displacement.grid,se.bands,lwd=1,col="blue",lty=3)
+
+
+fit.2=lm(mpg~poly(horsepower,4),data=Auto)
+summary(fit.2)
+fit.2=lm(mpg~poly(horsepower,2),data=Auto)
+summary(fit.2)
+horsepowerlims=range(Auto$horsepower)
+horsepower.grid=seq(from=horsepowerlims[1],to=horsepowerlims[2])
+preds=predict(fit.2,newdata=list(horsepower=horsepower.grid),se=TRUE)
+se.bands=cbind(preds$fit+2*preds$se.fit,preds$fit-2*preds$se.fit)
+plot(Auto$horsepower,Auto$mpg,xlim=horsepowerlims,cex=.5,col="darkgrey")
+title("Degree-2 Polynomial",outer=T)
+lines(horsepower.grid,preds$fit,lwd=2,col="blue")
+matlines(horsepower.grid,se.bands,lwd=1,col="blue",lty=3)
+
+fit.3=lm(mpg~poly(weight,4),data=Auto)
+summary(fit.3)
+fit.3=lm(mpg~poly(weight,2),data=Auto)
+summary(fit.3)
+weightlims=range(Auto$weight)
+weight.grid=seq(from=weightlims[1],to=weightlims[2])
+preds=predict(fit.3,newdata=list(weight=weight.grid),se=TRUE)
+se.bands=cbind(preds$fit+2*preds$se.fit,preds$fit-2*preds$se.fit)
+plot(Auto$weight,Auto$mpg,xlim=weightlims,cex=.5,col="darkgrey")
+title("Degree-2 Polynomial",outer=T)
+lines(weight.grid,preds$fit,lwd=2,col="blue")
+matlines(weight.grid,se.bands,lwd=1,col="blue",lty=3)
+
+fit.4=lm(mpg~poly(displacement,2)+poly(horsepower,2)+poly(weight,2),data=Auto)
+summary(fit.4)
+
+
+
+
+```
+
+# 10. This question relates to the College data set.
+
+## (a) Split the data into a training set and a test set. Using out-of-state tuition as the response and the other variables as the predictors, perform forward stepwise selection on the training set in order to identify a satisfactory model that uses just a subset of the predictors.
+
+## (b) Fit a GAM on the training data, using out-of-state tuition as the response and the features selected in the previous step as the predictors. Plot the results, and explain your ﬁndings. 
+
+## (c) Evaluate the model obtained on the test set, and explain the results obtained.
+
+## (d) For which variables, if any, is there evidence of a non-linear relationship with the response?

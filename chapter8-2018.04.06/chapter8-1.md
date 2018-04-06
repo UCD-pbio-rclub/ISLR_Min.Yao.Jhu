@@ -44,8 +44,7 @@ summary(tree.carseats)
 ```
 
 ```r
-plot(tree.carseats)
-text(tree.carseats,pretty=0)
+plot(tree.carseats);text(tree.carseats,pretty=0)
 ```
 
 ![](chapter8-1_files/figure-html/unnamed-chunk-1-2.png)<!-- -->
@@ -120,8 +119,7 @@ Carseats.test=Carseats[-train,]
 High.test=High[-train]
 tree.carseats=tree(High~.-Sales,Carseats,subset=train)
 #video
-plot(tree.carseats)
-text(tree.carseats,pretty=0)
+plot(tree.carseats);text(tree.carseats,pretty=0)
 ```
 
 ![](chapter8-1_files/figure-html/unnamed-chunk-1-3.png)<!-- -->
@@ -154,11 +152,11 @@ table(tree.pred,High.test)
 ```
 
 ```r
-(88+56)/200
+(86+57)/200
 ```
 
 ```
-## [1] 0.72
+## [1] 0.715
 ```
 
 ```r
@@ -286,8 +284,7 @@ summary(tree.boston)
 ```
 
 ```r
-plot(tree.boston)
-text(tree.boston,pretty=0)
+plot(tree.boston);text(tree.boston,pretty=0)
 ```
 
 ![](chapter8-1_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
@@ -301,8 +298,7 @@ plot(cv.boston$size,cv.boston$dev,type='b')
 
 ```r
 prune.boston=prune.tree(tree.boston,best=5)
-plot(prune.boston)
-text(prune.boston,pretty=0)
+plot(prune.boston);text(prune.boston,pretty=0)
 ```
 
 ![](chapter8-1_files/figure-html/unnamed-chunk-2-3.png)<!-- -->
@@ -324,179 +320,39 @@ mean((yhat-boston.test)^2)
 ## [1] 25.04559
 ```
 
-# Bagging and Random Forests
+# 1. Draw an example (of your own invention) of a partition of two-dimensional feature space that could result from recursive binary splitting. Your example should contain at least six regions. Draw a decision tree corresponding to this partition. Be sure to label all aspects of your ﬁgures, including the regions R 1 , R 2 , . . ., the cutpoints t 1 , t 2 , . . ., and so forth.
+Hint: Your result should look something like Figures 8.1 and 8.2.
 
+# 3. Consider the Gini index, classiﬁcation error, and entropy in a simple classiﬁcation setting with two classes. Create a single plot that displays each of these quantities as a function of ˆp m1 . The x-axis should display ˆp m1 , ranging from 0 to 1, and the y-axis should display the value of the Gini index, classiﬁcation error, and entropy. 
+Hint: In a setting with two classes, ˆp m1 = 1 − ˆp m2 . You could make this plot by hand, but it will be much easier to make in R.
 
-```r
-library(randomForest)
-```
+# 8. In the lab, a classiﬁcation tree was applied to the Carseats data set after converting Sales into a qualitative response variable. Now we will seek to predict Sales using regression trees and related approaches, treating the response as a quantitative variable. 
+## (a) Split the data set into a training set and a test set.
 
-```
-## randomForest 4.6-14
-```
+## (b) Fit a regression tree to the training set. Plot the tree, and interpret the results. What test MSE do you obtain?
 
-```
-## Type rfNews() to see new features/changes/bug fixes.
-```
+## (c) Use cross-validation in order to determine the optimal level of tree complexity. Does pruning the tree improve the test MSE?
 
-```r
-set.seed(1)
-bag.boston=randomForest(medv~.,data=Boston,subset=train,mtry=13,importance=TRUE)
-bag.boston
-```
+# 9. This problem involves the OJ data set which is part of the ISLR package.
 
-```
-## 
-## Call:
-##  randomForest(formula = medv ~ ., data = Boston, mtry = 13, importance = TRUE,      subset = train) 
-##                Type of random forest: regression
-##                      Number of trees: 500
-## No. of variables tried at each split: 13
-## 
-##           Mean of squared residuals: 11.15723
-##                     % Var explained: 86.49
-```
+## (a) Create a training set containing a random sample of 800 observations, and a test set containing the remaining observations.
 
-```r
-yhat.bag = predict(bag.boston,newdata=Boston[-train,])
-plot(yhat.bag, boston.test)
-abline(0,1)
-```
+## (b) Fit a tree to the training data, with Purchase as the response and the other variables as predictors. Use the summary() function to produce summary statistics about the tree, and describe the results obtained. What is the training error rate? How many terminal nodes does the tree have?
 
-![](chapter8-1_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+## (c) Type in the name of the tree object in order to get a detailed text output. Pick one of the terminal nodes, and interpret the information displayed.
 
-```r
-mean((yhat.bag-boston.test)^2)
-```
+## (d) Create a plot of the tree, and interpret the results.
 
-```
-## [1] 13.50808
-```
+## (e) Predict the response on the test data, and produce a confusion matrix comparing the test labels to the predicted test labels. What is the test error rate?
 
-```r
-bag.boston=randomForest(medv~.,data=Boston,subset=train,mtry=13,ntree=25)
-yhat.bag = predict(bag.boston,newdata=Boston[-train,])
-mean((yhat.bag-boston.test)^2)
-```
+## (f) Apply the cv.tree() function to the training set in order to determine the optimal tree size.
 
-```
-## [1] 13.94835
-```
+## (g) Produce a plot with tree size on the x-axis and cross-validated classiﬁcation error rate on the y-axis.
 
-```r
-set.seed(1)
-rf.boston=randomForest(medv~.,data=Boston,subset=train,mtry=6,importance=TRUE)
-yhat.rf = predict(rf.boston,newdata=Boston[-train,])
-mean((yhat.rf-boston.test)^2)
-```
+## (h) Which tree size corresponds to the lowest cross-validated classiﬁcation error rate?
 
-```
-## [1] 11.66454
-```
+## (i) Produce a pruned tree corresponding to the optimal tree size obtained using cross-validation. If cross-validation does not lead to selection of a pruned tree, then create a pruned tree with ﬁve terminal nodes.
 
-```r
-importance(rf.boston)
-```
+## (j) Compare the training error rates between the pruned and un-pruned trees. Which is higher?
 
-```
-##           %IncMSE IncNodePurity
-## crim    12.132320     986.50338
-## zn       1.955579      57.96945
-## indus    9.069302     882.78261
-## chas     2.210835      45.22941
-## nox     11.104823    1044.33776
-## rm      31.784033    6359.31971
-## age     10.962684     516.82969
-## dis     15.015236    1224.11605
-## rad      4.118011      95.94586
-## tax      8.587932     502.96719
-## ptratio 12.503896     830.77523
-## black    6.702609     341.30361
-## lstat   30.695224    7505.73936
-```
-
-```r
-varImpPlot(rf.boston)
-```
-
-![](chapter8-1_files/figure-html/unnamed-chunk-3-2.png)<!-- -->
-
-# Boosting
-
-
-```r
-library(gbm)
-```
-
-```
-## Loading required package: survival
-```
-
-```
-## Loading required package: lattice
-```
-
-```
-## Loading required package: splines
-```
-
-```
-## Loading required package: parallel
-```
-
-```
-## Loaded gbm 2.1.3
-```
-
-```r
-set.seed(1)
-boost.boston=gbm(medv~.,data=Boston[train,],distribution="gaussian",n.trees=5000,interaction.depth=4)
-summary(boost.boston)
-```
-
-![](chapter8-1_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
-
-```
-##             var    rel.inf
-## lstat     lstat 45.9627334
-## rm           rm 31.2238187
-## dis         dis  6.8087398
-## crim       crim  4.0743784
-## nox         nox  2.5605001
-## ptratio ptratio  2.2748652
-## black     black  1.7971159
-## age         age  1.6488532
-## tax         tax  1.3595005
-## indus     indus  1.2705924
-## chas       chas  0.8014323
-## rad         rad  0.2026619
-## zn           zn  0.0148083
-```
-
-```r
-par(mfrow=c(1,2))
-plot(boost.boston,i="rm")
-plot(boost.boston,i="lstat")
-```
-
-![](chapter8-1_files/figure-html/unnamed-chunk-4-2.png)<!-- -->
-
-```r
-yhat.boost=predict(boost.boston,newdata=Boston[-train,],n.trees=5000)
-mean((yhat.boost-boston.test)^2)
-```
-
-```
-## [1] 11.84434
-```
-
-```r
-boost.boston=gbm(medv~.,data=Boston[train,],distribution="gaussian",n.trees=5000,interaction.depth=4,shrinkage=0.2,verbose=F)
-yhat.boost=predict(boost.boston,newdata=Boston[-train,],n.trees=5000)
-mean((yhat.boost-boston.test)^2)
-```
-
-```
-## [1] 11.51109
-```
-
+## (k) Compare the test error rates between the pruned and unpruned trees. Which is higher?

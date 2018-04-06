@@ -338,14 +338,14 @@ plot(pm1,E)
 ![](chapter8-1_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
 ```r
-G=pm1*(1-pm1)
+G=pm1*(1-pm1)*2
 plot(pm1,G)
 ```
 
 ![](chapter8-1_files/figure-html/unnamed-chunk-3-2.png)<!-- -->
 
 ```r
-D=-(pm1*log10(pm1))
+D=-((pm1*log10(pm1))+((1-pm1)*log10(1-pm1)))
 plot(pm1,D)
 ```
 

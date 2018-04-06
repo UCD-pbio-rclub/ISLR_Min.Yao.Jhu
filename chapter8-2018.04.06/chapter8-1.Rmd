@@ -106,10 +106,10 @@ pm1=seq(0,1,by=0.01)
 E=1-pm1
 plot(pm1,E)
 
-G=pm1*(1-pm1)
+G=pm1*(1-pm1)*2
 plot(pm1,G)
 
-D=-(pm1*log10(pm1))
+D=-((pm1*log10(pm1))+((1-pm1)*log10(1-pm1)))
 plot(pm1,D)
 
 ```

@@ -374,6 +374,7 @@ legend("topright",legend = c("Test","OOB"),pch = 19,col = c("red","blue"))
 
 ```r
 #
+
 bag.boston=randomForest(medv~.,data=Boston,subset=train,mtry=13,importance=TRUE)
 bag.boston
 ```
@@ -622,7 +623,23 @@ this chapter. The second approach is to classify based on the average
 probability. In this example, what is the ﬁnal classiﬁcation under each
 of these two approaches?
 
+
+```r
+# The second approach
+X=c(0.1, 0.15, 0.2, 0.2, 0.55, 0.6, 0.6, 0.65, 0.7, 0.75)
+sum(X)/10
+```
+
+```
+## [1] 0.45
+```
+
+> By the first approach (if classiﬁcation is the goal), the ﬁnal classiﬁcation is red.
+> By the second approach (if regression is the goal), the ﬁnal classiﬁcation is green.
+
 # 7. In the lab, we applied random forests to the Boston data using mtry=6 and using ntree=25 and ntree=500. Create a plot displaying the test error resulting from random forests on this data set for a more comprehensive range of values for mtry and ntree. You can model your plot after Figure 8.10. Describe the results obtained.
+
+
 
 # 8. In the lab, a classiﬁcation tree was applied to the Carseats data set after converting Sales into a qualitative response variable. Now we will seek to predict Sales using regression trees and related approaches, treating the response as a quantitative variable. 
 
@@ -743,7 +760,7 @@ summary(tree.carseats)
 plot(tree.carseats);text(tree.carseats,pretty=0)
 ```
 
-![](chapter8-2_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+![](chapter8-2_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
 ```r
 yhat=predict(tree.carseats,newdata=Carseats.test)
@@ -752,7 +769,7 @@ plot(yhat,Sales.test)
 abline(0,1)
 ```
 
-![](chapter8-2_files/figure-html/unnamed-chunk-6-2.png)<!-- -->
+![](chapter8-2_files/figure-html/unnamed-chunk-7-2.png)<!-- -->
 
 ```r
 mean((yhat-Sales.test)^2)
@@ -797,14 +814,14 @@ cv.carseats
 plot(cv.carseats$size,cv.carseats$dev,type='b')
 ```
 
-![](chapter8-2_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+![](chapter8-2_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 
 ```r
 prune.carseats=prune.tree(tree.carseats,best=7)
 plot(prune.carseats);text(prune.carseats,pretty=0)
 ```
 
-![](chapter8-2_files/figure-html/unnamed-chunk-7-2.png)<!-- -->
+![](chapter8-2_files/figure-html/unnamed-chunk-8-2.png)<!-- -->
 
 ```r
 yhat=predict(prune.carseats,newdata=Carseats.test)
@@ -813,7 +830,7 @@ plot(yhat,Sales.test)
 abline(0,1)
 ```
 
-![](chapter8-2_files/figure-html/unnamed-chunk-7-3.png)<!-- -->
+![](chapter8-2_files/figure-html/unnamed-chunk-8-3.png)<!-- -->
 
 ```r
 mean((yhat-Sales.test)^2)

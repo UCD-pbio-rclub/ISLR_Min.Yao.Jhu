@@ -521,6 +521,7 @@ plot(boost.boston.v,i="rm")
 
 ```r
 #
+
 set.seed(1)
 boost.boston=gbm(medv~.,data=Boston[train,],distribution="gaussian",n.trees=5000,interaction.depth=4)
 summary(boost.boston)
@@ -639,6 +640,71 @@ sum(X)/10
 
 # 7. In the lab, we applied random forests to the Boston data using mtry=6 and using ntree=25 and ntree=500. Create a plot displaying the test error resulting from random forests on this data set for a more comprehensive range of values for mtry and ntree. You can model your plot after Figure 8.10. Describe the results obtained.
 
+
+```r
+library(MASS)
+library(randomForest)
+dim(Boston)
+```
+
+```
+## [1] 506  14
+```
+
+```r
+set.seed(1)
+train = sample(1:nrow(Boston), nrow(Boston)/2)
+#mtry
+obb.err=double(13)
+test.err=double(13)
+for(mtry in 1:13){
+  fit=randomForest(medv~.,data=Boston,subset=train,mtry=mtry,ntree=400)
+  obb.err[mtry]=fit$mse[400]
+  pred=predict(fit,Boston[-train,])
+  test.err[mtry]=with(Boston[-train,],mean((medv-pred)^2))
+  cat(mtry," ")
+}
+```
+
+```
+## 1  2  3  4  5  6  7  8  9  10  11  12  13
+```
+
+```r
+matplot(1:mtry,cbind(test.err,obb.err),pch = 19,col = c("red","blue"),type = "b",ylab = "Mean squared errors")
+legend("topright",legend = c("Test","OOB"),pch = 19,col = c("red","blue"))
+```
+
+![](chapter8-2_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+
+```r
+#
+#ntree
+obb.err2=double(10)
+test.err2=double(10)
+for(ntree in 1:50){
+  fit=randomForest(medv~.,data=Boston,subset=train,mtry=5,ntree=ntree)
+  obb.err2[ntree]=fit$mse[5]
+  pred2=predict(fit,Boston[-train,])
+  test.err2[ntree]=with(Boston[-train,],mean((medv-pred2)^2))
+  cat(ntree," ")
+}
+```
+
+```
+## 1  2  3  4  5  6  7  8  9  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36  37  38  39  40  41  42  43  44  45  46  47  48  49  50
+```
+
+```r
+matplot(1:ntree,cbind(test.err2,obb.err2),pch = 19,col = c("red","blue"),type = "b",ylab = "Mean squared errors")
+legend("topright",legend = c("Test","OOB"),pch = 19,col = c("red","blue"))
+```
+
+![](chapter8-2_files/figure-html/unnamed-chunk-6-2.png)<!-- -->
+
+```r
+#
+```
 
 
 # 8. In the lab, a classiﬁcation tree was applied to the Carseats data set after converting Sales into a qualitative response variable. Now we will seek to predict Sales using regression trees and related approaches, treating the response as a quantitative variable. 
@@ -760,7 +826,7 @@ summary(tree.carseats)
 plot(tree.carseats);text(tree.carseats,pretty=0)
 ```
 
-![](chapter8-2_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+![](chapter8-2_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 
 ```r
 yhat=predict(tree.carseats,newdata=Carseats.test)
@@ -769,7 +835,7 @@ plot(yhat,Sales.test)
 abline(0,1)
 ```
 
-![](chapter8-2_files/figure-html/unnamed-chunk-7-2.png)<!-- -->
+![](chapter8-2_files/figure-html/unnamed-chunk-8-2.png)<!-- -->
 
 ```r
 mean((yhat-Sales.test)^2)
@@ -814,14 +880,14 @@ cv.carseats
 plot(cv.carseats$size,cv.carseats$dev,type='b')
 ```
 
-![](chapter8-2_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+![](chapter8-2_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 
 ```r
 prune.carseats=prune.tree(tree.carseats,best=7)
 plot(prune.carseats);text(prune.carseats,pretty=0)
 ```
 
-![](chapter8-2_files/figure-html/unnamed-chunk-8-2.png)<!-- -->
+![](chapter8-2_files/figure-html/unnamed-chunk-9-2.png)<!-- -->
 
 ```r
 yhat=predict(prune.carseats,newdata=Carseats.test)
@@ -830,7 +896,7 @@ plot(yhat,Sales.test)
 abline(0,1)
 ```
 
-![](chapter8-2_files/figure-html/unnamed-chunk-8-3.png)<!-- -->
+![](chapter8-2_files/figure-html/unnamed-chunk-9-3.png)<!-- -->
 
 ```r
 mean((yhat-Sales.test)^2)
@@ -842,28 +908,1068 @@ mean((yhat-Sales.test)^2)
 
 > MSE = 4.419579, better
 
+## (d) Use the bagging approach in order to analyze this data. What test MSE do you obtain? Use the importance() function to determine which variables are most important.
+
+
+```r
+set.seed(1)
+rf.carseats=randomForest(Sales~.-High,data=Carseats.train,mtry=10,importance=TRUE)
+yhat.rf=predict(rf.carseats,newdata=Carseats.test)
+mean((yhat.rf-Sales.test)^2)
+```
+
+```
+## [1] 2.250674
+```
+
+```r
+importance(rf.carseats)
+```
+
+```
+##                %IncMSE IncNodePurity
+## CompPrice   20.4199056    157.984440
+## Income       8.7650043    103.320300
+## Advertising 23.1513675    187.914517
+## Population   1.3360011     61.047517
+## Price       48.7851374    462.533517
+## ShelveLoc   50.4473695    435.938666
+## Age          9.6626995    113.959640
+## Education    3.8671822     52.845173
+## Urban       -0.5692085      6.574594
+## US           1.9598781     12.023973
+```
+
+```r
+varImpPlot(rf.carseats)
+```
+
+![](chapter8-2_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+
+
+## (e) Use random forests to analyze this data. What test MSE do you obtain? Use the importance() function to determine which variables are most important. Describe the eﬀect of m, the number of variables considered at each split, on the error rate obtained.
+
+
+```r
+set.seed(1)
+rf.carseats=randomForest(Sales~.-High,data=Carseats.train,importance=TRUE)
+yhat.rf=predict(rf.carseats,newdata=Carseats.test)
+mean((yhat.rf-Sales.test)^2)
+```
+
+```
+## [1] 2.922907
+```
+
+```r
+importance(rf.carseats)
+```
+
+```
+##                %IncMSE IncNodePurity
+## CompPrice    9.2817931     139.03194
+## Income       4.9926014     152.43563
+## Advertising 16.2341682     177.60728
+## Population  -1.2015607     109.93106
+## Price       31.4315990     370.72587
+## ShelveLoc   35.7355118     324.37787
+## Age          7.0462353     161.81154
+## Education   -0.8271390      69.74261
+## Urban        0.2101922      14.18596
+## US           2.9645852      21.82999
+```
+
+```r
+varImpPlot(rf.carseats)
+```
+
+![](chapter8-2_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+
+
 # 10. We now use boosting to predict Salary in the Hitters data set.
 
 ## (a) Remove the observations for whom the salary information is unknown, and then log-transform the salaries.
 
+
+```r
+library(ISLR)
+summary(Hitters)
+```
+
+```
+##      AtBat            Hits         HmRun            Runs       
+##  Min.   : 16.0   Min.   :  1   Min.   : 0.00   Min.   :  0.00  
+##  1st Qu.:255.2   1st Qu.: 64   1st Qu.: 4.00   1st Qu.: 30.25  
+##  Median :379.5   Median : 96   Median : 8.00   Median : 48.00  
+##  Mean   :380.9   Mean   :101   Mean   :10.77   Mean   : 50.91  
+##  3rd Qu.:512.0   3rd Qu.:137   3rd Qu.:16.00   3rd Qu.: 69.00  
+##  Max.   :687.0   Max.   :238   Max.   :40.00   Max.   :130.00  
+##                                                                
+##       RBI             Walks            Years            CAtBat       
+##  Min.   :  0.00   Min.   :  0.00   Min.   : 1.000   Min.   :   19.0  
+##  1st Qu.: 28.00   1st Qu.: 22.00   1st Qu.: 4.000   1st Qu.:  816.8  
+##  Median : 44.00   Median : 35.00   Median : 6.000   Median : 1928.0  
+##  Mean   : 48.03   Mean   : 38.74   Mean   : 7.444   Mean   : 2648.7  
+##  3rd Qu.: 64.75   3rd Qu.: 53.00   3rd Qu.:11.000   3rd Qu.: 3924.2  
+##  Max.   :121.00   Max.   :105.00   Max.   :24.000   Max.   :14053.0  
+##                                                                      
+##      CHits            CHmRun           CRuns             CRBI        
+##  Min.   :   4.0   Min.   :  0.00   Min.   :   1.0   Min.   :   0.00  
+##  1st Qu.: 209.0   1st Qu.: 14.00   1st Qu.: 100.2   1st Qu.:  88.75  
+##  Median : 508.0   Median : 37.50   Median : 247.0   Median : 220.50  
+##  Mean   : 717.6   Mean   : 69.49   Mean   : 358.8   Mean   : 330.12  
+##  3rd Qu.:1059.2   3rd Qu.: 90.00   3rd Qu.: 526.2   3rd Qu.: 426.25  
+##  Max.   :4256.0   Max.   :548.00   Max.   :2165.0   Max.   :1659.00  
+##                                                                      
+##      CWalks        League  Division    PutOuts          Assists     
+##  Min.   :   0.00   A:175   E:157    Min.   :   0.0   Min.   :  0.0  
+##  1st Qu.:  67.25   N:147   W:165    1st Qu.: 109.2   1st Qu.:  7.0  
+##  Median : 170.50                    Median : 212.0   Median : 39.5  
+##  Mean   : 260.24                    Mean   : 288.9   Mean   :106.9  
+##  3rd Qu.: 339.25                    3rd Qu.: 325.0   3rd Qu.:166.0  
+##  Max.   :1566.00                    Max.   :1378.0   Max.   :492.0  
+##                                                                     
+##      Errors          Salary       NewLeague
+##  Min.   : 0.00   Min.   :  67.5   A:176    
+##  1st Qu.: 3.00   1st Qu.: 190.0   N:146    
+##  Median : 6.00   Median : 425.0            
+##  Mean   : 8.04   Mean   : 535.9            
+##  3rd Qu.:11.00   3rd Qu.: 750.0            
+##  Max.   :32.00   Max.   :2460.0            
+##                  NA's   :59
+```
+
+```r
+new.Hitters=na.omit(Hitters)
+summary(new.Hitters)
+```
+
+```
+##      AtBat            Hits           HmRun            Runs       
+##  Min.   : 19.0   Min.   :  1.0   Min.   : 0.00   Min.   :  0.00  
+##  1st Qu.:282.5   1st Qu.: 71.5   1st Qu.: 5.00   1st Qu.: 33.50  
+##  Median :413.0   Median :103.0   Median : 9.00   Median : 52.00  
+##  Mean   :403.6   Mean   :107.8   Mean   :11.62   Mean   : 54.75  
+##  3rd Qu.:526.0   3rd Qu.:141.5   3rd Qu.:18.00   3rd Qu.: 73.00  
+##  Max.   :687.0   Max.   :238.0   Max.   :40.00   Max.   :130.00  
+##       RBI             Walks            Years            CAtBat       
+##  Min.   :  0.00   Min.   :  0.00   Min.   : 1.000   Min.   :   19.0  
+##  1st Qu.: 30.00   1st Qu.: 23.00   1st Qu.: 4.000   1st Qu.:  842.5  
+##  Median : 47.00   Median : 37.00   Median : 6.000   Median : 1931.0  
+##  Mean   : 51.49   Mean   : 41.11   Mean   : 7.312   Mean   : 2657.5  
+##  3rd Qu.: 71.00   3rd Qu.: 57.00   3rd Qu.:10.000   3rd Qu.: 3890.5  
+##  Max.   :121.00   Max.   :105.00   Max.   :24.000   Max.   :14053.0  
+##      CHits            CHmRun           CRuns             CRBI       
+##  Min.   :   4.0   Min.   :  0.00   Min.   :   2.0   Min.   :   3.0  
+##  1st Qu.: 212.0   1st Qu.: 15.00   1st Qu.: 105.5   1st Qu.:  95.0  
+##  Median : 516.0   Median : 40.00   Median : 250.0   Median : 230.0  
+##  Mean   : 722.2   Mean   : 69.24   Mean   : 361.2   Mean   : 330.4  
+##  3rd Qu.:1054.0   3rd Qu.: 92.50   3rd Qu.: 497.5   3rd Qu.: 424.5  
+##  Max.   :4256.0   Max.   :548.00   Max.   :2165.0   Max.   :1659.0  
+##      CWalks       League  Division    PutOuts          Assists     
+##  Min.   :   1.0   A:139   E:129    Min.   :   0.0   Min.   :  0.0  
+##  1st Qu.:  71.0   N:124   W:134    1st Qu.: 113.5   1st Qu.:  8.0  
+##  Median : 174.0                    Median : 224.0   Median : 45.0  
+##  Mean   : 260.3                    Mean   : 290.7   Mean   :118.8  
+##  3rd Qu.: 328.5                    3rd Qu.: 322.5   3rd Qu.:192.0  
+##  Max.   :1566.0                    Max.   :1377.0   Max.   :492.0  
+##      Errors           Salary       NewLeague
+##  Min.   : 0.000   Min.   :  67.5   A:141    
+##  1st Qu.: 3.000   1st Qu.: 190.0   N:122    
+##  Median : 7.000   Median : 425.0            
+##  Mean   : 8.593   Mean   : 535.9            
+##  3rd Qu.:13.000   3rd Qu.: 750.0            
+##  Max.   :32.000   Max.   :2460.0
+```
+
+```r
+logSalary=log(new.Hitters$Salary)
+new.Hitters2=data.frame(new.Hitters,logSalary)
+summary(new.Hitters2)
+```
+
+```
+##      AtBat            Hits           HmRun            Runs       
+##  Min.   : 19.0   Min.   :  1.0   Min.   : 0.00   Min.   :  0.00  
+##  1st Qu.:282.5   1st Qu.: 71.5   1st Qu.: 5.00   1st Qu.: 33.50  
+##  Median :413.0   Median :103.0   Median : 9.00   Median : 52.00  
+##  Mean   :403.6   Mean   :107.8   Mean   :11.62   Mean   : 54.75  
+##  3rd Qu.:526.0   3rd Qu.:141.5   3rd Qu.:18.00   3rd Qu.: 73.00  
+##  Max.   :687.0   Max.   :238.0   Max.   :40.00   Max.   :130.00  
+##       RBI             Walks            Years            CAtBat       
+##  Min.   :  0.00   Min.   :  0.00   Min.   : 1.000   Min.   :   19.0  
+##  1st Qu.: 30.00   1st Qu.: 23.00   1st Qu.: 4.000   1st Qu.:  842.5  
+##  Median : 47.00   Median : 37.00   Median : 6.000   Median : 1931.0  
+##  Mean   : 51.49   Mean   : 41.11   Mean   : 7.312   Mean   : 2657.5  
+##  3rd Qu.: 71.00   3rd Qu.: 57.00   3rd Qu.:10.000   3rd Qu.: 3890.5  
+##  Max.   :121.00   Max.   :105.00   Max.   :24.000   Max.   :14053.0  
+##      CHits            CHmRun           CRuns             CRBI       
+##  Min.   :   4.0   Min.   :  0.00   Min.   :   2.0   Min.   :   3.0  
+##  1st Qu.: 212.0   1st Qu.: 15.00   1st Qu.: 105.5   1st Qu.:  95.0  
+##  Median : 516.0   Median : 40.00   Median : 250.0   Median : 230.0  
+##  Mean   : 722.2   Mean   : 69.24   Mean   : 361.2   Mean   : 330.4  
+##  3rd Qu.:1054.0   3rd Qu.: 92.50   3rd Qu.: 497.5   3rd Qu.: 424.5  
+##  Max.   :4256.0   Max.   :548.00   Max.   :2165.0   Max.   :1659.0  
+##      CWalks       League  Division    PutOuts          Assists     
+##  Min.   :   1.0   A:139   E:129    Min.   :   0.0   Min.   :  0.0  
+##  1st Qu.:  71.0   N:124   W:134    1st Qu.: 113.5   1st Qu.:  8.0  
+##  Median : 174.0                    Median : 224.0   Median : 45.0  
+##  Mean   : 260.3                    Mean   : 290.7   Mean   :118.8  
+##  3rd Qu.: 328.5                    3rd Qu.: 322.5   3rd Qu.:192.0  
+##  Max.   :1566.0                    Max.   :1377.0   Max.   :492.0  
+##      Errors           Salary       NewLeague   logSalary    
+##  Min.   : 0.000   Min.   :  67.5   A:141     Min.   :4.212  
+##  1st Qu.: 3.000   1st Qu.: 190.0   N:122     1st Qu.:5.247  
+##  Median : 7.000   Median : 425.0             Median :6.052  
+##  Mean   : 8.593   Mean   : 535.9             Mean   :5.927  
+##  3rd Qu.:13.000   3rd Qu.: 750.0             3rd Qu.:6.620  
+##  Max.   :32.000   Max.   :2460.0             Max.   :7.808
+```
+
+
 ## (b) Create a training set consisting of the ﬁrst 200 observations, and a test set consisting of the remaining observations.
+
+
+```r
+dim(new.Hitters2)
+```
+
+```
+## [1] 263  21
+```
+
+```r
+new.hitters.train=new.Hitters2[1:200,]
+new.hitters.test=new.Hitters2[201:nrow(new.Hitters2),]
+dim(new.hitters.train)
+```
+
+```
+## [1] 200  21
+```
+
+```r
+dim(new.hitters.test)
+```
+
+```
+## [1] 63 21
+```
+
 
 ## (c) Perform boosting on the training set with 1,000 trees for a range of values of the shrinkage parameter λ. Produce a plot with diﬀerent shrinkage values on the x-axis and the corresponding training set MSE on the y-axis.
 
+
+```r
+library(gbm)
+shrinkage=seq(0.001,0.2,0.001)
+train.err=double(200)
+test.err=double(200)
+for(s in shrinkage){
+  boost.hitters=gbm(logSalary~.-Salary, data=new.hitters.train, distribution="gaussian", n.trees=1000, shrinkage=s)
+  yhat.boost=predict(boost.hitters, newdata=new.hitters.test, n.trees=1000)
+  train.err[s*1000] <- mean((boost.hitters$train.error)^2)
+  test.err[s*1000] <- mean((yhat.boost-new.hitters.test$logSalary)^2)
+}
+plot(data.frame(shrinkage,train.err),type = "b",ylab = "Mean squared errors")
+```
+
+![](chapter8-2_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
+
+
 ## (d) Produce a plot with diﬀerent shrinkage values on the x-axis and the corresponding test set MSE on the y-axis.
+
+
+```r
+plot(data.frame(shrinkage,test.err),type = "l",ylab = "Mean squared errors")
+```
+
+![](chapter8-2_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
+
 
 ## (e) Compare the test MSE of boosting to the test MSE that results from applying two of the regression approaches seen in Chapters 3 and 6.
 
+
+```r
+set.seed(1)
+boost.hitters=gbm(logSalary~.-Salary, data=new.hitters.train, distribution="gaussian", n.trees=1000, shrinkage=0.01)
+yhat.boost <- predict(boost.hitters, newdata=new.hitters.test, n.trees = 1000)
+mean((yhat.boost - new.hitters.test$logSalary)^2)
+```
+
+```
+## [1] 0.2803223
+```
+
+```r
+hitters.lm=lm(logSalary ~ .-Salary, data=new.hitters.train)
+yhat.lm=predict(hitters.lm, newdata=new.hitters.test)
+mean((yhat.lm - new.hitters.test$logSalary)^2)
+```
+
+```
+## [1] 0.4917959
+```
+
+
 ## (f) Which variables appear to be the most important predictors in the boosted model?
 
+
+```r
+summary(boost.hitters)
+```
+
+![](chapter8-2_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
+
+```
+##                 var    rel.inf
+## CAtBat       CAtBat 27.3054217
+## CHits         CHits 11.1342066
+## CRBI           CRBI 10.4738117
+## CWalks       CWalks  8.5854670
+## CRuns         CRuns  7.9895047
+## Years         Years  6.1452125
+## CHmRun       CHmRun  5.7226448
+## Hits           Hits  4.7410655
+## Walks         Walks  3.9378531
+## RBI             RBI  3.6359708
+## PutOuts     PutOuts  2.9766872
+## AtBat         AtBat  2.0255320
+## HmRun         HmRun  1.4556220
+## Errors       Errors  1.2362298
+## Runs           Runs  0.9874552
+## Assists     Assists  0.8528629
+## Division   Division  0.5232692
+## NewLeague NewLeague  0.1488451
+## League       League  0.1223383
+```
+
+
 ## (g) Now apply bagging to the training set. What is the test set MSE for this approach?
+
+
+```r
+library(randomForest)
+dim(new.hitters.train)
+```
+
+```
+## [1] 200  21
+```
+
+```r
+bag.hitters=randomForest(logSalary~.-Salary, data=new.hitters.train, mtry = 19, importance = TRUE)
+yhat.bag=predict(bag.hitters, newdata=new.hitters.test)
+mean((yhat.bag-new.hitters.test$logSalary)^2)
+```
+
+```
+## [1] 0.2291558
+```
+
+```r
+importance(bag.hitters)
+```
+
+```
+##              %IncMSE IncNodePurity
+## AtBat     10.6894273     7.5685193
+## Hits       8.7218826     4.3285810
+## HmRun      2.4883643     1.4422836
+## Runs       2.9541817     3.2372411
+## RBI        3.0885520     3.2627338
+## Walks     10.2876058     7.3734641
+## Years     11.4369034     1.8685740
+## CAtBat    34.9292453    84.8497925
+## CHits      8.3050003    12.1753813
+## CHmRun    11.0675100     4.8725825
+## CRuns     12.1271533    11.6831791
+## CRBI      11.4076584     9.2394258
+## CWalks     5.9008280     6.4417680
+## League    -2.0342049     0.1191828
+## Division  -2.4813658     0.1939507
+## PutOuts    1.5690627     2.7279423
+## Assists   -0.8374132     1.4812270
+## Errors     1.0804031     1.2713468
+## NewLeague  1.9472873     0.1883526
+```
+
+```r
+varImpPlot(bag.hitters)
+```
+
+![](chapter8-2_files/figure-html/unnamed-chunk-18-1.png)<!-- -->
 
 # 11. This question uses the Caravan data set.
 
 ## (a) Create a training set consisting of the ﬁrst 1,000 observations, and a test set consisting of the remaining observations.
 
+```r
+summary(Caravan)
+```
+
+```
+##     MOSTYPE         MAANTHUI         MGEMOMV         MGEMLEEF    
+##  Min.   : 1.00   Min.   : 1.000   Min.   :1.000   Min.   :1.000  
+##  1st Qu.:10.00   1st Qu.: 1.000   1st Qu.:2.000   1st Qu.:2.000  
+##  Median :30.00   Median : 1.000   Median :3.000   Median :3.000  
+##  Mean   :24.25   Mean   : 1.111   Mean   :2.679   Mean   :2.991  
+##  3rd Qu.:35.00   3rd Qu.: 1.000   3rd Qu.:3.000   3rd Qu.:3.000  
+##  Max.   :41.00   Max.   :10.000   Max.   :5.000   Max.   :6.000  
+##     MOSHOOFD          MGODRK           MGODPR          MGODOV    
+##  Min.   : 1.000   Min.   :0.0000   Min.   :0.000   Min.   :0.00  
+##  1st Qu.: 3.000   1st Qu.:0.0000   1st Qu.:4.000   1st Qu.:0.00  
+##  Median : 7.000   Median :0.0000   Median :5.000   Median :1.00  
+##  Mean   : 5.774   Mean   :0.6965   Mean   :4.627   Mean   :1.07  
+##  3rd Qu.: 8.000   3rd Qu.:1.0000   3rd Qu.:6.000   3rd Qu.:2.00  
+##  Max.   :10.000   Max.   :9.0000   Max.   :9.000   Max.   :5.00  
+##      MGODGE          MRELGE          MRELSA           MRELOV    
+##  Min.   :0.000   Min.   :0.000   Min.   :0.0000   Min.   :0.00  
+##  1st Qu.:2.000   1st Qu.:5.000   1st Qu.:0.0000   1st Qu.:1.00  
+##  Median :3.000   Median :6.000   Median :1.0000   Median :2.00  
+##  Mean   :3.259   Mean   :6.183   Mean   :0.8835   Mean   :2.29  
+##  3rd Qu.:4.000   3rd Qu.:7.000   3rd Qu.:1.0000   3rd Qu.:3.00  
+##  Max.   :9.000   Max.   :9.000   Max.   :7.0000   Max.   :9.00  
+##     MFALLEEN        MFGEKIND       MFWEKIND      MOPLHOOG    
+##  Min.   :0.000   Min.   :0.00   Min.   :0.0   Min.   :0.000  
+##  1st Qu.:0.000   1st Qu.:2.00   1st Qu.:3.0   1st Qu.:0.000  
+##  Median :2.000   Median :3.00   Median :4.0   Median :1.000  
+##  Mean   :1.888   Mean   :3.23   Mean   :4.3   Mean   :1.461  
+##  3rd Qu.:3.000   3rd Qu.:4.00   3rd Qu.:6.0   3rd Qu.:2.000  
+##  Max.   :9.000   Max.   :9.00   Max.   :9.0   Max.   :9.000  
+##     MOPLMIDD        MOPLLAAG        MBERHOOG        MBERZELF    
+##  Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.000  
+##  1st Qu.:2.000   1st Qu.:3.000   1st Qu.:0.000   1st Qu.:0.000  
+##  Median :3.000   Median :5.000   Median :2.000   Median :0.000  
+##  Mean   :3.351   Mean   :4.572   Mean   :1.895   Mean   :0.398  
+##  3rd Qu.:4.000   3rd Qu.:6.000   3rd Qu.:3.000   3rd Qu.:1.000  
+##  Max.   :9.000   Max.   :9.000   Max.   :9.000   Max.   :5.000  
+##     MBERBOER         MBERMIDD        MBERARBG       MBERARBO    
+##  Min.   :0.0000   Min.   :0.000   Min.   :0.00   Min.   :0.000  
+##  1st Qu.:0.0000   1st Qu.:2.000   1st Qu.:1.00   1st Qu.:1.000  
+##  Median :0.0000   Median :3.000   Median :2.00   Median :2.000  
+##  Mean   :0.5223   Mean   :2.899   Mean   :2.22   Mean   :2.306  
+##  3rd Qu.:1.0000   3rd Qu.:4.000   3rd Qu.:3.00   3rd Qu.:3.000  
+##  Max.   :9.0000   Max.   :9.000   Max.   :9.00   Max.   :9.000  
+##       MSKA           MSKB1           MSKB2            MSKC      
+##  Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.000  
+##  1st Qu.:0.000   1st Qu.:1.000   1st Qu.:1.000   1st Qu.:2.000  
+##  Median :1.000   Median :2.000   Median :2.000   Median :4.000  
+##  Mean   :1.621   Mean   :1.607   Mean   :2.203   Mean   :3.759  
+##  3rd Qu.:2.000   3rd Qu.:2.000   3rd Qu.:3.000   3rd Qu.:5.000  
+##  Max.   :9.000   Max.   :9.000   Max.   :9.000   Max.   :9.000  
+##       MSKD           MHHUUR          MHKOOP          MAUT1     
+##  Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.00  
+##  1st Qu.:0.000   1st Qu.:2.000   1st Qu.:2.000   1st Qu.:5.00  
+##  Median :1.000   Median :4.000   Median :5.000   Median :6.00  
+##  Mean   :1.067   Mean   :4.237   Mean   :4.772   Mean   :6.04  
+##  3rd Qu.:2.000   3rd Qu.:7.000   3rd Qu.:7.000   3rd Qu.:7.00  
+##  Max.   :9.000   Max.   :9.000   Max.   :9.000   Max.   :9.00  
+##      MAUT2           MAUT0          MZFONDS          MZPART     
+##  Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.000  
+##  1st Qu.:0.000   1st Qu.:1.000   1st Qu.:5.000   1st Qu.:1.000  
+##  Median :1.000   Median :2.000   Median :7.000   Median :2.000  
+##  Mean   :1.316   Mean   :1.959   Mean   :6.277   Mean   :2.729  
+##  3rd Qu.:2.000   3rd Qu.:3.000   3rd Qu.:8.000   3rd Qu.:4.000  
+##  Max.   :7.000   Max.   :9.000   Max.   :9.000   Max.   :9.000  
+##     MINKM30         MINK3045        MINK4575        MINK7512     
+##  Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.0000  
+##  1st Qu.:1.000   1st Qu.:2.000   1st Qu.:1.000   1st Qu.:0.0000  
+##  Median :2.000   Median :4.000   Median :3.000   Median :0.0000  
+##  Mean   :2.574   Mean   :3.536   Mean   :2.731   Mean   :0.7961  
+##  3rd Qu.:4.000   3rd Qu.:5.000   3rd Qu.:4.000   3rd Qu.:1.0000  
+##  Max.   :9.000   Max.   :9.000   Max.   :9.000   Max.   :9.0000  
+##     MINK123M         MINKGEM         MKOOPKLA        PWAPART      
+##  Min.   :0.0000   Min.   :0.000   Min.   :1.000   Min.   :0.0000  
+##  1st Qu.:0.0000   1st Qu.:3.000   1st Qu.:3.000   1st Qu.:0.0000  
+##  Median :0.0000   Median :4.000   Median :4.000   Median :0.0000  
+##  Mean   :0.2027   Mean   :3.784   Mean   :4.236   Mean   :0.7712  
+##  3rd Qu.:0.0000   3rd Qu.:4.000   3rd Qu.:6.000   3rd Qu.:2.0000  
+##  Max.   :9.0000   Max.   :9.000   Max.   :8.000   Max.   :3.0000  
+##     PWABEDR           PWALAND           PPERSAUT       PBESAUT       
+##  Min.   :0.00000   Min.   :0.00000   Min.   :0.00   Min.   :0.00000  
+##  1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.00   1st Qu.:0.00000  
+##  Median :0.00000   Median :0.00000   Median :5.00   Median :0.00000  
+##  Mean   :0.04002   Mean   :0.07162   Mean   :2.97   Mean   :0.04827  
+##  3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:6.00   3rd Qu.:0.00000  
+##  Max.   :6.00000   Max.   :4.00000   Max.   :8.00   Max.   :7.00000  
+##     PMOTSCO          PVRAAUT            PAANHANG          PTRACTOR      
+##  Min.   :0.0000   Min.   :0.000000   Min.   :0.00000   Min.   :0.00000  
+##  1st Qu.:0.0000   1st Qu.:0.000000   1st Qu.:0.00000   1st Qu.:0.00000  
+##  Median :0.0000   Median :0.000000   Median :0.00000   Median :0.00000  
+##  Mean   :0.1754   Mean   :0.009447   Mean   :0.02096   Mean   :0.09258  
+##  3rd Qu.:0.0000   3rd Qu.:0.000000   3rd Qu.:0.00000   3rd Qu.:0.00000  
+##  Max.   :7.0000   Max.   :9.000000   Max.   :5.00000   Max.   :6.00000  
+##      PWERKT            PBROM           PLEVEN          PPERSONG      
+##  Min.   :0.00000   Min.   :0.000   Min.   :0.0000   Min.   :0.00000  
+##  1st Qu.:0.00000   1st Qu.:0.000   1st Qu.:0.0000   1st Qu.:0.00000  
+##  Median :0.00000   Median :0.000   Median :0.0000   Median :0.00000  
+##  Mean   :0.01305   Mean   :0.215   Mean   :0.1948   Mean   :0.01374  
+##  3rd Qu.:0.00000   3rd Qu.:0.000   3rd Qu.:0.0000   3rd Qu.:0.00000  
+##  Max.   :6.00000   Max.   :6.000   Max.   :9.0000   Max.   :6.00000  
+##     PGEZONG           PWAOREG            PBRAND         PZEILPL         
+##  Min.   :0.00000   Min.   :0.00000   Min.   :0.000   Min.   :0.0000000  
+##  1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.000   1st Qu.:0.0000000  
+##  Median :0.00000   Median :0.00000   Median :2.000   Median :0.0000000  
+##  Mean   :0.01529   Mean   :0.02353   Mean   :1.828   Mean   :0.0008588  
+##  3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:4.000   3rd Qu.:0.0000000  
+##  Max.   :3.00000   Max.   :7.00000   Max.   :8.000   Max.   :3.0000000  
+##     PPLEZIER           PFIETS           PINBOED           PBYSTAND      
+##  Min.   :0.00000   Min.   :0.00000   Min.   :0.00000   Min.   :0.00000  
+##  1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.00000  
+##  Median :0.00000   Median :0.00000   Median :0.00000   Median :0.00000  
+##  Mean   :0.01889   Mean   :0.02525   Mean   :0.01563   Mean   :0.04758  
+##  3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.00000  
+##  Max.   :6.00000   Max.   :1.00000   Max.   :6.00000   Max.   :5.00000  
+##     AWAPART         AWABEDR           AWALAND           APERSAUT     
+##  Min.   :0.000   Min.   :0.00000   Min.   :0.00000   Min.   :0.0000  
+##  1st Qu.:0.000   1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.0000  
+##  Median :0.000   Median :0.00000   Median :0.00000   Median :1.0000  
+##  Mean   :0.403   Mean   :0.01477   Mean   :0.02061   Mean   :0.5622  
+##  3rd Qu.:1.000   3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:1.0000  
+##  Max.   :2.000   Max.   :5.00000   Max.   :1.00000   Max.   :7.0000  
+##     ABESAUT           AMOTSCO           AVRAAUT            AAANHANG      
+##  Min.   :0.00000   Min.   :0.00000   Min.   :0.000000   Min.   :0.00000  
+##  1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.000000   1st Qu.:0.00000  
+##  Median :0.00000   Median :0.00000   Median :0.000000   Median :0.00000  
+##  Mean   :0.01048   Mean   :0.04105   Mean   :0.002233   Mean   :0.01254  
+##  3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.000000   3rd Qu.:0.00000  
+##  Max.   :4.00000   Max.   :8.00000   Max.   :3.000000   Max.   :3.00000  
+##     ATRACTOR           AWERKT             ABROM             ALEVEN       
+##  Min.   :0.00000   Min.   :0.000000   Min.   :0.00000   Min.   :0.00000  
+##  1st Qu.:0.00000   1st Qu.:0.000000   1st Qu.:0.00000   1st Qu.:0.00000  
+##  Median :0.00000   Median :0.000000   Median :0.00000   Median :0.00000  
+##  Mean   :0.03367   Mean   :0.006183   Mean   :0.07042   Mean   :0.07661  
+##  3rd Qu.:0.00000   3rd Qu.:0.000000   3rd Qu.:0.00000   3rd Qu.:0.00000  
+##  Max.   :4.00000   Max.   :6.000000   Max.   :2.00000   Max.   :8.00000  
+##     APERSONG           AGEZONG            AWAOREG             ABRAND      
+##  Min.   :0.000000   Min.   :0.000000   Min.   :0.000000   Min.   :0.0000  
+##  1st Qu.:0.000000   1st Qu.:0.000000   1st Qu.:0.000000   1st Qu.:0.0000  
+##  Median :0.000000   Median :0.000000   Median :0.000000   Median :1.0000  
+##  Mean   :0.005325   Mean   :0.006527   Mean   :0.004638   Mean   :0.5701  
+##  3rd Qu.:0.000000   3rd Qu.:0.000000   3rd Qu.:0.000000   3rd Qu.:1.0000  
+##  Max.   :1.000000   Max.   :1.000000   Max.   :2.000000   Max.   :7.0000  
+##     AZEILPL             APLEZIER            AFIETS       
+##  Min.   :0.0000000   Min.   :0.000000   Min.   :0.00000  
+##  1st Qu.:0.0000000   1st Qu.:0.000000   1st Qu.:0.00000  
+##  Median :0.0000000   Median :0.000000   Median :0.00000  
+##  Mean   :0.0005153   Mean   :0.006012   Mean   :0.03178  
+##  3rd Qu.:0.0000000   3rd Qu.:0.000000   3rd Qu.:0.00000  
+##  Max.   :1.0000000   Max.   :2.000000   Max.   :3.00000  
+##     AINBOED            ABYSTAND       Purchase  
+##  Min.   :0.000000   Min.   :0.00000   No :5474  
+##  1st Qu.:0.000000   1st Qu.:0.00000   Yes: 348  
+##  Median :0.000000   Median :0.00000             
+##  Mean   :0.007901   Mean   :0.01426             
+##  3rd Qu.:0.000000   3rd Qu.:0.00000             
+##  Max.   :2.000000   Max.   :2.00000
+```
+
+```r
+dim(Caravan)
+```
+
+```
+## [1] 5822   86
+```
+
+```r
+?ifelse
+```
+
+```
+## starting httpd help server ... done
+```
+
+```r
+Caravan$Purchase=ifelse(Caravan$Purchase == "Yes", 1, 0)
+Caravan.train=Caravan[1:1000,]
+Caravan.test=Caravan[1001:nrow(Caravan),]
+dim(Caravan.train)
+```
+
+```
+## [1] 1000   86
+```
+
+```r
+dim(Caravan.test)
+```
+
+```
+## [1] 4822   86
+```
+
 ## (b) Fit a boosting model to the training set with Purchase as the response and the other variables as predictors. Use 1,000 trees, and a shrinkage value of 0.01. Which predictors appear to be the most important?
+
+```r
+set.seed(1)
+boost.Caravan=gbm(Purchase~.,data=Caravan.train,distribution="bernoulli",shrinkage=0.01,n.trees = 1000)
+```
+
+```
+## Warning in gbm.fit(x, y, offset = offset, distribution = distribution, w =
+## w, : variable 50: PVRAAUT has no variation.
+```
+
+```
+## Warning in gbm.fit(x, y, offset = offset, distribution = distribution, w =
+## w, : variable 71: AVRAAUT has no variation.
+```
+
+```r
+summary(boost.Caravan)
+```
+
+![](chapter8-2_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
+
+```
+##               var     rel.inf
+## PPERSAUT PPERSAUT 14.63504779
+## MKOOPKLA MKOOPKLA  9.47091649
+## MOPLHOOG MOPLHOOG  7.31457416
+## MBERMIDD MBERMIDD  6.08651965
+## PBRAND     PBRAND  4.66766122
+## MGODGE     MGODGE  4.49463264
+## ABRAND     ABRAND  4.32427755
+## MINK3045 MINK3045  4.17590619
+## MOSTYPE   MOSTYPE  2.86402583
+## PWAPART   PWAPART  2.78191075
+## MAUT1       MAUT1  2.61929152
+## MBERARBG MBERARBG  2.10480508
+## MSKA         MSKA  2.10185152
+## MAUT2       MAUT2  2.02172510
+## MSKC         MSKC  1.98684345
+## MINKGEM   MINKGEM  1.92122708
+## MGODPR     MGODPR  1.91777542
+## MBERHOOG MBERHOOG  1.80710618
+## MGODOV     MGODOV  1.78693913
+## PBYSTAND PBYSTAND  1.57279593
+## MSKB1       MSKB1  1.43551401
+## MFWEKIND MFWEKIND  1.37264255
+## MRELGE     MRELGE  1.20805179
+## MOPLMIDD MOPLMIDD  0.93791970
+## MINK7512 MINK7512  0.92590720
+## MINK4575 MINK4575  0.91745993
+## MGODRK     MGODRK  0.90765539
+## MFGEKIND MFGEKIND  0.85745374
+## MZPART     MZPART  0.82531066
+## MRELOV     MRELOV  0.80731252
+## MINKM30   MINKM30  0.74126812
+## MHKOOP     MHKOOP  0.73690793
+## MZFONDS   MZFONDS  0.71638323
+## MAUT0       MAUT0  0.71388052
+## MHHUUR     MHHUUR  0.59287247
+## APERSAUT APERSAUT  0.58056986
+## MOSHOOFD MOSHOOFD  0.58029563
+## MSKB2       MSKB2  0.53885275
+## PLEVEN     PLEVEN  0.53052444
+## MINK123M MINK123M  0.50660603
+## MBERARBO MBERARBO  0.48596479
+## MGEMOMV   MGEMOMV  0.47614792
+## PMOTSCO   PMOTSCO  0.46163590
+## MSKD         MSKD  0.39735297
+## MBERBOER MBERBOER  0.36417546
+## MGEMLEEF MGEMLEEF  0.26166240
+## MFALLEEN MFALLEEN  0.21448118
+## MBERZELF MBERZELF  0.15906143
+## MOPLLAAG MOPLLAAG  0.05263665
+## MAANTHUI MAANTHUI  0.03766014
+## MRELSA     MRELSA  0.00000000
+## PWABEDR   PWABEDR  0.00000000
+## PWALAND   PWALAND  0.00000000
+## PBESAUT   PBESAUT  0.00000000
+## PVRAAUT   PVRAAUT  0.00000000
+## PAANHANG PAANHANG  0.00000000
+## PTRACTOR PTRACTOR  0.00000000
+## PWERKT     PWERKT  0.00000000
+## PBROM       PBROM  0.00000000
+## PPERSONG PPERSONG  0.00000000
+## PGEZONG   PGEZONG  0.00000000
+## PWAOREG   PWAOREG  0.00000000
+## PZEILPL   PZEILPL  0.00000000
+## PPLEZIER PPLEZIER  0.00000000
+## PFIETS     PFIETS  0.00000000
+## PINBOED   PINBOED  0.00000000
+## AWAPART   AWAPART  0.00000000
+## AWABEDR   AWABEDR  0.00000000
+## AWALAND   AWALAND  0.00000000
+## ABESAUT   ABESAUT  0.00000000
+## AMOTSCO   AMOTSCO  0.00000000
+## AVRAAUT   AVRAAUT  0.00000000
+## AAANHANG AAANHANG  0.00000000
+## ATRACTOR ATRACTOR  0.00000000
+## AWERKT     AWERKT  0.00000000
+## ABROM       ABROM  0.00000000
+## ALEVEN     ALEVEN  0.00000000
+## APERSONG APERSONG  0.00000000
+## AGEZONG   AGEZONG  0.00000000
+## AWAOREG   AWAOREG  0.00000000
+## AZEILPL   AZEILPL  0.00000000
+## APLEZIER APLEZIER  0.00000000
+## AFIETS     AFIETS  0.00000000
+## AINBOED   AINBOED  0.00000000
+## ABYSTAND ABYSTAND  0.00000000
+```
+
+> PPERSAUT is the most important.
 
 ## (c) Use the boosting model to predict the response on the test data. Predict that a person will make a purchase if the estimated probability of purchase is greater than 20 %. Form a confusion matrix. What fraction of the people predicted to make a purchase do in fact make one? How does this compare with the results obtained from applying KNN or logistic regression to this data set?
 
+
+```r
+preds.boost=predict(boost.Caravan,newdata=Caravan.test,n.trees = 1000,type = "response")
+preds.boost=ifelse(preds.boost > 0.2, "yes", "no")
+table(Caravan.test$Purchase, preds.boost)
+```
+
+```
+##    preds.boost
+##       no  yes
+##   0 4410  123
+##   1  256   33
+```
+
+```r
+(4410+33)/4822
+```
+
+```
+## [1] 0.9214019
+```
+
+```r
+33/(123+33)
+```
+
+```
+## [1] 0.2115385
+```
+
+```r
+#logistic regression
+Caravan.logi=glm(Purchase~ ., data = Caravan.train, family = "binomial")
+```
+
+```
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+```
+
+```r
+preds.logi=predict(Caravan.logi, newdata=Caravan.test, type = "response")
+```
+
+```
+## Warning in predict.lm(object, newdata, se.fit, scale = 1, type =
+## ifelse(type == : prediction from a rank-deficient fit may be misleading
+```
+
+```r
+preds.logi=ifelse(preds.logi > .2, "yes", "no")
+table(Caravan.test$Purchase, preds.logi)
+```
+
+```
+##    preds.logi
+##       no  yes
+##   0 4183  350
+##   1  231   58
+```
+
+```r
+(4183+58)/4822
+```
+
+```
+## [1] 0.8795106
+```
+
+```r
+58/(350+58)
+```
+
+```
+## [1] 0.1421569
+```
+
 # 12. Apply boosting, bagging, and random forests to a data set of your choice. Be sure to ﬁt the models on a training set and to evaluate their performance on a test set. How accurate are the results compared to simple methods like linear or logistic regression? Which of these approaches yields the best performance?
+
+## Bagging and Random Forests
+
+
+```r
+# Bagging and Random Forests
+library(MASS)
+library(randomForest)
+#
+dim(Boston)
+```
+
+```
+## [1] 506  14
+```
+
+```r
+#
+set.seed(1)
+train = sample(1:nrow(Boston), nrow(Boston)/2)
+#
+obb.err=double(13)
+test.err=double(13)
+for(mtry in 1:13){
+  fit=randomForest(medv~.,data=Boston,subset=train,mtry=mtry,ntree=400)
+  obb.err[mtry]=fit$mse[400]
+  pred=predict(fit,Boston[-train,])
+  test.err[mtry]=with(Boston[-train,],mean((medv-pred)^2))
+  cat(mtry," ")
+}
+```
+
+```
+## 1  2  3  4  5  6  7  8  9  10  11  12  13
+```
+
+```r
+matplot(1:mtry,cbind(test.err,obb.err),pch = 19,col = c("red","blue"),type = "b",ylab = "Mean squared errors")
+legend("topright",legend = c("Test","OOB"),pch = 19,col = c("red","blue"))
+```
+
+![](chapter8-2_files/figure-html/unnamed-chunk-22-1.png)<!-- -->
+
+```r
+#
+
+bag.boston=randomForest(medv~.,data=Boston,subset=train,mtry=13,importance=TRUE)
+bag.boston
+```
+
+```
+## 
+## Call:
+##  randomForest(formula = medv ~ ., data = Boston, mtry = 13, importance = TRUE,      subset = train) 
+##                Type of random forest: regression
+##                      Number of trees: 500
+## No. of variables tried at each split: 13
+## 
+##           Mean of squared residuals: 10.31237
+##                     % Var explained: 87.51
+```
+
+```r
+yhat.bag = predict(bag.boston,newdata=Boston[-train,])
+plot(yhat.bag, boston.test)
+abline(0,1)
+```
+
+![](chapter8-2_files/figure-html/unnamed-chunk-22-2.png)<!-- -->
+
+```r
+mean((yhat.bag-boston.test)^2)
+```
+
+```
+## [1] 13.26379
+```
+
+```r
+bag.boston=randomForest(medv~.,data=Boston,subset=train,mtry=13,ntree=25)
+yhat.bag = predict(bag.boston,newdata=Boston[-train,])
+mean((yhat.bag-boston.test)^2)
+```
+
+```
+## [1] 15.20602
+```
+
+```r
+set.seed(1)
+rf.boston=randomForest(medv~.,data=Boston,subset=train,mtry=6,importance=TRUE)
+yhat.rf = predict(rf.boston,newdata=Boston[-train,])
+mean((yhat.rf-boston.test)^2)
+```
+
+```
+## [1] 11.66454
+```
+
+```r
+importance(rf.boston)
+```
+
+```
+##           %IncMSE IncNodePurity
+## crim    12.132320     986.50338
+## zn       1.955579      57.96945
+## indus    9.069302     882.78261
+## chas     2.210835      45.22941
+## nox     11.104823    1044.33776
+## rm      31.784033    6359.31971
+## age     10.962684     516.82969
+## dis     15.015236    1224.11605
+## rad      4.118011      95.94586
+## tax      8.587932     502.96719
+## ptratio 12.503896     830.77523
+## black    6.702609     341.30361
+## lstat   30.695224    7505.73936
+```
+
+```r
+varImpPlot(rf.boston)
+```
+
+![](chapter8-2_files/figure-html/unnamed-chunk-22-3.png)<!-- -->
+
+## Boosting
+
+
+```r
+library(gbm)
+#
+boost.boston.v=gbm(medv~.,data=Boston[train,],distribution="gaussian",n.trees=10000,shrinkage = 0.01,interaction.depth=4)
+summary(boost.boston.v)
+```
+
+![](chapter8-2_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
+
+```
+##             var    rel.inf
+## lstat     lstat 38.9726171
+## rm           rm 25.3463087
+## dis         dis  9.9651290
+## crim       crim  6.4526734
+## black     black  4.5367354
+## age         age  3.9985809
+## nox         nox  3.6256050
+## ptratio ptratio  2.5123317
+## tax         tax  1.6797030
+## indus     indus  1.6485092
+## chas       chas  0.6820674
+## rad         rad  0.4499396
+## zn           zn  0.1297996
+```
+
+```r
+plot(boost.boston.v,i="lstat")
+```
+
+![](chapter8-2_files/figure-html/unnamed-chunk-23-2.png)<!-- -->
+
+```r
+plot(boost.boston.v,i="rm")
+```
+
+![](chapter8-2_files/figure-html/unnamed-chunk-23-3.png)<!-- -->
+
+```r
+#
+
+set.seed(1)
+boost.boston=gbm(medv~.,data=Boston[train,],distribution="gaussian",n.trees=5000,interaction.depth=4)
+summary(boost.boston)
+```
+
+![](chapter8-2_files/figure-html/unnamed-chunk-23-4.png)<!-- -->
+
+```
+##             var    rel.inf
+## lstat     lstat 45.9627334
+## rm           rm 31.2238187
+## dis         dis  6.8087398
+## crim       crim  4.0743784
+## nox         nox  2.5605001
+## ptratio ptratio  2.2748652
+## black     black  1.7971159
+## age         age  1.6488532
+## tax         tax  1.3595005
+## indus     indus  1.2705924
+## chas       chas  0.8014323
+## rad         rad  0.2026619
+## zn           zn  0.0148083
+```
+
+```r
+par(mfrow=c(1,2))
+plot(boost.boston,i="rm")
+plot(boost.boston,i="lstat")
+```
+
+![](chapter8-2_files/figure-html/unnamed-chunk-23-5.png)<!-- -->
+
+```r
+yhat.boost=predict(boost.boston,newdata=Boston[-train,],n.trees=5000)
+mean((yhat.boost-boston.test)^2)
+```
+
+```
+## [1] 11.84434
+```
+
+```r
+boost.boston=gbm(medv~.,data=Boston[train,],distribution="gaussian",n.trees=5000,interaction.depth=4,shrinkage=0.2,verbose=F)
+yhat.boost=predict(boost.boston,newdata=Boston[-train,],n.trees=5000)
+mean((yhat.boost-boston.test)^2)
+```
+
+```
+## [1] 11.51109
+```
+
+```r
+#
+n.trees=seq(from=100,to=10000,by=100)
+predmat=predict(boost.boston,newdata=Boston[-train,],n.trees=n.trees)
+```
+
+```
+## Warning in predict.gbm(boost.boston, newdata = Boston[-train, ], n.trees
+## = n.trees): Number of trees not specified or exceeded number fit so far.
+## Using 100 200 300 400 500 600 700 800 900 1000 1100 1200 1300 1400 1500
+## 1600 1700 1800 1900 2000 2100 2200 2300 2400 2500 2600 2700 2800 2900 3000
+## 3100 3200 3300 3400 3500 3600 3700 3800 3900 4000 4100 4200 4300 4400 4500
+## 4600 4700 4800 4900 5000 5000 5000 5000 5000 5000 5000 5000 5000 5000 5000
+## 5000 5000 5000 5000 5000 5000 5000 5000 5000 5000 5000 5000 5000 5000 5000
+## 5000 5000 5000 5000 5000 5000 5000 5000 5000 5000 5000 5000 5000 5000 5000
+## 5000 5000 5000 5000 5000 5000 5000 5000 5000 5000.
+```
+
+```r
+dim(predmat)
+```
+
+```
+## [1] 253 100
+```
+
+```r
+berr=with(Boston[-train,],apply((predmat-medv)^2,2,mean))
+plot(n.trees,berr,pch=19,ylab = "Mean squared errors",xlab = "# Trees",main =" Bossting Test Error")
+abline(h=min(test.err),col="red")
+
+matplot(1:mtry,cbind(test.err,obb.err),pch = 19,col = c("red","blue"),type = "b",ylab = "Mean squared errors")
+legend("topright",legend = c("Test","OOB"),pch = 19,col = c("red","blue"))
+abline(h=min(test.err),col="red")
+```
+
+![](chapter8-2_files/figure-html/unnamed-chunk-23-6.png)<!-- -->
+
+```r
+#
+```
+
+
+#logistic regression
+
+
+```r
+#logistic regression
+Boston.logi=glm(medv~ ., data=Boston, subset=train)
+preds.logi=predict(Boston.logi,newdata=Boston[-train,], type = "response")
+mean((preds.logi-boston.test)^2)
+```
+
+```
+## [1] 26.28676
+```
+
+
+> Boosting yields the best performance

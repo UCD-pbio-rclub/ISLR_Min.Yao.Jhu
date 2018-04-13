@@ -197,6 +197,43 @@ sum(X)/10
 
 # 7. In the lab, we applied random forests to the Boston data using mtry=6 and using ntree=25 and ntree=500. Create a plot displaying the test error resulting from random forests on this data set for a more comprehensive range of values for mtry and ntree. You can model your plot after Figure 8.10. Describe the results obtained.
 
+```{r}
+library(MASS)
+library(randomForest)
+dim(Boston)
+
+set.seed(1)
+train = sample(1:nrow(Boston), nrow(Boston)/2)
+#mtry
+obb.err=double(13)
+test.err=double(13)
+for(mtry in 1:13){
+  fit=randomForest(medv~.,data=Boston,subset=train,mtry=mtry,ntree=400)
+  obb.err[mtry]=fit$mse[400]
+  pred=predict(fit,Boston[-train,])
+  test.err[mtry]=with(Boston[-train,],mean((medv-pred)^2))
+  cat(mtry," ")
+}
+matplot(1:mtry,cbind(test.err,obb.err),pch = 19,col = c("red","blue"),type = "b",ylab = "Mean squared errors")
+legend("topright",legend = c("Test","OOB"),pch = 19,col = c("red","blue"))
+#
+#ntree
+obb.err2=double(10)
+test.err2=double(10)
+for(ntree in 1:50){
+  fit=randomForest(medv~.,data=Boston,subset=train,mtry=5,ntree=ntree)
+  obb.err2[ntree]=fit$mse[5]
+  pred2=predict(fit,Boston[-train,])
+  test.err2[ntree]=with(Boston[-train,],mean((medv-pred2)^2))
+  cat(ntree," ")
+}
+matplot(1:ntree,cbind(test.err2,obb.err2),pch = 19,col = c("red","blue"),type = "b",ylab = "Mean squared errors")
+legend("topright",legend = c("Test","OOB"),pch = 19,col = c("red","blue"))
+#
+
+
+
+```
 
 
 # 8. In the lab, a classiﬁcation tree was applied to the Carseats data set after converting Sales into a qualitative response variable. Now we will seek to predict Sales using regression trees and related approaches, treating the response as a quantitative variable. 
@@ -249,28 +286,260 @@ mean((yhat-Sales.test)^2)
 
 > MSE = 4.419579, better
 
+## (d) Use the bagging approach in order to analyze this data. What test MSE do you obtain? Use the importance() function to determine which variables are most important.
+
+```{r}
+set.seed(1)
+rf.carseats=randomForest(Sales~.-High,data=Carseats.train,mtry=10,importance=TRUE)
+yhat.rf=predict(rf.carseats,newdata=Carseats.test)
+mean((yhat.rf-Sales.test)^2)
+
+importance(rf.carseats)
+varImpPlot(rf.carseats)
+```
+
+
+## (e) Use random forests to analyze this data. What test MSE do you obtain? Use the importance() function to determine which variables are most important. Describe the eﬀect of m, the number of variables considered at each split, on the error rate obtained.
+
+```{r}
+set.seed(1)
+rf.carseats=randomForest(Sales~.-High,data=Carseats.train,importance=TRUE)
+yhat.rf=predict(rf.carseats,newdata=Carseats.test)
+mean((yhat.rf-Sales.test)^2)
+
+importance(rf.carseats)
+varImpPlot(rf.carseats)
+```
+
+
 # 10. We now use boosting to predict Salary in the Hitters data set.
 
 ## (a) Remove the observations for whom the salary information is unknown, and then log-transform the salaries.
 
+```{r}
+library(ISLR)
+summary(Hitters)
+new.Hitters=na.omit(Hitters)
+summary(new.Hitters)
+logSalary=log(new.Hitters$Salary)
+new.Hitters2=data.frame(new.Hitters,logSalary)
+summary(new.Hitters2)
+
+```
+
+
 ## (b) Create a training set consisting of the ﬁrst 200 observations, and a test set consisting of the remaining observations.
+
+```{r}
+dim(new.Hitters2)
+new.hitters.train=new.Hitters2[1:200,]
+new.hitters.test=new.Hitters2[201:nrow(new.Hitters2),]
+dim(new.hitters.train)
+dim(new.hitters.test)
+```
+
 
 ## (c) Perform boosting on the training set with 1,000 trees for a range of values of the shrinkage parameter λ. Produce a plot with diﬀerent shrinkage values on the x-axis and the corresponding training set MSE on the y-axis.
 
+```{r}
+library(gbm)
+shrinkage=seq(0.001,0.2,0.001)
+train.err=double(200)
+test.err=double(200)
+for(s in shrinkage){
+  boost.hitters=gbm(logSalary~.-Salary, data=new.hitters.train, distribution="gaussian", n.trees=1000, shrinkage=s)
+  yhat.boost=predict(boost.hitters, newdata=new.hitters.test, n.trees=1000)
+  train.err[s*1000] <- mean((boost.hitters$train.error)^2)
+  test.err[s*1000] <- mean((yhat.boost-new.hitters.test$logSalary)^2)
+}
+plot(data.frame(shrinkage,train.err),type = "b",ylab = "Mean squared errors")
+
+
+
+```
+
+
 ## (d) Produce a plot with diﬀerent shrinkage values on the x-axis and the corresponding test set MSE on the y-axis.
+
+```{r}
+plot(data.frame(shrinkage,test.err),type = "l",ylab = "Mean squared errors")
+
+```
+
 
 ## (e) Compare the test MSE of boosting to the test MSE that results from applying two of the regression approaches seen in Chapters 3 and 6.
 
+```{r}
+set.seed(1)
+boost.hitters=gbm(logSalary~.-Salary, data=new.hitters.train, distribution="gaussian", n.trees=1000, shrinkage=0.01)
+yhat.boost <- predict(boost.hitters, newdata=new.hitters.test, n.trees = 1000)
+mean((yhat.boost - new.hitters.test$logSalary)^2)
+
+hitters.lm=lm(logSalary ~ .-Salary, data=new.hitters.train)
+yhat.lm=predict(hitters.lm, newdata=new.hitters.test)
+mean((yhat.lm - new.hitters.test$logSalary)^2)
+
+```
+
+
 ## (f) Which variables appear to be the most important predictors in the boosted model?
 
+```{r}
+summary(boost.hitters)
+```
+
+
 ## (g) Now apply bagging to the training set. What is the test set MSE for this approach?
+
+```{r}
+library(randomForest)
+dim(new.hitters.train)
+bag.hitters=randomForest(logSalary~.-Salary, data=new.hitters.train, mtry = 19, importance = TRUE)
+yhat.bag=predict(bag.hitters, newdata=new.hitters.test)
+mean((yhat.bag-new.hitters.test$logSalary)^2)
+importance(bag.hitters)
+varImpPlot(bag.hitters)
+
+```
 
 # 11. This question uses the Caravan data set.
 
 ## (a) Create a training set consisting of the ﬁrst 1,000 observations, and a test set consisting of the remaining observations.
+```{r}
+summary(Caravan)
+dim(Caravan)
+?ifelse
+Caravan$Purchase=ifelse(Caravan$Purchase == "Yes", 1, 0)
+Caravan.train=Caravan[1:1000,]
+Caravan.test=Caravan[1001:nrow(Caravan),]
+dim(Caravan.train)
+dim(Caravan.test)
+```
 
 ## (b) Fit a boosting model to the training set with Purchase as the response and the other variables as predictors. Use 1,000 trees, and a shrinkage value of 0.01. Which predictors appear to be the most important?
+```{r}
+set.seed(1)
+boost.Caravan=gbm(Purchase~.,data=Caravan.train,distribution="bernoulli",shrinkage=0.01,n.trees = 1000)
+summary(boost.Caravan)
+```
+
+> PPERSAUT is the most important.
 
 ## (c) Use the boosting model to predict the response on the test data. Predict that a person will make a purchase if the estimated probability of purchase is greater than 20 %. Form a confusion matrix. What fraction of the people predicted to make a purchase do in fact make one? How does this compare with the results obtained from applying KNN or logistic regression to this data set?
 
+```{r}
+preds.boost=predict(boost.Caravan,newdata=Caravan.test,n.trees = 1000,type = "response")
+preds.boost=ifelse(preds.boost > 0.2, "yes", "no")
+table(Caravan.test$Purchase, preds.boost)
+(4410+33)/4822
+33/(123+33)
+
+#logistic regression
+Caravan.logi=glm(Purchase~ ., data = Caravan.train, family = "binomial")
+preds.logi=predict(Caravan.logi, newdata=Caravan.test, type = "response")
+preds.logi=ifelse(preds.logi > .2, "yes", "no")
+table(Caravan.test$Purchase, preds.logi)
+
+(4183+58)/4822
+58/(350+58)
+```
+
 # 12. Apply boosting, bagging, and random forests to a data set of your choice. Be sure to ﬁt the models on a training set and to evaluate their performance on a test set. How accurate are the results compared to simple methods like linear or logistic regression? Which of these approaches yields the best performance?
+
+## Bagging and Random Forests
+
+```{r}
+# Bagging and Random Forests
+library(MASS)
+library(randomForest)
+#
+dim(Boston)
+#
+set.seed(1)
+train = sample(1:nrow(Boston), nrow(Boston)/2)
+#
+obb.err=double(13)
+test.err=double(13)
+for(mtry in 1:13){
+  fit=randomForest(medv~.,data=Boston,subset=train,mtry=mtry,ntree=400)
+  obb.err[mtry]=fit$mse[400]
+  pred=predict(fit,Boston[-train,])
+  test.err[mtry]=with(Boston[-train,],mean((medv-pred)^2))
+  cat(mtry," ")
+}
+matplot(1:mtry,cbind(test.err,obb.err),pch = 19,col = c("red","blue"),type = "b",ylab = "Mean squared errors")
+legend("topright",legend = c("Test","OOB"),pch = 19,col = c("red","blue"))
+#
+
+bag.boston=randomForest(medv~.,data=Boston,subset=train,mtry=13,importance=TRUE)
+bag.boston
+
+yhat.bag = predict(bag.boston,newdata=Boston[-train,])
+plot(yhat.bag, boston.test)
+abline(0,1)
+mean((yhat.bag-boston.test)^2)
+
+bag.boston=randomForest(medv~.,data=Boston,subset=train,mtry=13,ntree=25)
+yhat.bag = predict(bag.boston,newdata=Boston[-train,])
+mean((yhat.bag-boston.test)^2)
+
+set.seed(1)
+rf.boston=randomForest(medv~.,data=Boston,subset=train,mtry=6,importance=TRUE)
+yhat.rf = predict(rf.boston,newdata=Boston[-train,])
+mean((yhat.rf-boston.test)^2)
+
+importance(rf.boston)
+varImpPlot(rf.boston)
+```
+
+## Boosting
+
+```{r}
+library(gbm)
+#
+boost.boston.v=gbm(medv~.,data=Boston[train,],distribution="gaussian",n.trees=10000,shrinkage = 0.01,interaction.depth=4)
+summary(boost.boston.v)
+plot(boost.boston.v,i="lstat")
+plot(boost.boston.v,i="rm")
+#
+
+set.seed(1)
+boost.boston=gbm(medv~.,data=Boston[train,],distribution="gaussian",n.trees=5000,interaction.depth=4)
+summary(boost.boston)
+
+par(mfrow=c(1,2))
+plot(boost.boston,i="rm")
+plot(boost.boston,i="lstat")
+
+yhat.boost=predict(boost.boston,newdata=Boston[-train,],n.trees=5000)
+mean((yhat.boost-boston.test)^2)
+
+boost.boston=gbm(medv~.,data=Boston[train,],distribution="gaussian",n.trees=5000,interaction.depth=4,shrinkage=0.2,verbose=F)
+yhat.boost=predict(boost.boston,newdata=Boston[-train,],n.trees=5000)
+mean((yhat.boost-boston.test)^2)
+#
+n.trees=seq(from=100,to=10000,by=100)
+predmat=predict(boost.boston,newdata=Boston[-train,],n.trees=n.trees)
+dim(predmat)
+berr=with(Boston[-train,],apply((predmat-medv)^2,2,mean))
+plot(n.trees,berr,pch=19,ylab = "Mean squared errors",xlab = "# Trees",main =" Bossting Test Error")
+abline(h=min(test.err),col="red")
+
+matplot(1:mtry,cbind(test.err,obb.err),pch = 19,col = c("red","blue"),type = "b",ylab = "Mean squared errors")
+legend("topright",legend = c("Test","OOB"),pch = 19,col = c("red","blue"))
+abline(h=min(test.err),col="red")
+#
+```
+
+
+#logistic regression
+
+```{r}
+#logistic regression
+Boston.logi=glm(medv~ ., data=Boston, subset=train)
+preds.logi=predict(Boston.logi,newdata=Boston[-train,], type = "response")
+mean((preds.logi-boston.test)^2)
+```
+
+
+> Boosting yields the best performance

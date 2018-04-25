@@ -13,6 +13,76 @@ output:
 
 
 ```r
+#video
+set.seed(10111)
+x=matrix(rnorm(40),20,2)
+y=rep(c(-1,1),c(10,10))
+x[y==1,]=x[y==1,] + 1
+plot(x, col=y+3,pch=19)
+```
+
+![](chpater9-1_files/figure-html/unnamed-chunk-1-1.png)<!-- -->
+
+```r
+library(e1071)
+dat=data.frame(x,y=as.factor(y))
+svmfit=svm(y~., data=dat, kernel="linear", cost=10,scale=FALSE)
+print(svmfit)
+```
+
+```
+## 
+## Call:
+## svm(formula = y ~ ., data = dat, kernel = "linear", cost = 10, 
+##     scale = FALSE)
+## 
+## 
+## Parameters:
+##    SVM-Type:  C-classification 
+##  SVM-Kernel:  linear 
+##        cost:  10 
+##       gamma:  0.5 
+## 
+## Number of Support Vectors:  6
+```
+
+```r
+plot(svmfit, dat)
+```
+
+![](chpater9-1_files/figure-html/unnamed-chunk-1-2.png)<!-- -->
+
+```r
+make.grid=function(x,n=75){
+  grange=apply(x,2,range)
+  x1=seq(from=grange[1,1],to=grange[2,1],length=n)
+  x2=seq(from=grange[1,2],to=grange[2,2],length=n)
+  expand.grid(X1=x1,X2=x2)
+}
+xgrid=make.grid(x)
+ygrid=predict(svmfit,xgrid)
+plot(xgrid,col=c("red","blue")[as.numeric(ygrid)],pch=20,cex=.2)
+points(x,col=y+3,pch=19)
+points(x[svmfit$index,],pch=5,cex=2)
+```
+
+![](chpater9-1_files/figure-html/unnamed-chunk-1-3.png)<!-- -->
+
+```r
+beta=drop(t(svmfit$coefs)%*%x[svmfit$index,])
+beta0=svmfit$rho
+plot(xgrid,col=c("red","blue")[as.numeric(ygrid)],pch=20,cex=.2)
+points(x,col=y+3,pch=19)
+points(x[svmfit$index,],pch=5,cex=2)
+abline(beta0/beta[2],-beta[1]/beta[2])
+abline((beta0-1)/beta[2],-beta[1]/beta[2],lty=2)
+abline((beta0+1)/beta[2],-beta[1]/beta[2],lty=2)
+```
+
+![](chpater9-1_files/figure-html/unnamed-chunk-1-4.png)<!-- -->
+
+```r
+#
 set.seed(1)
 x=matrix(rnorm(20*2), ncol=2)
 y=c(rep(-1,10), rep(1,10))
@@ -20,16 +90,17 @@ x[y==1,]=x[y==1,] + 1
 plot(x, col=(3-y))
 ```
 
-![](chpater9-1_files/figure-html/unnamed-chunk-1-1.png)<!-- -->
+![](chpater9-1_files/figure-html/unnamed-chunk-1-5.png)<!-- -->
 
 ```r
 dat=data.frame(x=x, y=as.factor(y))
+
 library(e1071)
 svmfit=svm(y~., data=dat, kernel="linear", cost=10,scale=FALSE)
 plot(svmfit, dat)
 ```
 
-![](chpater9-1_files/figure-html/unnamed-chunk-1-2.png)<!-- -->
+![](chpater9-1_files/figure-html/unnamed-chunk-1-6.png)<!-- -->
 
 ```r
 svmfit$index
@@ -72,7 +143,7 @@ svmfit=svm(y~., data=dat, kernel="linear", cost=0.1,scale=FALSE)
 plot(svmfit, dat)
 ```
 
-![](chpater9-1_files/figure-html/unnamed-chunk-1-3.png)<!-- -->
+![](chpater9-1_files/figure-html/unnamed-chunk-1-7.png)<!-- -->
 
 ```r
 svmfit$index
@@ -174,7 +245,7 @@ x[y==1,]=x[y==1,]+0.5
 plot(x, col=(y+5)/2, pch=19)
 ```
 
-![](chpater9-1_files/figure-html/unnamed-chunk-1-4.png)<!-- -->
+![](chpater9-1_files/figure-html/unnamed-chunk-1-8.png)<!-- -->
 
 ```r
 dat=data.frame(x=x,y=as.factor(y))
@@ -209,7 +280,7 @@ summary(svmfit)
 plot(svmfit, dat)
 ```
 
-![](chpater9-1_files/figure-html/unnamed-chunk-1-5.png)<!-- -->
+![](chpater9-1_files/figure-html/unnamed-chunk-1-9.png)<!-- -->
 
 ```r
 svmfit=svm(y~., data=dat, kernel="linear", cost=1)
@@ -243,7 +314,7 @@ summary(svmfit)
 plot(svmfit,dat)
 ```
 
-![](chpater9-1_files/figure-html/unnamed-chunk-1-6.png)<!-- -->
+![](chpater9-1_files/figure-html/unnamed-chunk-1-10.png)<!-- -->
 
 # Support Vector Machine
 

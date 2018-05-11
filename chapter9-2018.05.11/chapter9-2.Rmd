@@ -42,8 +42,7 @@ xgrid=make.grid(x)
 ygrid=predict(fit,xgrid)
 plot(xgrid,col=as.numeric(ygrid),pch=20,cex=.2)
 points(x,col=y+1,pch=19)
-xgrid
-
+#xgrid
 #contour(xgrid$X1,xgrid$X2,matrix(func,69,99),level = 0, add=TRUE)
 #contour(X1,X2,matrix(prob,69,99),level = 0.5, add=TRUE, col="blue",lwd = 2)
 ```

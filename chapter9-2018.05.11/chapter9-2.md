@@ -7166,7 +7166,7 @@ dim(testdata)
 
 
 ```r
-svmfit=svm(Purchase~.,data=traindata, kernel = "linear", cost = 0.01, scale=FALSE)
+svmfit=svm(Purchase~.,data=traindata, kernel = "linear", cost = 0.01, scale=TRUE)
 summary(svmfit)
 ```
 
@@ -7174,7 +7174,7 @@ summary(svmfit)
 ## 
 ## Call:
 ## svm(formula = Purchase ~ ., data = traindata, kernel = "linear", 
-##     cost = 0.01, scale = FALSE)
+##     cost = 0.01, scale = TRUE)
 ## 
 ## 
 ## Parameters:
@@ -7183,9 +7183,9 @@ summary(svmfit)
 ##        cost:  0.01 
 ##       gamma:  0.05555556 
 ## 
-## Number of Support Vectors:  615
+## Number of Support Vectors:  432
 ## 
-##  ( 306 309 )
+##  ( 215 217 )
 ## 
 ## 
 ## Number of Classes:  2 
@@ -7206,16 +7206,16 @@ table(predict=pred, truth=traindata$Purchase)
 ```
 ##        truth
 ## predict  CH  MM
-##      CH 473 189
-##      MM  21 117
+##      CH 439  78
+##      MM  55 228
 ```
 
 ```r
-(1-(473+117)/800)*100
+(1-(439+228)/800)*100
 ```
 
 ```
-## [1] 26.25
+## [1] 16.625
 ```
 
 ```r
@@ -7227,16 +7227,16 @@ table(predict=pred, truth=testdata$Purchase)
 ```
 ##        truth
 ## predict  CH  MM
-##      CH 156  68
-##      MM   3  43
+##      CH 141  31
+##      MM  18  80
 ```
 
 ```r
-(1-(156+43)/270)*100
+(1-(141+80)/270)*100
 ```
 
 ```
-## [1] 26.2963
+## [1] 18.14815
 ```
 
 ### (d) Use the tune() function to select an optimal cost. Consider values in the range 0.01 to 10.
@@ -7244,7 +7244,7 @@ table(predict=pred, truth=testdata$Purchase)
 
 ```r
 set.seed(11)
-tune.out=tune(svm, Purchase~., data=traindata, kernel="linear", ranges=list(cost=c(0.01,0.1,1,10)))
+tune.out=tune(svm, Purchase~., data=traindata, scale=TRUE, kernel="linear", ranges=list(cost=c(0.01,0.1,1,10)))
 summary(tune.out)
 ```
 
@@ -7277,7 +7277,8 @@ summary(bestmod)
 ## 
 ## Call:
 ## best.tune(method = svm, train.x = Purchase ~ ., data = traindata, 
-##     ranges = list(cost = c(0.01, 0.1, 1, 10)), kernel = "linear")
+##     ranges = list(cost = c(0.01, 0.1, 1, 10)), scale = TRUE, 
+##     kernel = "linear")
 ## 
 ## 
 ## Parameters:
@@ -7342,17 +7343,409 @@ table(predict=pred, truth=testdata$Purchase)
 ## [1] 18.88889
 ```
 
+> 18.89%
+
 ### (f) Repeat parts (b) through (e) using a support vector machine with a radial kernel. Use the default value for gamma.
 
 
+```r
+#b
+svmfit=svm(Purchase~.,data=traindata, kernel = "radial", cost = 0.01, scale=TRUE)
+summary(svmfit)
+```
 
+```
+## 
+## Call:
+## svm(formula = Purchase ~ ., data = traindata, kernel = "radial", 
+##     cost = 0.01, scale = TRUE)
+## 
+## 
+## Parameters:
+##    SVM-Type:  C-classification 
+##  SVM-Kernel:  radial 
+##        cost:  0.01 
+##       gamma:  0.05555556 
+## 
+## Number of Support Vectors:  617
+## 
+##  ( 306 311 )
+## 
+## 
+## Number of Classes:  2 
+## 
+## Levels: 
+##  CH MM
+```
+
+```r
+#c
+# training
+pred=predict(svmfit,traindata)
+table(predict=pred, truth=traindata$Purchase)
+```
+
+```
+##        truth
+## predict  CH  MM
+##      CH 494 306
+##      MM   0   0
+```
+
+```r
+(1-(494+0)/800)*100
+```
+
+```
+## [1] 38.25
+```
+
+```r
+# test
+pred=predict(svmfit,testdata)
+table(predict=pred, truth=testdata$Purchase)
+```
+
+```
+##        truth
+## predict  CH  MM
+##      CH 159 111
+##      MM   0   0
+```
+
+```r
+(1-(159+0)/270)*100
+```
+
+```
+## [1] 41.11111
+```
+
+
+```r
+#d
+set.seed(11)
+tune.out=tune(svm, Purchase~., data=traindata, kernel="radial", scale=TRUE, ranges=list(cost=c(0.01,0.1,1,10),gamma=c(0.1,0.5,1,2,3,4)))
+summary(tune.out)
+```
+
+```
+## 
+## Parameter tuning of 'svm':
+## 
+## - sampling method: 10-fold cross validation 
+## 
+## - best parameters:
+##  cost gamma
+##     1   0.1
+## 
+## - best performance: 0.1825 
+## 
+## - Detailed performance results:
+##     cost gamma   error dispersion
+## 1   0.01   0.1 0.38250 0.07777282
+## 2   0.10   0.1 0.18875 0.05350558
+## 3   1.00   0.1 0.18250 0.02898755
+## 4  10.00   0.1 0.18750 0.02946278
+## 5   0.01   0.5 0.38250 0.07777282
+## 6   0.10   0.5 0.28500 0.06258328
+## 7   1.00   0.5 0.20125 0.03606033
+## 8  10.00   0.5 0.20750 0.03184162
+## 9   0.01   1.0 0.38250 0.07777282
+## 10  0.10   1.0 0.33500 0.07723521
+## 11  1.00   1.0 0.21375 0.03356689
+## 12 10.00   1.0 0.23500 0.03162278
+## 13  0.01   2.0 0.38250 0.07777282
+## 14  0.10   2.0 0.36250 0.07971303
+## 15  1.00   2.0 0.22625 0.04427267
+## 16 10.00   2.0 0.24500 0.03641962
+## 17  0.01   3.0 0.38250 0.07777282
+## 18  0.10   3.0 0.37875 0.07928719
+## 19  1.00   3.0 0.23000 0.03593976
+## 20 10.00   3.0 0.24000 0.04073969
+## 21  0.01   4.0 0.38250 0.07777282
+## 22  0.10   4.0 0.38125 0.07933097
+## 23  1.00   4.0 0.24000 0.03670453
+## 24 10.00   4.0 0.23500 0.03670453
+```
+
+```r
+bestmod=tune.out$best.model
+summary(bestmod)
+```
+
+```
+## 
+## Call:
+## best.tune(method = svm, train.x = Purchase ~ ., data = traindata, 
+##     ranges = list(cost = c(0.01, 0.1, 1, 10), gamma = c(0.1, 
+##         0.5, 1, 2, 3, 4)), kernel = "radial", scale = TRUE)
+## 
+## 
+## Parameters:
+##    SVM-Type:  C-classification 
+##  SVM-Kernel:  radial 
+##        cost:  1 
+##       gamma:  0.1 
+## 
+## Number of Support Vectors:  380
+## 
+##  ( 185 195 )
+## 
+## 
+## Number of Classes:  2 
+## 
+## Levels: 
+##  CH MM
+```
+
+```r
+#e
+# training
+pred=predict(bestmod,traindata)
+table(predict=pred, truth=traindata$Purchase)
+```
+
+```
+##        truth
+## predict  CH  MM
+##      CH 455  75
+##      MM  39 231
+```
+
+```r
+(1-(455+231)/800)*100
+```
+
+```
+## [1] 14.25
+```
+
+```r
+# test
+pred=predict(bestmod,testdata)
+table(predict=pred, truth=testdata$Purchase)
+```
+
+```
+##        truth
+## predict  CH  MM
+##      CH 142  28
+##      MM  17  83
+```
+
+```r
+(1-(142+83)/270)*100
+```
+
+```
+## [1] 16.66667
+```
+
+> 16.67%
 
 ### (g) Repeat parts (b) through (e) using a support vector machine with a polynomial kernel. Set degree=2.
 
 
+```r
+#b
+svmfit=svm(Purchase~.,data=traindata, kernel = "polynomial", degree=2, cost = 0.01, scale=FALSE)
+summary(svmfit)
+```
 
+```
+## 
+## Call:
+## svm(formula = Purchase ~ ., data = traindata, kernel = "polynomial", 
+##     degree = 2, cost = 0.01, scale = FALSE)
+## 
+## 
+## Parameters:
+##    SVM-Type:  C-classification 
+##  SVM-Kernel:  polynomial 
+##        cost:  0.01 
+##      degree:  2 
+##       gamma:  0.05555556 
+##      coef.0:  0 
+## 
+## Number of Support Vectors:  331
+## 
+##  ( 165 166 )
+## 
+## 
+## Number of Classes:  2 
+## 
+## Levels: 
+##  CH MM
+```
+
+```r
+#c
+# training
+pred=predict(svmfit,traindata)
+table(predict=pred, truth=traindata$Purchase)
+```
+
+```
+##        truth
+## predict  CH  MM
+##      CH 438  71
+##      MM  56 235
+```
+
+```r
+(1-(438+235)/800)*100
+```
+
+```
+## [1] 15.875
+```
+
+```r
+# test
+pred=predict(svmfit,testdata)
+table(predict=pred, truth=testdata$Purchase)
+```
+
+```
+##        truth
+## predict  CH  MM
+##      CH 140  31
+##      MM  19  80
+```
+
+```r
+(1-(140+80)/270)*100
+```
+
+```
+## [1] 18.51852
+```
+
+
+```r
+#d
+set.seed(11)
+tune.out=tune(svm, Purchase~., data=traindata, scale=TRUE, kernel="polynomial", ranges=list(cost=c(0.01,0.1,1,10),degree=c(1,2,3,4,5)))
+summary(tune.out)
+```
+
+```
+## 
+## Parameter tuning of 'svm':
+## 
+## - sampling method: 10-fold cross validation 
+## 
+## - best parameters:
+##  cost degree
+##     1      1
+## 
+## - best performance: 0.1675 
+## 
+## - Detailed performance results:
+##     cost degree   error dispersion
+## 1   0.01      1 0.38250 0.07777282
+## 2   0.10      1 0.16875 0.02716334
+## 3   1.00      1 0.16750 0.02648375
+## 4  10.00      1 0.16750 0.02443813
+## 5   0.01      2 0.38250 0.07777282
+## 6   0.10      2 0.32750 0.06866788
+## 7   1.00      2 0.19625 0.04251225
+## 8  10.00      2 0.17500 0.03435921
+## 9   0.01      3 0.36750 0.07364517
+## 10  0.10      3 0.30500 0.06406377
+## 11  1.00      3 0.18750 0.03864008
+## 12 10.00      3 0.18875 0.02598744
+## 13  0.01      4 0.36750 0.07364517
+## 14  0.10      4 0.32000 0.06851602
+## 15  1.00      4 0.24000 0.04993051
+## 16 10.00      4 0.19625 0.03387579
+## 17  0.01      5 0.37250 0.06816035
+## 18  0.10      5 0.32750 0.06582806
+## 19  1.00      5 0.24250 0.04571956
+## 20 10.00      5 0.21375 0.02913689
+```
+
+```r
+bestmod=tune.out$best.model
+summary(bestmod)
+```
+
+```
+## 
+## Call:
+## best.tune(method = svm, train.x = Purchase ~ ., data = traindata, 
+##     ranges = list(cost = c(0.01, 0.1, 1, 10), degree = c(1, 2, 
+##         3, 4, 5)), scale = TRUE, kernel = "polynomial")
+## 
+## 
+## Parameters:
+##    SVM-Type:  C-classification 
+##  SVM-Kernel:  polynomial 
+##        cost:  1 
+##      degree:  1 
+##       gamma:  0.05555556 
+##      coef.0:  0 
+## 
+## Number of Support Vectors:  352
+## 
+##  ( 176 176 )
+## 
+## 
+## Number of Classes:  2 
+## 
+## Levels: 
+##  CH MM
+```
+
+```r
+#e
+# training
+pred=predict(bestmod,traindata)
+table(predict=pred, truth=traindata$Purchase)
+```
+
+```
+##        truth
+## predict  CH  MM
+##      CH 439  73
+##      MM  55 233
+```
+
+```r
+(1-(439+233)/800)*100
+```
+
+```
+## [1] 16
+```
+
+```r
+# test
+pred=predict(bestmod,testdata)
+table(predict=pred, truth=testdata$Purchase)
+```
+
+```
+##        truth
+## predict  CH  MM
+##      CH 139  32
+##      MM  20  79
+```
+
+```r
+(1-(139+79)/270)*100
+```
+
+```
+## [1] 19.25926
+```
+
+> 19.25%
 
 ### (h) Overall, which approach seems to give the best results on this data?
+
+> linear = 18.89%, radial =  16.67%, polynomial =19.25%, so radial seems to give the best results on this data
 
 
 

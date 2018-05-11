@@ -405,7 +405,7 @@ dim(testdata)
 ### (b) Fit a support vector classiﬁer to the training data using cost=0.01, with Purchase as the response and the other variables as predictors. Use the summary() function to produce summary statistics, and describe the results obtained.
 
 ```{r}
-svmfit=svm(Purchase~.,data=traindata, kernel = "linear", cost = 0.01, scale=FALSE)
+svmfit=svm(Purchase~.,data=traindata, kernel = "linear", cost = 0.01, scale=TRUE)
 summary(svmfit)
 ```
 
@@ -415,19 +415,19 @@ summary(svmfit)
 # training
 pred=predict(svmfit,traindata)
 table(predict=pred, truth=traindata$Purchase)
-(1-(473+117)/800)*100
+(1-(439+228)/800)*100
 
 # test
 pred=predict(svmfit,testdata)
 table(predict=pred, truth=testdata$Purchase)
-(1-(156+43)/270)*100
+(1-(141+80)/270)*100
 ```
 
 ### (d) Use the tune() function to select an optimal cost. Consider values in the range 0.01 to 10.
 
 ```{r}
 set.seed(11)
-tune.out=tune(svm, Purchase~., data=traindata, kernel="linear", ranges=list(cost=c(0.01,0.1,1,10)))
+tune.out=tune(svm, Purchase~., data=traindata, scale=TRUE, kernel="linear", ranges=list(cost=c(0.01,0.1,1,10)))
 summary(tune.out)
 
 bestmod=tune.out$best.model
@@ -448,23 +448,94 @@ table(predict=pred, truth=testdata$Purchase)
 (1-(140+79)/270)*100
 ```
 
+> 18.89%
+
 ### (f) Repeat parts (b) through (e) using a support vector machine with a radial kernel. Use the default value for gamma.
 
 ```{r}
+#b
+svmfit=svm(Purchase~.,data=traindata, kernel = "radial", cost = 0.01, scale=TRUE)
+summary(svmfit)
+
+#c
+# training
+pred=predict(svmfit,traindata)
+table(predict=pred, truth=traindata$Purchase)
+(1-(494+0)/800)*100
+
+# test
+pred=predict(svmfit,testdata)
+table(predict=pred, truth=testdata$Purchase)
+(1-(159+0)/270)*100
+```
+
+```{r}
+#d
+set.seed(11)
+tune.out=tune(svm, Purchase~., data=traindata, kernel="radial", scale=TRUE, ranges=list(cost=c(0.01,0.1,1,10),gamma=c(0.1,0.5,1,2,3,4)))
+summary(tune.out)
+bestmod=tune.out$best.model
+summary(bestmod)
+
+#e
+# training
+pred=predict(bestmod,traindata)
+table(predict=pred, truth=traindata$Purchase)
+(1-(455+231)/800)*100
+
+# test
+pred=predict(bestmod,testdata)
+table(predict=pred, truth=testdata$Purchase)
+(1-(142+83)/270)*100
 
 ```
 
+> 16.67%
 
 ### (g) Repeat parts (b) through (e) using a support vector machine with a polynomial kernel. Set degree=2.
 
 ```{r}
+#b
+svmfit=svm(Purchase~.,data=traindata, kernel = "polynomial", degree=2, cost = 0.01, scale=FALSE)
+summary(svmfit)
 
+#c
+# training
+pred=predict(svmfit,traindata)
+table(predict=pred, truth=traindata$Purchase)
+(1-(438+235)/800)*100
+
+# test
+pred=predict(svmfit,testdata)
+table(predict=pred, truth=testdata$Purchase)
+(1-(140+80)/270)*100
 ```
 
+```{r}
+#d
+set.seed(11)
+tune.out=tune(svm, Purchase~., data=traindata, scale=TRUE, kernel="polynomial", ranges=list(cost=c(0.01,0.1,1,10),degree=c(1,2,3,4,5)))
+summary(tune.out)
+bestmod=tune.out$best.model
+summary(bestmod)
+
+#e
+# training
+pred=predict(bestmod,traindata)
+table(predict=pred, truth=traindata$Purchase)
+(1-(439+233)/800)*100
+
+# test
+pred=predict(bestmod,testdata)
+table(predict=pred, truth=testdata$Purchase)
+(1-(139+79)/270)*100
+```
+
+> 19.25%
 
 ### (h) Overall, which approach seems to give the best results on this data?
 
-```{r}
+> linear = 18.89%, radial =  16.67%, polynomial =19.25%, so radial seems to give the best results on this data
 
-```
+
 

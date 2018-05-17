@@ -54,17 +54,11 @@ On the USArrests data, calculate PVE in two ways:
 
 ## (b) By applying Equation 10.8 directly. That is, use the prcomp() function to compute the principal component loadings. Then, use those loadings in Equation 10.8 to obtain the PVE. 
 These two approaches should give the same results.
-Hint: You will only obtain the same results in (a) and (b) if the same
-data is used in both cases. For instance, if in (a) you performed
-prcomp() using centered and scaled variables, then you must center
-and scale the variables before applying Equation 10.3 in (b).
+Hint: You will only obtain the same results in (a) and (b) if the same data is used in both cases. For instance, if in (a) you performed prcomp() using centered and scaled variables, then you must center and scale the variables before applying Equation 10.3 in (b).
 
 # 10. In this problem, you will generate simulated data, and then perform PCA and K-means clustering on the data.
 
 ## (a) Generate a simulated data set with 20 observations in each of three classes (i.e. 60 observations total), and 50 variables.
-Hint: There are a number of functions in R that you can use to
-generate data. One example is the rnorm() function; runif() is
-another option. Be sure to add a mean shift to the observations
-in each class so that there are three distinct classes.
+Hint: There are a number of functions in R that you can use to generate data. One example is the rnorm() function; runif() is another option. Be sure to add a mean shift to the observations in each class so that there are three distinct classes.
 
 ## (b) Perform PCA on the 60 observations and plot the ﬁrst two principal component score vectors. Use a diﬀerent color to indicate the observations in each of the three classes. If the three classes appear separated in this plot, then continue on to part (c). If not, then return to part (a) and modify the simulation so that there is greater separation between the three classes. Do not continue to part (c) until the three classes show at least some separation in the ﬁrst two principal component score vectors.

@@ -15,12 +15,14 @@ states
 
 names(USArrests)
 
+dimnames(USArrests)
+
 apply(USArrests, 2, mean)
 
 apply(USArrests, 2, var)
 
 pr.out=prcomp(USArrests, scale=TRUE)
-
+pr.out
 names(pr.out)
 
 pr.out$center
@@ -30,10 +32,12 @@ pr.out$rotation
 dim(pr.out$x)
 
 biplot(pr.out, scale=0)
+biplot(pr.out, scale=0, cex=0.6)
 
 pr.out$rotation=-pr.out$rotation
 pr.out$x=-pr.out$x
 biplot(pr.out, scale=0)
+biplot(pr.out, scale=0, cex=0.6)
 
 pr.out$sdev
 
@@ -53,26 +57,134 @@ cumsum(a)
 # 6. A researcher collects expression measurements for 1,000 genes in 100 tissue samples. The data can be written as a 1, 000 × 100 matrix, which we call X, in which each row represents a gene and each column a tissue sample. Each tissue sample was processed on a diﬀerent day, and the columns of X are ordered so that the samples that were processed earliest are on the left, and the samples that were processed later are on the right. The tissue samples belong to two groups: control (C) and treatment (T). The C and T samples were processed in a random order across the days. The researcher wishes to determine whether each gene’s expression measurements diﬀer between the treatment and control groups. 
 As a pre-analysis (before comparing T versus C), the researcher performs a principal component analysis of the data, and ﬁnds that the ﬁrst principal component (a vector of length 100) has a strong linear trend from left to right, and explains 10 % of the variation. The researcher now remembers that each patient sample was run on one of
 two machines, A and B, and machine A was used more often in the earlier times while B was used more often later. The researcher has a record of which sample was run on which machine.
+
 ## (a) Explain what it means that the ﬁrst principal component “explains 10 % of the variation”.
+
+> The proportion of variance explained (PVE) by each principal component. This means PC1 contains 10 % of total variance present in this data set.
 
 ## (b) The researcher decides to replace the (j, i)th element of X with
 x ji − φ j1 z i1
 where z i1 is the ith score, and φ j1 is the jth loading, for the ﬁrst principal component. He will then perform a two-sample t-test on each gene in this new data set in order to determine whether its expression diﬀers between the two conditions. Critique this idea, and suggest a better approach. (The principal component analysis is performed on X T ).
 
+> Since each patient sample was run on one of two machines, A and B, and machine A was used more often in the earlier times while B was used more often later. If the tissue samples belong to two groups control (C) and treatment (T) samples were not equally run on one of two machines, this approach may has bias. We should rescale the data base on the information of machines.
+
 ## (c) Design and run a small simulation experiment to demonstrate the superiority of your idea.
+
+```{r}
+set.seed(1)
+AC = matrix(rnorm(10*1000,mean = 1),ncol = 1000)
+AT = matrix(rnorm(40*1000,mean = 2),ncol = 1000)
+BC = matrix(rnorm(40*1000,mean = 4),ncol = 1000)
+BT = matrix(rnorm(10*1000,mean = 5),ncol = 1000)
+dim(AC)
+data6=rbind(AC,AT,BC,BT)
+dim(data6)
+
+groupindex6=c(rep("AC", 10), rep("AT", 40), rep("BC", 40), rep("BT", 10))
+pca.out6 <- prcomp(data6)
+summary(pca.out6)
+biplot(pca.out6,scale = 0,cex=0.5)
+
+names(pca.out6)
+scorematrix6=as.data.frame(pca.out6$x)
+dim(scorematrix6)
+
+library(ggplot2)
+ggplot(scorematrix6, aes(x=PC1, y=PC2, color=groupindex6)) + geom_point()
+
+newAC= AC/1.5
+newAT= AT/1.5
+newBC= BC/4.5
+newBT= BT/4.5
+
+dim(newAC)
+data6new=rbind(newAC,newAT,newBC,newBT)
+dim(data6new)
+
+pca.out6new <- prcomp(data6new)
+summary(pca.out6new)
+biplot(pca.out6new,scale = 0,cex=0.5)
+
+names(pca.out6new)
+scorematrix6new=as.data.frame(pca.out6new$x)
+dim(scorematrix6new)
+ggplot(scorematrix6new, aes(x=PC1, y=PC2, color=groupindex6)) + geom_point()
+
+```
+
 
 # 8. In Section 10.2.3, a formula for calculating PVE was given in Equation 10.8. We also saw that the PVE can be obtained using the sdev output of the prcomp() function.
 On the USArrests data, calculate PVE in two ways:
 
 ## (a) Using the sdev output of the prcomp() function, as was done in Section 10.2.3.
 
+```{r}
+pr.out=prcomp(USArrests, scale=TRUE)
+pr.out
+
+pr.out$sdev
+
+pr.var=pr.out$sdev^2
+pr.var
+
+pve=pr.var/sum(pr.var)
+pve
+```
+
+
 ## (b) By applying Equation 10.8 directly. That is, use the prcomp() function to compute the principal component loadings. Then, use those loadings in Equation 10.8 to obtain the PVE. 
 These two approaches should give the same results.
 Hint: You will only obtain the same results in (a) and (b) if the same data is used in both cases. For instance, if in (a) you performed prcomp() using centered and scaled variables, then you must center and scale the variables before applying Equation 10.3 in (b).
+
+```{r}
+pr.out=prcomp(USArrests, scale=TRUE)
+pr.out
+
+newUSArrests=scale(USArrests)
+summary(USArrests)
+summary(newUSArrests)
+
+head(newUSArrests)
+score=pr.out$rotation
+score
+
+newUSArrests.score=newUSArrests%*%score
+head(newUSArrests.score)
+  
+e10.8up=apply(newUSArrests.score^2,2,sum)
+e10.8low=sum(apply(newUSArrests^2,2,sum))
+e10.8up/e10.8low
+
+```
+
 
 # 10. In this problem, you will generate simulated data, and then perform PCA and K-means clustering on the data.
 
 ## (a) Generate a simulated data set with 20 observations in each of three classes (i.e. 60 observations total), and 50 variables.
 Hint: There are a number of functions in R that you can use to generate data. One example is the rnorm() function; runif() is another option. Be sure to add a mean shift to the observations in each class so that there are three distinct classes.
 
+```{r}
+set.seed(1)
+A = matrix(rnorm(1000,mean = 1),ncol = 50)
+B = matrix(rnorm(1000,mean = 2),ncol = 50)
+C = matrix(rnorm(1000,mean = 3),ncol = 50)
+dim(C)
+data10=rbind(A,B,C)
+dim(data10)
+
+```
+
+
 ## (b) Perform PCA on the 60 observations and plot the ﬁrst two principal component score vectors. Use a diﬀerent color to indicate the observations in each of the three classes. If the three classes appear separated in this plot, then continue on to part (c). If not, then return to part (a) and modify the simulation so that there is greater separation between the three classes. Do not continue to part (c) until the three classes show at least some separation in the ﬁrst two principal component score vectors.
+
+```{r}
+groupindex=c(rep("A", 20), rep("B", 20), rep("C", 20))
+pca.out <- prcomp(data10)
+biplot(pca.out,scale = 0,cex=0.5)
+names(pca.out)
+scorematrix=as.data.frame(pca.out$x)
+colnames(scorematrix)
+library(ggplot2)
+ggplot(scorematrix, aes(x=PC1, y=PC2, color=groupindex)) + geom_point()
+```
+

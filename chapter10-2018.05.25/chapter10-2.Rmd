@@ -105,7 +105,9 @@ plot(hclust(dd, method="complete"), main="Complete Linkage with Correlation-Base
 library(ISLR)
 nci.labs=NCI60$labs
 nci.data=NCI60$data
+
 dim(nci.data)
+
 nci.labs[1:4]
 table(nci.labs)
 ```
@@ -114,15 +116,20 @@ table(nci.labs)
 
 ```{r}
 pr.out=prcomp(nci.data, scale=TRUE)
+
 Cols=function(vec){
     cols=rainbow(length(unique(vec)))
     return(cols[as.numeric(as.factor(vec))])
-  }
+}
+
 par(mfrow=c(1,2))
 plot(pr.out$x[,1:2], col=Cols(nci.labs), pch=19,xlab="Z1",ylab="Z2")
 plot(pr.out$x[,c(1,3)], col=Cols(nci.labs), pch=19,xlab="Z1",ylab="Z3")
+
 summary(pr.out)
+
 plot(pr.out)
+
 pve=100*pr.out$sdev^2/sum(pr.out$sdev^2)
 par(mfrow=c(1,2))
 plot(pve,  type="o", ylab="PVE", xlab="Principal Component", col="blue")
@@ -133,22 +140,28 @@ plot(cumsum(pve), type="o", ylab="Cumulative PVE", xlab="Principal Component", c
 
 ```{r}
 sd.data=scale(nci.data)
+
 par(mfrow=c(1,3))
 data.dist=dist(sd.data)
 plot(hclust(data.dist), labels=nci.labs, main="Complete Linkage", xlab="", sub="",ylab="")
 plot(hclust(data.dist, method="average"), labels=nci.labs, main="Average Linkage", xlab="", sub="",ylab="")
 plot(hclust(data.dist, method="single"), labels=nci.labs,  main="Single Linkage", xlab="", sub="",ylab="")
+
 hc.out=hclust(dist(sd.data))
 hc.clusters=cutree(hc.out,4)
 table(hc.clusters,nci.labs)
+
 par(mfrow=c(1,1))
 plot(hc.out, labels=nci.labs)
 abline(h=139, col="red")
+
 hc.out
+
 set.seed(2)
 km.out=kmeans(sd.data, 4, nstart=20)
 km.clusters=km.out$cluster
 table(km.clusters,hc.clusters)
+
 hc.out=hclust(dist(pr.out$x[,1:5]))
 plot(hc.out, labels=nci.labs, main="Hier. Clust. on First Five Score Vectors")
 table(cutree(hc.out,4), nci.labs)
@@ -157,11 +170,47 @@ table(cutree(hc.out,4), nci.labs)
 # 9. Consider the USArrests data. We will now perform hierarchical clustering on the states.
 ## (a) Using hierarchical clustering with complete linkage and Euclidean distance, cluster the states.
 
+```{r}
+library(ISLR)
+summary(USArrests)
+head(USArrests)
+
+hc.complete=hclust(dist(USArrests), method="complete")
+plot(hc.complete)
+```
+
+
 ## (b) Cut the dendrogram at a height that results in three distinct clusters. Which states belong to which clusters?
+
+```{r}
+cut.hc=cutree(hc.complete, 3)
+cut.hc
+table(cut.hc)
+```
+
 
 ## (c) Hierarchically cluster the states using complete linkage and Euclidean distance, after scaling the variables to have standard deviation one.
 
+```{r}
+sd.USArrests=scale(USArrests)
+
+sd.hc.complete=hclust(dist(sd.USArrests), method="complete")
+plot(sd.hc.complete)
+
+cut.sd.hc=cutree(sd.hc.complete, 3)
+cut.sd.hc
+table(cut.sd.hc)
+```
+
+
 ## (d) What eﬀect does scaling the variables have on the hierarchical clustering obtained? In your opinion, should the variables be scaled before the inter-observation dissimilarities are computed? Provide a justiﬁcation for your answer.
+
+```{r}
+table(cut.hc,cut.sd.hc)
+summary(USArrests)
+```
+
+>  it is a good decision to scale the variables before computing the dissimilarity measure.
 
 # 10. In this problem, you will generate simulated data, and then perform PCA and K-means clustering on the data.
 
@@ -182,7 +231,7 @@ dim(data10)
 ## (b) Perform PCA on the 60 observations and plot the ﬁrst two principal component score vectors. Use a diﬀerent color to indicate the observations in each of the three classes. If the three classes appear separated in this plot, then continue on to part (c). If not, then return to part (a) and modify the simulation so that there is greater separation between the three classes. Do not continue to part (c) until the three classes show at least some separation in the ﬁrst two principal component score vectors.
 
 ```{r}
-groupindex=c(rep("A", 20), rep("B", 20), rep("C", 20))
+groupindex=c(rep(1, 20), rep(2, 20), rep(3, 20))
 pca.out <- prcomp(data10)
 biplot(pca.out,scale = 0,cex=0.5)
 names(pca.out)
@@ -195,18 +244,120 @@ ggplot(scorematrix, aes(x=PC1, y=PC2, color=groupindex)) + geom_point()
 ## (c) Perform K-means clustering of the observations with K = 3. How well do the clusters that you obtained in K-means clustering compare to the true class labels?
 Hint: You can use the table() function in R to compare the true class labels to the class labels obtained by clustering. Be careful how you interpret the results: K-means clustering will arbitrarily number the clusters, so you cannot simply check whether the true class labels and clustering labels are the same.
 
+```{r}
+km.out=kmeans(data10,3,nstart=20)
+km.out
+plot(data10, col=km.out$cluster, lwd=2, pch=20, cex=2)
+points(data10,col=groupindex,pch=19)
+table(groupindex,km.out$cluster)
+
+```
+
+> all correct!
+
 ## (d) Perform K-means clustering with K = 2. Describe your results.
+
+```{r}
+km.out=kmeans(data10,2,nstart=20)
+km.out
+plot(data10, col=km.out$cluster, lwd=2, pch=20, cex=2)
+points(data10,col=groupindex,pch=19)
+table(groupindex,km.out$cluster)
+```
+
 
 ## (e) Now perform K-means clustering with K = 4, and describe your results.
 
+```{r}
+km.out=kmeans(data10,4,nstart=20)
+km.out
+plot(data10, col=km.out$cluster, lwd=2, pch=20, cex=2)
+points(data10,col=groupindex,pch=19)
+table(groupindex,km.out$cluster)
+```
+
+
 ## (f) Now perform K-means clustering with K = 3 on the ﬁrst two principal component score vectors, rather than on the raw data. That is, perform K-means clustering on the 60 × 2 matrix of which the ﬁrst column is the ﬁrst principal component score vector, and the second column is the second principal component score vector. Comment on the results.
 
+```{r}
+summary(pca.out)
+names(pca.out)
+
+km.out=kmeans(pca.out$x[,1:2],3,nstart=20)
+km.out
+plot(data10, col=km.out$cluster, lwd=2, pch=20, cex=2)
+points(data10,col=groupindex,pch=19)
+table(groupindex,km.out$cluster)
+
+```
+
+> all correct!
+
 ## (g) Using the scale() function, perform K-means clustering with K = 3 on the data after scaling each variable to have standard deviation one. How do these results compare to those obtained in (b)? Explain.
+
+```{r}
+km.out=kmeans(scale(data10),3,nstart=20)
+km.out
+plot(data10, col=km.out$cluster, lwd=2, pch=20, cex=2)
+points(data10,col=groupindex,pch=19)
+table(groupindex,km.out$cluster)
+```
+
+> all correct!
 
 # 11. On the book website, www.StatLearning.com, there is a gene expression data set (Ch10Ex11.csv) that consists of 40 tissue samples with measurements on 1,000 genes. The ﬁrst 20 samples are from healthy patients, while the second 20 are from a diseased group.
 
 ## (a) Load in the data using read.csv(). You will need to select header=F.
 
+```{r}
+data11 <- read.csv(url("http://www-bcf.usc.edu/~gareth/ISL/Ch10Ex11.csv"), header = F)
+head(data11)
+dim(data11)
+```
+
+
 ## (b) Apply hierarchical clustering to the samples using correlation-based distance, and plot the dendrogram. Do the genes separate the samples into the two groups? Do your results depend on the type of linkage used?
 
+```{r}
+ddata11=as.dist(1-cor(data11))
+hc.c=hclust(ddata11, method="complete")
+plot(hc.c, main="Complete Linkage with Correlation-Based Distance", xlab="", sub="")
+hc.c.clusters=cutree(hc.c,2)
+
+hc.s=hclust(ddata11, method="single")
+plot(hc.s, main="single Linkage with Correlation-Based Distance", xlab="", sub="")
+hc.s.clusters=cutree(hc.s,2)
+
+hc.a=hclust(ddata11, method="average")
+plot(hc.a, main="average Linkage with Correlation-Based Distance", xlab="", sub="")
+hc.a.clusters=cutree(hc.a,2)
+
+table(hc.c.clusters,hc.s.clusters)
+table(hc.c.clusters,hc.a.clusters)
+table(hc.a.clusters,hc.s.clusters)
+```
+
+
 ## (c) Your collaborator wants to know which genes diﬀer the most across the two groups. Suggest a way to answer this question, and apply it here.
+
+```{r}
+pr.out=prcomp(t(data11), scale=TRUE)
+
+patients.labs=c(rep(1, 20), rep(2, 20))
+
+par(mfrow=c(1,2))
+plot(pr.out$x[,1:2], col=patients.labs, pch=19,xlab="Z1",ylab="Z2")
+plot(pr.out$x[,c(1,3)], col=patients.labs, pch=19,xlab="Z1",ylab="Z3")
+
+summary(pr.out)
+biplot(pr.out, scale=0, cex=0.6)
+plot(pr.out)
+
+pve=100*pr.out$sdev^2/sum(pr.out$sdev^2)
+par(mfrow=c(1,2))
+plot(pve,  type="o", ylab="PVE", xlab="Principal Component", col="blue")
+plot(cumsum(pve), type="o", ylab="Cumulative PVE", xlab="Principal Component", col="brown3")
+
+
+```
+

@@ -81,7 +81,7 @@ data6=rbind(AC,AT,BC,BT)
 dim(data6)
 
 groupindex6=c(rep("AC", 10), rep("AT", 40), rep("BC", 40), rep("BT", 10))
-pca.out6 <- prcomp(data6, scale=TRUE)
+pca.out6 <- prcomp(data6)
 summary(pca.out6)
 biplot(pca.out6,scale = 0,cex=0.5)
 
@@ -101,7 +101,7 @@ dim(newAC)
 data6new=rbind(newAC,newAT,newBC,newBT)
 dim(data6new)
 
-pca.out6new <- prcomp(data6new, scale=TRUE)
+pca.out6new <- prcomp(data6new)
 summary(pca.out6new)
 biplot(pca.out6new,scale = 0,cex=0.5)
 

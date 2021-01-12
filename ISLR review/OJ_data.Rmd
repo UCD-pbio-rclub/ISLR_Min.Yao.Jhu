@@ -1,0 +1,135 @@
+---
+title: "OJ_data"
+output: html_document
+---
+
+
+```{r}
+library(tree)
+library(ISLR)
+summary(OJ)
+```
+
+## (a) Create a training set containing a random sample of 800 observations, and a test set containing the remaining observations.
+
+```{r}
+set.seed(10)
+train=sample(1:nrow(OJ), 800)
+OJ.test=OJ[-train,]
+OJ.train=OJ[train,]
+summary(OJ.test)
+summary(OJ.train)
+dim(OJ)
+dim(OJ.test)
+dim(OJ.train)
+```
+## (b) Fit a tree to the training data, with Purchase as the response and the other variables as predictors. Use the summary() function to produce summary statistics about the tree, and describe the results obtained. What is the training error rate? How many terminal nodes does the tree have?
+
+```{r}
+tree.OJ=tree(Purchase~.,OJ,subset=train)
+summary(tree.OJ)
+```
+
+> Number of terminal nodes:  7
+
+> Misclassification error rate: 0.1775
+
+## (c) Type in the name of the tree object in order to get a detailed text output. Pick one of the terminal nodes, and interpret the information displayed.
+
+```{r}
+tree.OJ
+?OJ
+```
+
+> 4) LoyalCH < 0.035047 51    9.844 MM ( 0.01961 0.98039 ) *
+
+> when customer brand loyalty for Citrus Hill is less than 0.035047, 98.039% customer purchased Minute Maid Orange Juice and 1.961% customer purchased Citrus Hill.
+
+## (d) Create a plot of the tree, and interpret the results.
+
+```{r}
+plot(tree.OJ);text(tree.OJ,pretty=0)
+```
+
+> Customer brand loyalty for CH (LoyalCH) and Sale price of MM less sale price of CH (PriceDiff) are important. Discount offered for MM (DiscMM) is also a factor but not as important.
+
+## (e) Predict the response on the test data, and produce a confusion matrix comparing the test labels to the predicted test labels. What is the test error rate?
+
+```{r}
+tree.pred=predict(tree.OJ,OJ.test,type="class")
+purchase.test=OJ.test$Purchase
+table(tree.pred,purchase.test)
+(135+88)/270
+1-((135+88)/270)
+```
+
+> the test error rate = 17.4%
+
+## (f) Apply the cv.tree() function to the training set in order to determine the optimal tree size.
+
+```{r}
+cv.OJ=cv.tree(tree.OJ,FUN=prune.misclass)
+names(cv.OJ)
+cv.OJ
+plot(cv.OJ)
+```
+
+## (g) Produce a plot with tree size on the x-axis and cross-validated classiﬁcation error rate on the y-axis.
+
+```{r}
+plot(cv.OJ$size,cv.OJ$dev,type="b")
+```
+
+## (h) Which tree size corresponds to the lowest cross-validated classiﬁcation error rate?
+
+> size 5 corresponds to the lowest cross-validated classiﬁcation error rate
+
+## (i) Produce a pruned tree corresponding to the optimal tree size obtained using cross-validation. If cross-validation does not lead to selection of a pruned tree, then create a pruned tree with ﬁve terminal nodes.
+
+```{r}
+prune.OJ=prune.misclass(tree.OJ,best=5)
+plot(prune.OJ);text(prune.OJ,pretty=0)
+
+```
+
+## (j) Compare the training error rates between the pruned and un-pruned trees. Which is higher?
+
+```{r}
+summary(tree.OJ)
+summary(prune.OJ)
+```
+
+> the training error rates of the pruned trees is higher
+
+## (k) Compare the test error rates between the pruned and unpruned trees. Which is higher?
+
+```{r}
+tree.pred=predict(tree.OJ,OJ.test,type="class")
+table(tree.pred,purchase.test)
+(135+88)/270
+1-((135+88)/270)
+
+prune.pred=predict(prune.OJ,OJ.test,type="class")
+table(prune.pred,purchase.test)
+(135+88)/270
+1-((135+88)/270)
+```
+
+> the test error rates of the pruned and unpruned trees are the same.
+
+```{r}
+library(keras)
+library(dplyr)
+```
+
+```{r}
+length(OJ.test)
+length(OJ.train)
+```
+
+```{r}
+dim(OJ)
+dim(OJ.test)
+dim(OJ.train)
+```
+
